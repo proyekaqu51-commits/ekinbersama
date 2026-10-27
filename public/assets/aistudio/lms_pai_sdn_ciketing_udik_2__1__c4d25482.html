@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<base target="_top">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>LMS PAI - SDN Ciketing Udik 2 Bantargebang</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+<style>
+* { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+.font-display { font-family: 'Outfit', sans-serif; }
+.font-arabic, .khat-naskh {
+  font-family: 'Noto Naskh Arabic', 'Amiri', 'Traditional Arabic', serif !important;
+  line-height: 2.35 !important;
+  font-size: 1.45rem;
+  direction: rtl;
+  unicode-bidi: embed;
+}
+.khat-naskh-inline {
+  font-family: 'Noto Naskh Arabic', 'Amiri', 'Traditional Arabic', serif !important;
+  font-size: 1.35em;
+  line-height: 2.1;
+  direction: rtl;
+  display: inline-block;
+  padding: 0 4px;
+}
+body { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); min-height: 100vh; color: #e2e8f0; }
+.glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+.glass-strong { background: rgba(255,255,255,0.08); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.15); }
+.gradient-text { background: linear-gradient(135deg, #10b981, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.gradient-bg { background: linear-gradient(135deg, #10b981, #06b6d4); }
+.btn-primary { background: linear-gradient(135deg, #10b981, #06b6d4); transition: all .25s; }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:hover { box-shadow: 0 10px 25px rgba(16,185,129,.3); }
+.btn-secondary { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); transition: all .2s; }
+.btn-secondary:hover { background: rgba(255,255,255,0.12); }
+.sidebar-item { transition: all .2s; }
+.sidebar-item:active, .sidebar-item.active { background: linear-gradient(90deg, rgba(16,185,129,.2), transparent); border-left: 3px solid #10b981; }
+input:not([type="checkbox"]):not([type="radio"]), select, textarea { background: rgba(255,255,255,0.05) !important; border: 1px solid rgba(255,255,255,0.15) !important; color: #e2e8f0 !important; font-size: 14px !important; }
+select option { background-color: #0f172a !important; color: #e2e8f0 !important; }
+input:focus, select:focus, textarea:focus { outline: none !important; border-color: #10b981 !important; box-shadow: 0 0 0 3px rgba(16,185,129,.15); }
+.modal-backdrop { background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(16,185,129,.5); border-radius: 4px; }
+.badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+.fade-in { animation: fadeIn .25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+.spinner { border: 3px solid rgba(16, 185, 129, 0.2); border-left-color: #10b981; animation: spin 1s linear infinite; border-radius: 50%; width: 24px; height: 24px; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.toast { animation: slideIn .3s ease; }
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+.word-editor-wrapper { background: #ffffff; color: #0f172a; border-radius: 12px; overflow: hidden; border: 2px solid #cbd5e1; }
+.word-editor-wrapper .ql-toolbar.ql-snow { background: #f1f5f9; border: none; border-bottom: 1px solid #cbd5e1; padding: 10px; }
+.word-editor-wrapper .ql-container.ql-snow { border: none; font-family: 'Inter', sans-serif; font-size: 15px; min-height: 280px; max-height: 400px; overflow-y: auto; background: #ffffff; color: #0f172a; }
+.word-editor-wrapper .ql-editor { min-height: 280px; padding: 20px 24px; line-height: 1.75; }
+.word-editor-wrapper .ql-editor.ql-blank::before { color: #94a3b8; font-style: italic; }
+.word-editor-wrapper .ql-editor [dir="rtl"], .word-content-view [dir="rtl"], .ql-direction-rtl { font-family: 'Amiri', serif !important; font-size: 1.4em; line-height: 2.1; text-align: right; }
+</style>
+</head>
+<body>
+
+<div id="toastContainer" class="fixed top-4 right-4 z-[200] space-y-2 pointer-events-none"></div>
+
+<!-- HALAMAN LOGIN -->
+<div id="loginView" class="min-h-screen flex items-center justify-center p-4 sm:p-6">
+  <div class="w-full max-w-md fade-in">
+    <div class="text-center mb-8">
+      <img id="loginLogoImg" src="https://jhlryjdhotxtndavacpd.supabase.co/storage/v1/object/public/logo/logo.png" alt="Logo" class="w-24 h-24 object-contain mx-auto mb-4 drop-shadow-xl" onerror="this.style.display='none'">
+      <h1 class="font-display text-3xl font-extrabold gradient-text mb-2">LMS PAI</h1>
+      <p class="text-slate-400 text-sm">SDN Ciketing Udik 2 Bantargebang</p>
+    </div>
+    <div class="glass-strong rounded-2xl p-6 sm:p-8 shadow-2xl">
+      <h2 class="text-xl font-bold mb-1">Selamat Datang</h2>
+      <p class="text-slate-400 text-sm mb-4">Masuk untuk melanjutkan pembelajaran</p>
+      <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 mb-5 flex items-center justify-between text-xs text-emerald-200">
+        <span>Demo Guru: <b>admin</b> / <b>admin123</b></span>
+        <button type="button" onclick="document.getElementById('loginUsername').value='admin';document.getElementById('loginPassword').value='admin123';handleLogin();" class="px-2.5 py-1 rounded-lg bg-emerald-500 text-white font-bold hover:bg-emerald-600">Masuk Cepat</button>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-semibold text-slate-300 uppercase mb-2 block">Username Siswa / ID Guru</label>
+          <input id="loginUsername" type="text" class="w-full px-4 py-3 rounded-xl font-mono uppercase" placeholder="Contoh: 5A01 atau admin" autocomplete="off" onkeydown="if(event.key==='Enter')handleLogin()">
+        </div>
+        <div class="relative">
+          <label class="text-xs font-semibold text-slate-300 uppercase mb-2 block">Password</label>
+          <input id="loginPassword" type="password" class="w-full px-4 py-3 rounded-xl pr-12" placeholder="Masukkan password" onkeydown="if(event.key==='Enter')handleLogin()">
+          <button type="button" onclick="togglePwd()" class="absolute right-4 top-[34px] text-slate-400 hover:text-emerald-400 focus:outline-none"><i data-lucide="eye" id="eyeIcon" class="w-5 h-5"></i></button>
+        </div>
+        <button id="btnLogin" onclick="handleLogin()" class="btn-primary w-full py-3.5 rounded-xl font-semibold text-white flex items-center justify-center gap-2 mt-2"><i data-lucide="log-in" class="w-5 h-5"></i> Masuk</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APLIKASI UTAMA -->
+<div id="mainApp" class="hidden flex h-[100dvh] overflow-hidden w-full relative">
+  <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden backdrop-blur-sm"></div>
+  
+  <aside id="sidebar" class="fixed lg:relative inset-y-0 left-0 z-50 w-72 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 glass-strong flex flex-col flex-shrink-0 border-r border-white/10">
+    <div class="p-5 border-b border-white/10 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img id="sidebarLogoImg" src="https://jhlryjdhotxtndavacpd.supabase.co/storage/v1/object/public/logo/logo.png" class="w-10 h-10 object-contain" onerror="this.style.display='none'">
+        <div><h2 class="font-display font-bold text-base gradient-text">LMS PAI</h2><p class="text-[10px] text-slate-400 truncate w-32">SDN Ciketing Udik 2</p></div>
+      </div>
+      <button onclick="toggleSidebar()" class="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg btn-secondary"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div class="p-4 border-b border-white/10">
+      <div class="glass rounded-xl p-3 flex items-center gap-3"><div id="userAvatar" class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center font-bold text-white text-base">U</div><div class="flex-1 min-w-0"><p id="userName" class="text-sm font-semibold truncate">User</p><p id="userRole" class="text-[10px] text-emerald-400 uppercase font-bold tracking-wider">Role</p></div></div>
+    </div>
+    <nav class="flex-1 overflow-y-auto p-3 space-y-1.5" id="sidebarNav"></nav>
+    <div class="p-4 border-t border-white/10">
+      <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl btn-secondary text-sm font-semibold text-rose-400 hover:bg-rose-500/10"><i data-lucide="log-out" class="w-4 h-4"></i> Keluar Aplikasi</button>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col min-w-0 h-[100dvh]">
+    <header class="glass sticky top-0 z-30 px-4 sm:px-6 py-4 flex items-center justify-between border-b border-white/10">
+      <div class="flex items-center gap-3"><button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-xl btn-secondary text-white"><i data-lucide="menu" class="w-6 h-6"></i></button><div><h1 id="pageTitle" class="text-lg sm:text-xl font-bold font-display">Dashboard</h1><p id="pageSubtitle" class="text-[11px] sm:text-xs text-slate-400 hidden sm:block">Ringkasan sistem</p></div></div>
+      <div class="text-right"><p class="text-[10px] text-slate-400">Hari ini</p><p id="currentDate" class="text-xs sm:text-sm font-semibold truncate"></p></div>
+    </header>
+    <div id="mainContent" class="flex-1 overflow-y-auto p-4 sm:p-6 w-full"></div>
+  </main>
+</div>
+
+<!-- MODAL GLOBAL -->
+<div id="modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 modal-backdrop">
+  <div id="modalDialog" class="glass-strong rounded-2xl w-full max-w-lg max-h-[92dvh] overflow-hidden flex flex-col shadow-2xl border border-white/20 transition-all">
+    <div class="flex items-center justify-between p-4 border-b border-white/10"><h3 id="modalTitle" class="font-display font-bold text-lg">Modal</h3><button onclick="closeModal()" class="p-2 rounded-lg btn-secondary text-slate-300"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+    <div id="modalBody" class="p-4 sm:p-5 overflow-y-auto flex-1"></div>
+    <div id="modalFooter" class="p-4 border-t border-white/10 flex flex-wrap justify-end gap-3"></div>
+  </div>
+</div>
+
+<!-- MODAL KONFIRMASI -->
+<div id="confirmModal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4 modal-backdrop">
+  <div class="glass-strong rounded-2xl w-full max-w-sm p-6 shadow-2xl border border-white/20 text-center">
+    <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-3"><i data-lucide="help-circle" class="w-6 h-6"></i></div>
+    <h4 id="confirmTitle" class="font-display font-bold text-base text-white mb-1">Konfirmasi</h4>
+    <p id="confirmMessage" class="text-xs text-slate-300 mb-5 leading-relaxed">Apakah Anda yakin?</p>
+    <div class="flex gap-2 justify-center">
+      <button id="confirmCancelBtn" class="flex-1 btn-secondary py-2.5 rounded-xl text-xs font-bold text-slate-300">Batal</button>
+      <button id="confirmOkBtn" class="flex-1 btn-primary py-2.5 rounded-xl text-xs font-bold text-white">Ya, Lanjutkan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPA_URL = 'https://jhlryjdhotxtndavacpd.supabase.co'; 
+const SUPA_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpobHJ5amRob3R4dG5kYXZhY3BkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE3MDczMDksImV4cCI6MjEwNzI4MzMwOX0.2PpRfYPg73dTfmKQmk-9j3SDEfUGJXd9tfk6m3W0Cro';
+
+const APP = {
+  session: null,
+  currentView: 'dashboard',
+  data: { classes: [], students: [], quizzes: [], materials: [], announcements: [], questions: [], references: [], journals: [] },
+  chartInstances: {},
+  quizState: null,
+  quillInstance: null,
+  teacherProfile: { fullName: 'Guru PAI', nip: '-', schoolName: 'SDN Ciketing Udik 2 Bantargebang' },
+  appSettings: { principalName: '', principalNip: '', appLogoUrl: '' }
+};
+
+const gradeOptionsHTML = `
+  <option value="">-- Semua Tingkat / Umum --</option>
+  <option value="1">Tingkat Kelas 1</option>
+  <option value="2">Tingkat Kelas 2</option>
+  <option value="3">Tingkat Kelas 3</option>
+  <option value="4">Tingkat Kelas 4</option>
+  <option value="5">Tingkat Kelas 5</option>
+  <option value="6">Tingkat Kelas 6</option>
+`;
+
+const ADMIN_NAV = [
+  { id: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' },
+  { id: 'profile', label: 'Profil Guru', icon: 'user' },
+  { id: 'settings', label: 'Pengaturan', icon: 'settings' },
+  { id: 'classes', label: 'Daftar Kelas', icon: 'school' },
+  { id: 'students', label: 'Data Siswa', icon: 'users' },
+  { id: 'attendance', label: 'Absensi Siswa', icon: 'calendar-check' },
+  { id: 'journals', label: 'Jurnal Mengajar', icon: 'notebook-pen' },
+  { id: 'questions', label: 'Bank Soal & AI', icon: 'sparkles' },
+  { id: 'quizzes', label: 'Manajemen Soal', icon: 'file-question' },
+  { id: 'materials', label: 'Bahan Materi', icon: 'book-text' },
+  { id: 'references', label: 'Referensi Baca', icon: 'library' },
+  { id: 'announcements', label: 'Pengumuman', icon: 'megaphone' },
+  { id: 'reports', label: 'Rekap Nilai', icon: 'bar-chart-3' }
+];
+
+const STUDENT_NAV = [
+  { id: 'dashboard', label: 'Beranda', icon: 'home' },
+  { id: 'student-quizzes', label: 'Tugas & Kuis', icon: 'file-question' },
+  { id: 'student-materials', label: 'Baca Materi', icon: 'book-text' },
+  { id: 'student-references', label: 'Referensi Baca', icon: 'library' },
+  { id: 'student-announcements', label: 'Pengumuman', icon: 'megaphone' },
+  { id: 'student-scores', label: 'Nilai Saya', icon: 'bar-chart-3' }
+];
+
+document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+
+function uuidv4() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) { var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8); return v.toString(16); }); }
+function toCamel(obj) { if (Array.isArray(obj)) return obj.map(v => toCamel(v)); if (obj !== null && typeof obj === 'object') { return Object.keys(obj).reduce((acc, key) => { acc[key.replace(/_([a-z])/g, g => g[1].toUpperCase())] = toCamel(obj[key]); return acc; }, {}); } return obj; }
+function toSnake(obj) { if (Array.isArray(obj)) return obj.map(v => toSnake(v)); if (obj !== null && typeof obj === 'object') { return Object.keys(obj).reduce((acc, key) => { acc[key.replace(/[A-Z]/g, l => `_${l.toLowerCase()}`)] = toSnake(obj[key]); return acc; }, {}); } return obj; }
+
+function formatHariTanggalIndo(dateStr) {
+  if (!dateStr) return '-';
+  try {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const dt = new Date(y, (m || 1) - 1, d || 1);
+    return dt.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  } catch (e) { return dateStr; }
+}
+
+function askConfirm(message, onYes, title = 'Konfirmasi Tindakan') {
+  const modal = document.getElementById('confirmModal');
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMessage').textContent = message;
+  modal.classList.remove('hidden');
+  try { lucide.createIcons(); } catch(e){}
+  const okBtn = document.getElementById('confirmOkBtn');
+  const cancelBtn = document.getElementById('confirmCancelBtn');
+  const cleanup = () => modal.classList.add('hidden');
+  okBtn.onclick = () => { cleanup(); if (onYes) onYes(); };
+  cancelBtn.onclick = () => { cleanup(); };
+}
+
+async function supaFetch(path, method = 'GET', body = null) {
+  const url = `${SUPA_URL}/rest/v1/${path}`, headers = { 'apikey': SUPA_ANON_KEY, 'Authorization': `Bearer ${SUPA_ANON_KEY}`, 'Content-Type': 'application/json' };
+  if(method === 'POST' || method === 'PATCH') headers['Prefer'] = 'return=minimal';
+  const res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : null });
+  if(!res.ok) throw new Error(`HTTP Error ${res.status}`);
+  if(method === 'GET') return await res.json();
+  return true;
+}
+
+async function generateStudentUsername(classId) {
+  try {
+    const c = await supaFetch(`classes?id=eq.${classId}`);
+    if (!c || c.length === 0) return "S" + Math.floor(Math.random()*1000); 
+    const classNameClean = c[0].class_name.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    const studentsInClass = await supaFetch(`users?role=eq.siswa&class_id=eq.${classId}&select=username`);
+    let urutanTinggi = 0;
+    if (studentsInClass && studentsInClass.length > 0) {
+      studentsInClass.forEach(s => {
+        const uname = s.username;
+        if(uname.startsWith(classNameClean)) {
+          const numStr = uname.substring(classNameClean.length);
+          if(!isNaN(numStr)) { const num = parseInt(numStr, 10); if(num > urutanTinggi) urutanTinggi = num; }
+        }
+      });
+    }
+    const urutanBaru = urutanTinggi + 1;
+    return classNameClean + String(urutanBaru).padStart(2, '0'); 
+  } catch (e) { return "S" + Math.floor(Math.random()*10000); }
+}
+
+const DirectAPI = {
+  loginUser: async (username, password) => {
+    try {
+      const cleanUsername = username.replace(/\s+/g, '').toUpperCase();
+      const users = await supaFetch(`users?username=ilike.${encodeURIComponent(cleanUsername)}&password=eq.${encodeURIComponent(password)}`);
+      if(!users || users.length === 0) return {success: false, message: 'Username atau Password salah!'};
+      
+      const u = toCamel(users[0]);
+      let className = '';
+      if(u.classId) {
+        const c = await supaFetch(`classes?id=eq.${u.classId}`);
+        if(c && c.length) className = c[0].class_name;
+      }
+      return {success: true, data: { userId: u.id, role: u.role, fullName: u.fullName, username: u.username, classId: u.classId || '', className }};
+    } catch(err) {
+      return {success: false, message: 'Gagal menghubungi database Supabase.'};
+    }
+  },
+  
+  getDashboard: async (role, userId) => {
+    const students = await supaFetch('users?role=eq.siswa&select=id');
+    const quizzes = await supaFetch('quizzes?select=id,title,created_at');
+    const materials = await supaFetch('materials?select=id,title,created_at');
+    const scores = await supaFetch('scores?select=percentage');
+    const avgScore = scores.length ? Math.round(scores.reduce((a,b)=>a+(b.percentage||0),0)/scores.length) : 0;
+    
+    let recentItems = [
+      ...quizzes.slice(-3).map(q => ({ icon:'file-question', title:q.title, subtitle:'Kuis', date: new Date(q.created_at).toLocaleDateString('id-ID') })), 
+      ...materials.slice(-3).map(m => ({ icon:'book-text', title:m.title, subtitle:'Materi', date: new Date(m.created_at).toLocaleDateString('id-ID') }))
+    ].sort((a,b) => new Date(b.date) - new Date(a.date));
+    
+    return { success: true, data: { totalStudents: students.length, totalQuizzes: quizzes.length, totalMaterials: materials.length, avgScore, recentItems: recentItems.slice(0, 5) }};
+  },
+
+  getTeacherProfile: async (userId) => {
+    const savedLocal = localStorage.getItem('lms_teacher_profile');
+    let localProf = savedLocal ? JSON.parse(savedLocal) : null;
+    try {
+      if(userId === 'admin-bypass') {
+        const settings = await supaFetch('settings?key=eq.school_name');
+        return {
+          success: true,
+          data: {
+            fullName: localProf?.fullName || 'Guru PAI',
+            nip: localProf?.nip || '198501012010011001',
+            schoolName: (settings && settings.length ? settings[0].value : null) || localProf?.schoolName || 'SDN Ciketing Udik 2 Bantargebang'
+          }
+        };
+      }
+      const u = await supaFetch(`users?id=eq.${userId}`);
+      const settings = await supaFetch('settings?key=eq.school_name');
+      if(!u.length) return { success: true, data: localProf || { fullName: 'Guru PAI', nip: '-', schoolName: 'SDN Ciketing Udik 2 Bantargebang' } };
+      return { success: true, data: { fullName: u[0].full_name, nip: u[0].nip || '', schoolName: settings.length ? settings[0].value : 'SDN Ciketing Udik 2 Bantargebang' } };
+    } catch (e) {
+      return { success: true, data: localProf || { fullName: 'Guru PAI', nip: '-', schoolName: 'SDN Ciketing Udik 2 Bantargebang' } };
+    }
+  },
+
+  updateTeacherProfile: async (userId, fullName, nip, schoolName) => {
+    localStorage.setItem('lms_teacher_profile', JSON.stringify({ fullName, nip, schoolName }));
+    try {
+      if(userId !== 'admin-bypass') await supaFetch(`users?id=eq.${userId}`, 'PATCH', toSnake({ fullName, nip }));
+      await supaFetch(`settings?key=eq.school_name`, 'PATCH', { value: schoolName });
+    } catch (e) {}
+    return { success: true };
+  },
+
+  getAppSettings: async () => {
+    const savedLocal = localStorage.getItem('lms_app_settings');
+    let localSet = savedLocal ? JSON.parse(savedLocal) : { principalName: '', principalNip: '', appLogoUrl: '' };
+    try {
+      const rows = await supaFetch('settings?key=eq.app_general_settings');
+      if (rows && rows.length && rows[0].value) {
+        const parsed = JSON.parse(rows[0].value);
+        localSet = { ...localSet, ...parsed };
+      }
+    } catch (e) {}
+    return { success: true, data: localSet };
+  },
+
+  saveAppSettings: async (settingsObj) => {
+    const jsonStr = JSON.stringify(settingsObj);
+    localStorage.setItem('lms_app_settings', jsonStr);
+    try {
+      const existing = await supaFetch('settings?key=eq.app_general_settings');
+      if (existing && existing.length > 0) {
+        await supaFetch('settings?key=eq.app_general_settings', 'PATCH', { value: jsonStr });
+      } else {
+        await supaFetch('settings', 'POST', { key: 'app_general_settings', value: jsonStr });
+      }
+    } catch (e) {}
+    return { success: true };
+  },
+
+  getClasses: async () => {
+    const classes = toCamel(await supaFetch('classes'));
+    const students = toCamel(await supaFetch('users?role=eq.siswa&select=class_id'));
+    classes.forEach(c => c.studentCount = students.filter(s => s.classId === c.id).length);
+    return { success: true, data: classes };
+  },
+
+  createClass: async (className, homeroom, academicYear) => {
+    await supaFetch('classes', 'POST', toSnake({ id: uuidv4(), className, homeroom, academicYear }));
+    return { success: true };
+  },
+  
+  updateClass: async (id, className, homeroom, academicYear) => {
+    await supaFetch(`classes?id=eq.${id}`, 'PATCH', toSnake({ className, homeroom, academicYear }));
+    return { success: true };
+  },
+  
+  deleteClass: async (id) => {
+    await supaFetch(`classes?id=eq.${id}`, 'DELETE');
+    return { success: true };
+  },
+
+  getStudents: async () => {
+    const all = toCamel(await supaFetch('users?role=eq.siswa'));
+    const classes = toCamel(await supaFetch('classes?select=id,class_name'));
+    const mapped = all.map(s => ({ ...s, className: (classes.find(c=>c.id===s.classId)||{}).className||'' }));
+    return { success: true, data: mapped };
+  },
+
+  createStudent: async (nis, fullName, classId) => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; 
+    let defaultPassword = '';
+    for (let i = 0; i < 6; i++) defaultPassword += chars.charAt(Math.floor(Math.random() * chars.length));
+    const newUsername = await generateStudentUsername(classId);
+    await supaFetch('users', 'POST', toSnake({ id: uuidv4(), role: 'siswa', username: newUsername, password: defaultPassword, fullName, nis: nis || '-', classId, avatarColor: '#10b981' }));
+    return { success: true, data: { defaultPassword, newUsername } };
+  },
+
+  uploadStudentsBulk: async (studentsArray) => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const payload = [];
+    const classCounters = {}; 
+    const classesData = await supaFetch('classes');
+    const existingUsers = await supaFetch('users?role=eq.siswa&select=class_id,username');
+    
+    for (let i=0; i<classesData.length; i++) {
+        const cid = classesData[i].id;
+        const cNameClean = classesData[i].class_name.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        let urutanTinggi = 0;
+        existingUsers.forEach(eu => {
+            if(eu.class_id === cid && eu.username.startsWith(cNameClean)) {
+                const numStr = eu.username.substring(cNameClean.length);
+                if(!isNaN(numStr)) {
+                    const num = parseInt(numStr, 10);
+                    if(num > urutanTinggi) urutanTinggi = num;
+                }
+            }
+        });
+        classCounters[cid] = { prefix: cNameClean, counter: urutanTinggi };
+    }
+
+    for (let i = 0; i < studentsArray.length; i++) {
+      const s = studentsArray[i];
+      let pwd = ''; 
+      for (let j = 0; j < 6; j++) pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+      
+      let finalUsername = "S" + Math.floor(Math.random()*100000); 
+      if (classCounters[s.classId]) {
+          classCounters[s.classId].counter += 1;
+          const numPadded = String(classCounters[s.classId].counter).padStart(2, '0');
+          finalUsername = classCounters[s.classId].prefix + numPadded;
+      }
+      payload.push(toSnake({ id: uuidv4(), role: 'siswa', username: finalUsername, password: pwd, fullName: s.fullName, nis: s.nis || '-', classId: s.classId, avatarColor: '#10b981' }));
+    }
+    
+    if(payload.length > 0) await supaFetch('users', 'POST', payload);
+    return { success: true };
+  },
+
+  updateStudent: async (id, nis, fullName, classId) => {
+    await supaFetch(`users?id=eq.${id}`, 'PATCH', toSnake({ fullName, nis: nis || '-', classId }));
+    return { success: true };
+  },
+
+  deleteStudent: async (id) => {
+    await supaFetch(`users?id=eq.${id}`, 'DELETE');
+    return { success: true };
+  },
+
+  getDailyAttendance: async (classId, dateStr) => {
+    const students = await supaFetch(`users?role=eq.siswa&class_id=eq.${classId}&select=id,full_name,nis`);
+    const attendance = await supaFetch(`attendance?class_id=eq.${classId}&date=eq.${dateStr}`);
+    const attMap = {};
+    attendance.forEach(a => attMap[a.student_id] = a);
+    const mapped = students.map(s => ({ studentId: s.id, nis: s.nis, fullName: s.full_name, status: attMap[s.id] ? attMap[s.id].status : 'Hadir', notes: attMap[s.id] ? attMap[s.id].notes : '' }));
+    mapped.sort((a,b) => a.fullName.localeCompare(b.fullName));
+    return { success: true, data: mapped };
+  },
+
+  saveDailyAttendance: async (classId, dateStr, recordsJson) => {
+    const records = JSON.parse(recordsJson);
+    await supaFetch(`attendance?class_id=eq.${classId}&date=eq.${dateStr}`, 'DELETE');
+    const payload = records.map(r => toSnake({ id: uuidv4(), studentId: r.studentId, classId: classId, date: dateStr, status: r.status, notes: r.notes || '' }));
+    if(payload.length > 0) await supaFetch('attendance', 'POST', payload);
+    return { success: true };
+  },
+
+  getMonthlyRecap: async (classId, monthStr) => {
+    const students = await supaFetch(`users?role=eq.siswa&class_id=eq.${classId}&select=id,full_name,nis`);
+    const attendance = await supaFetch(`attendance?class_id=eq.${classId}&date=like.${monthStr}-*`);
+    const cls = await supaFetch(`classes?id=eq.${classId}&select=class_name`);
+    const summaryMap = {};
+    students.forEach(s => { summaryMap[s.id] = { studentId: s.id, nis: s.nis, fullName: s.full_name, hadir: 0, sakit: 0, izin: 0, alpa: 0 }; });
+    attendance.forEach(a => {
+      if (summaryMap[a.student_id]) {
+        const stat = (a.status || '').toLowerCase();
+        if (stat === 'hadir') summaryMap[a.student_id].hadir++;
+        else if (stat === 'sakit') summaryMap[a.student_id].sakit++;
+        else if (stat === 'izin') summaryMap[a.student_id].izin++;
+        else if (stat === 'alpa') summaryMap[a.student_id].alpa++;
+      }
+    });
+    return { success: true, data: { className: cls.length ? cls[0].class_name : '', students: Object.values(summaryMap).sort((a,b) => a.fullName.localeCompare(b.fullName)) } };
+  },
+
+  getQuestions: async () => {
+    const all = toCamel(await supaFetch('questions'));
+    const classes = toCamel(await supaFetch('classes?select=id,class_name'));
+    const mapped = all.map(q => {
+      let cName = 'Semua Tingkat';
+      if (['1','2','3','4','5','6'].includes(q.classId)) cName = 'Tingkat Kelas ' + q.classId;
+      else if (q.classId) { const f = classes.find(c=>c.id===q.classId); cName = f ? f.className : q.classId; }
+      return { ...q, className: cName };
+    });
+    return { success: true, data: mapped };
+  },
+
+  createQuestion: async (type, question, optsJson, correct, classId, scoreWeight, semester) => {
+    await supaFetch('questions', 'POST', toSnake({ id: uuidv4(), quizId: '', questionType: type, question, optionsJson: optsJson, correctAnswer: correct, scoreWeight, classId, semester: semester||'Ganjil' }));
+    return { success: true };
+  },
+
+  updateQuestion: async (id, type, question, optsJson, correct, classId, scoreWeight, semester) => {
+    await supaFetch(`questions?id=eq.${id}`, 'PATCH', toSnake({ questionType: type, question, optionsJson: optsJson, correctAnswer: correct, scoreWeight, classId, semester: semester||'Ganjil' }));
+    return { success: true };
+  },
+
+  deleteQuestion: async (id) => {
+    await supaFetch(`questions?id=eq.${id}`, 'DELETE');
+    return { success: true };
+  },
+
+  getQuizzes: async (classId, studentId) => {
+    let all = toCamel(await supaFetch('quizzes'));
+    const classes = toCamel(await supaFetch('classes?select=id,class_name'));
+    const attempts = studentId ? toCamel(await supaFetch(`quizattempts?student_id=eq.${studentId}`)) : [];
+    
+    let mapped = all.map(q => ({
+      ...q,
+      className: (classes.find(c=>c.id===q.classId)||{}).className||'',
+      completed: attempts.some(a => a.quizId === q.id),
+    }));
+    if (classId) mapped = mapped.filter(q => !q.classId || q.classId === classId);
+    return { success: true, data: mapped };
+  },
+
+  createQuiz: async (title, desc, classId, duration, deadline, randomize, showScore, qIdsJson, semester) => {
+    const id = uuidv4();
+    const qIds = typeof qIdsJson === 'string' ? JSON.parse(qIdsJson) : qIdsJson;
+    await supaFetch('quizzes', 'POST', toSnake({ id, title, description: desc, classId, durationMinutes: duration, deadline: deadline ? new Date(deadline).toISOString() : null, randomize, showScoreImmediately: showScore, totalQuestions: qIds.length, status: 'published', semester: semester||'Ganjil' }));
+    if (qIds.length > 0) { await supaFetch(`questions?id=in.(${qIds.join(',')})`, 'PATCH', { quiz_id: id }); }
+    return { success: true };
+  },
+
+  updateQuiz: async (id, title, desc, classId, duration, deadline, randomize, showScore, status, semester) => {
+    const payload = {};
+    if (title !== null) payload.title = title;
+    if (status !== null) payload.status = status;
+    if (semester !== null) payload.semester = semester;
+    await supaFetch(`quizzes?id=eq.${id}`, 'PATCH', toSnake(payload));
+    return { success: true };
+  },
+
+  deleteQuiz: async (id) => {
+    await supaFetch(`quizzes?id=eq.${id}`, 'DELETE');
+    return { success: true };
+  },
+
+  getQuizForStudent: async (quizId, studentId) => {
+    const quizzes = toCamel(await supaFetch(`quizzes?id=eq.${quizId}`));
+    if(!quizzes.length) throw new Error('Kuis tidak ditemukan');
+    const quiz = quizzes[0];
+    if (quiz.deadline && new Date(quiz.deadline) < new Date()) throw new Error('Kuis sudah ditutup');
+    
+    let questions = toCamel(await supaFetch(`questions?quiz_id=eq.${quizId}`));
+    questions = questions.map(unpackQuestionPayload);
+    if (quiz.randomize) questions = questions.sort(() => Math.random() - 0.5);
+    return { success: true, data: { quiz, questions } };
+  },
+
+  submitQuiz: async (quizId, studentId, answersJson, status) => {
+    const questions = toCamel(await supaFetch(`questions?quiz_id=eq.${quizId}`));
+    const answers = typeof answersJson === 'string' ? JSON.parse(answersJson) : answersJson;
+    let score = 0, maxScore = 0;
+    
+    questions.forEach(q => {
+      maxScore += q.scoreWeight;
+      const ans = answers[q.id];
+      if (ans === undefined || ans === null || ans === '') return;
+      if (q.questionType === 'pg_standar' || q.questionType === 'benar_salah') {
+        if (String(ans).trim() === String(q.correctAnswer).trim()) score += q.scoreWeight;
+      } else if (q.questionType === 'pg_kompleks') {
+        const studentAns = String(ans).split(',').sort().join(',');
+        const correctAns = String(q.correctAnswer).split(',').sort().join(',');
+        if (studentAns === correctAns) score += q.scoreWeight;
+      }
+    });
+    
+    const percentage = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+    const attemptId = uuidv4();
+    await supaFetch('quizattempts', 'POST', toSnake({ id: attemptId, quizId, studentId, answersJson: JSON.stringify(answers), score, startedAt: new Date().toISOString(), submittedAt: new Date().toISOString(), status }));
+    await supaFetch('scores', 'POST', toSnake({ id: uuidv4(), studentId, quizId, attemptId, rawScore: score, maxScore, percentage, graded: !questions.some(q=>q.questionType==='essay') }));
+    return { success: true, data: { score, maxScore, percentage } };
+  },
+
+  getMaterials: async (classId, studentId) => {
+    let all = toCamel(await supaFetch('materials'));
+    const classes = toCamel(await supaFetch('classes?select=id,class_name'));
+    
+    if (studentId) {
+      const user = await supaFetch(`users?id=eq.${studentId}&select=class_id`);
+      let studentGrade = '';
+      if (user && user.length && user[0].class_id) {
+        const c = classes.find(x => x.id === user[0].class_id);
+        if (c && c.class_name) {
+          const match = c.class_name.match(/\d/);
+          if (match) studentGrade = match[0];
+        }
+      }
+      all = all.filter(m => !m.classId || m.classId === studentGrade || (user[0] && m.classId === user[0].class_id));
+    }
+    
+    const mapped = all.map(m => {
+      let cName = 'Semua Tingkat';
+      if (['1','2','3','4','5','6'].includes(m.classId)) cName = 'Tingkat Kelas ' + m.classId;
+      else if (m.classId) { const f = classes.find(c=>c.id===m.classId); cName = f ? f.className : m.classId; }
+      return { ...m, className: cName };
+    });
+    return { success: true, data: mapped };
+  },
+
+  createMaterial: async (title, type, contentText, fileData, classId, subject, semester) => {
+    if (type === 'text' || typeof google === 'undefined' || !google.script) {
+      let fileUrl = '';
+      if (type !== 'text' && fileData && fileData.data) {
+        fileUrl = `data:${fileData.mime};base64,${fileData.data}`;
+      }
+      await supaFetch('materials', 'POST', toSnake({
+        id: uuidv4(),
+        title,
+        contentType: type,
+        contentText: contentText || '',
+        fileUrl,
+        classId: classId || '',
+        subject: subject || 'PAI',
+        semester: semester || 'Ganjil',
+        createdBy: 'admin'
+      }));
+      return { success: true };
+    }
+    return await new Promise((resolve, reject) => {
+      google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).createMaterial(title, type, contentText, fileData, classId, subject, semester);
+    });
+  },
+
+  updateMaterial: async (id, title, type, contentText, classId, semester) => {
+    const payload = { title, contentType: type, classId: classId || '', semester: semester || 'Ganjil' };
+    if (type === 'text') payload.contentText = contentText || '';
+    await supaFetch(`materials?id=eq.${id}`, 'PATCH', toSnake(payload));
+    return { success: true };
+  },
+
+  deleteMaterial: async (id) => {
+    await supaFetch(`materials?id=eq.${id}`, 'DELETE');
+    return { success: true };
+  },
+
+  getReferences: async (classId, studentId) => {
+    let all = toCamel(await supaFetch('reading_references'));
+    const classes = toCamel(await supaFetch('classes?select=id,class_name'));
+    
+    if (studentId) {
+      const user = await supaFetch(`users?id=eq.${studentId}&select=class_id`);
+      let studentGrade = '';
+      if (user && user.length && user[0].class_id) {
+        const c = classes.find(x => x.id === user[0].class_id);
+        if (c && c.class_name) {
+          const match = c.class_name.match(/\d/);
+          if (match) studentGrade = match[0];
+        }
+      }
+      all = all.filter(m => !m.classId || m.classId === studentGrade);
+    }
+
+    const mapped = all.map(m => {
+      let cName = 'Semua Tingkat';
+      if (['1','2','3','4','5','6'].includes(m.classId)) cName = 'Tingkat Kelas ' + m.classId;
+      else if (m.classId) { const f = classes.find(c=>c.id===m.classId); cName = f ? f.className : m.classId; }
+      return { ...m, className: cName };
+    });
+    return { success: true, data: mapped };
+  },
+
+  createReference: async (title, type, urlOrFile, classId, semester) => {
+    if (type === 'link' || typeof google === 'undefined' || !google.script) {
+      const finalUrl = type === 'link' ? urlOrFile : (urlOrFile && urlOrFile.data ? `data:${urlOrFile.mime};base64,${urlOrFile.data}` : '');
+      await supaFetch('reading_references', 'POST', toSnake({
+        id: uuidv4(),
+        title,
+        refType: type,
+        url: finalUrl,
+        classId: classId || '',
+        semester: semester || 'Ganjil'
+      }));
+      return { success: true };
+    }
+    return await new Promise((resolve, reject) => {
+      google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).createReference(title, type, urlOrFile, classId, semester);
+    });
+  },
+
+  deleteReference: async (id) => {
+    await supaFetch(`reading_references?id=eq.${id}`, 'DELETE');
+    return { success: true };
+  },
+
+  getAnnouncements: async (classId, studentId) => {
+    let all = toCamel(await supaFetch('announcements'));
+    const classes = toCamel(await supaFetch('classes?select=id,class_name'));
+    
+    if (studentId) {
+      const user = await supaFetch(`users?id=eq.${studentId}&select=class_id`);
+      let sClassId = user && user.length ? user[0].class_id : '';
+      all = all.filter(a => a.target === 'all' || a.classId === sClassId);
+    }
+    
+    const mapped = all.map(a => ({ 
+      ...a, 
+      targetLabel: a.target === 'all' ? 'Semua Siswa' : ((classes.find(c=>c.id===a.classId)||{}).className || 'Kelas'), 
+      date: new Date(a.createdAt).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' }) 
+    })).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return { success: true, data: mapped };
+  },
+
+  createAnnouncement: async (title, body, target, classId) => {
+    await supaFetch('announcements', 'POST', toSnake({ id: uuidv4(), title, body, target, classId: target === 'class_id' ? classId : '', createdBy: 'admin' }));
+    return { success: true };
+  },
+
+  deleteAnnouncement: async (id) => {
+    await supaFetch(`announcements?id=eq.${id}`, 'DELETE');
+    return { success: true };
+  },
+
+  getStudentScores: async (studentId) => {
+    const scores = toCamel(await supaFetch(`scores?student_id=eq.${studentId}`));
+    const quizzes = toCamel(await supaFetch('quizzes?select=id,title'));
+    const mapped = scores.map(s => ({ 
+      ...s, 
+      quizTitle: (quizzes.find(q=>q.id===s.quizId)||{}).title || 'Kuis', 
+      submittedAt: new Date(s.createdAt).toLocaleDateString('id-ID') 
+    })).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return { success: true, data: mapped };
+  },
+
+  getClassRecap: async (classId, semester) => {
+    const students = toCamel(await supaFetch(`users?role=eq.siswa&class_id=eq.${classId}`));
+    let allQuizzes = toCamel(await supaFetch(`quizzes?select=id,title,created_at,class_id,semester`));
+    
+    let filteredQuizzes = allQuizzes.filter(q => (!q.classId || q.classId === classId) && (!semester || q.semester === semester));
+    filteredQuizzes.sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+    const scores = toCamel(await supaFetch('scores?select=*'));
+    const cls = toCamel(await supaFetch(`classes?id=eq.${classId}`));
+    
+    const recapped = students.map(s => {
+      const sScores = scores.filter(x => x.studentId === s.id);
+      const quizScores = {};
+      let validScores = [];
+      
+      filteredQuizzes.forEach(q => {
+        const match = sScores.find(x => x.quizId === q.id);
+        if (match) {
+          quizScores[q.id] = match.percentage;
+          validScores.push(match.percentage);
+        } else {
+          quizScores[q.id] = null;
+        }
+      });
+      
+      const avg = validScores.length ? Math.round(validScores.reduce((a,b)=>a+b,0)/validScores.length) : 0;
+      return { id: s.id, name: s.fullName, avg, quizCount: validScores.length, quizScores };
+    });
+    
+    const allAvgs = recapped.filter(r => r.quizCount > 0).map(r => r.avg);
+    const stats = { 
+      avgClass: allAvgs.length ? Math.round(allAvgs.reduce((a,b)=>a+b,0)/allAvgs.length) : 0, 
+      highest: allAvgs.length ? Math.max(...allAvgs) : 0, 
+      lowest: allAvgs.length ? Math.min(...allAvgs) : 0 
+    };
+    
+    return { success: true, data: { className: cls.length ? cls[0].className : '', students: recapped, quizzes: filteredQuizzes, stats } };
+  },
+
+  getTeachingJournals: async () => {
+    let list = [];
+    try {
+      const rows = await supaFetch('settings?key=eq.teaching_journals_data');
+      if (rows && rows.length && rows[0].value) {
+        list = JSON.parse(rows[0].value);
+      }
+    } catch (e) {}
+    if (!list || list.length === 0) {
+      const local = localStorage.getItem('lms_teaching_journals');
+      if (local) {
+        try { list = JSON.parse(local); } catch(err){ list = []; }
+      }
+    }
+    return { success: true, data: Array.isArray(list) ? list : [] };
+  },
+
+  saveTeachingJournals: async (journalsArray) => {
+    const jsonStr = JSON.stringify(journalsArray);
+    localStorage.setItem('lms_teaching_journals', jsonStr);
+    try {
+      const existing = await supaFetch('settings?key=eq.teaching_journals_data');
+      if (existing && existing.length > 0) {
+        await supaFetch('settings?key=eq.teaching_journals_data', 'PATCH', { value: jsonStr });
+      } else {
+        await supaFetch('settings', 'POST', { key: 'teaching_journals_data', value: jsonStr });
+      }
+    } catch (e) {}
+    return { success: true };
+  }
+};
+
+async function serverCall(fnName, args = []) {
+  try {
+    if (DirectAPI[fnName]) {
+      return await DirectAPI[fnName](...args);
+    }
+    if (typeof google !== 'undefined' && google.script) {
+      return await new Promise((resolve, reject) => {
+        google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[fnName](...args);
+      });
+    }
+    return { success: false, message: 'Fungsi server tidak ditemukan: ' + fnName };
+  } catch (e) {
+    showToast('Gagal memproses data: ' + e.message, 'error');
+    return { success: false, message: e.message || String(e) };
+  }
+}
+
+function showLoadingContent(msg = "Memuat data...") {
+  document.getElementById('mainContent').innerHTML = `
+    <div class="flex flex-col items-center justify-center h-64 opacity-70">
+      <div class="spinner mb-4 w-10 h-10 border-4"></div>
+      <p class="text-sm text-slate-400 font-medium animate-pulse">${msg}</p>
+    </div>
+  `;
+}
+
+function setLoadingButton(btnId, isLoad, text = "Tunggu...") {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  if (isLoad) {
+    btn.disabled = true;
+    btn.dataset.original = btn.innerHTML;
+    btn.innerHTML = `<div class="spinner w-4 h-4 border-2 mr-2"></div> ${text}`;
+    btn.classList.add('opacity-70', 'cursor-not-allowed');
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = btn.dataset.original || btn.innerHTML;
+    btn.classList.remove('opacity-70', 'cursor-not-allowed');
+  }
+}
+
+function showToast(msg, type='success') {
+  const c = document.getElementById('toastContainer');
+  const colors = { success:'border-emerald-500 bg-emerald-500/90', error:'border-red-500 bg-red-500/90', info:'border-blue-500 bg-blue-500/90' };
+  const icons = { success:'check-circle', error:'alert-circle', info:'info' };
+  const el = document.createElement('div');
+  el.className = `toast backdrop-blur-md border-l-4 ${colors[type]} rounded-xl p-4 flex items-center gap-3 min-w-[280px] sm:min-w-[320px] shadow-2xl text-white pointer-events-auto`;
+  el.innerHTML = `<i data-lucide="${icons[type]}" class="w-5 h-5"></i><p class="text-sm font-medium flex-1">${msg}</p>`;
+  c.appendChild(el);
+  try { lucide.createIcons(); } catch(e){}
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => el.remove(), 300);
+  }, 3500);
+}
+
+function togglePwd() {
+  const pwd = document.getElementById('loginPassword');
+  const eye = document.getElementById('eyeIcon');
+  if (pwd.type === 'password') {
+    pwd.type = 'text';
+    eye.setAttribute('data-lucide', 'eye-off');
+  } else {
+    pwd.type = 'password';
+    eye.setAttribute('data-lucide', 'eye');
+  }
+  try { lucide.createIcons(); } catch(e){}
+}
+
+async function handleLogin() {
+  try {
+    const user = document.getElementById('loginUsername').value.trim();
+    const pass = document.getElementById('loginPassword').value.trim();
+    
+    if (!user || !pass) {
+      showToast('Harap isi username & password', 'error');
+      return;
+    }
+    
+    if(user.toLowerCase() === 'admin' && pass === 'admin123') {
+      APP.session = { userId: 'admin-bypass', role: 'admin', fullName: 'Guru PAI', username: 'admin', classId: '', className: '' };
+      localStorage.setItem('lmsSession', JSON.stringify(APP.session));
+      showMainApp();
+      showToast('Berhasil masuk ke mode Guru PAI', 'success');
+      return;
+    }
+    
+    setLoadingButton('btnLogin', true, 'Memeriksa...');
+    const res = await serverCall('loginUser', [user, pass]);
+    setLoadingButton('btnLogin', false);
+    
+    if (res.success) {
+      APP.session = res.data;
+      localStorage.setItem('lmsSession', JSON.stringify(res.data));
+      showMainApp();
+      showToast('Berhasil masuk', 'success');
+    } else {
+      showToast(res.message || 'Login gagal, pastikan nama/username benar', 'error');
+    }
+  } catch(err) {
+    setLoadingButton('btnLogin', false);
+    showToast('Terjadi kesalahan sistem: ' + err.message, 'error');
+  }
+}
+
+async function loadAppSettingsGlobal() {
+  try {
+    const res = await DirectAPI.getAppSettings();
+    if (res.success && res.data) {
+      APP.appSettings = res.data;
+      if (res.data.appLogoUrl) {
+        const loginLogo = document.getElementById('loginLogoImg');
+        const sidebarLogo = document.getElementById('sidebarLogoImg');
+        if (loginLogo) loginLogo.src = res.data.appLogoUrl;
+        if (sidebarLogo) sidebarLogo.src = res.data.appLogoUrl;
+      }
+    }
+  } catch (e) {}
+}
+
+function showMainApp() {
+  document.getElementById('loginView').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  document.getElementById('userName').textContent = APP.session.fullName;
+  document.getElementById('userRole').textContent = APP.session.role === 'admin' ? 'Guru PAI' : 'Siswa';
+  document.getElementById('userAvatar').textContent = APP.session.fullName.charAt(0).toUpperCase();
+  
+  const navItems = APP.session.role === 'admin' ? ADMIN_NAV : STUDENT_NAV;
+  document.getElementById('sidebarNav').innerHTML = navItems.map(i => `
+    <button onclick="navigate('${i.id}'); if(window.innerWidth < 1024) toggleSidebar();" data-nav="${i.id}" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-300">
+      <i data-lucide="${i.icon}" class="w-[18px] h-[18px]"></i> <span>${i.label}</span>
+    </button>
+  `).join('');
+  
+  loadAppSettingsGlobal();
+  try { lucide.createIcons(); } catch(e){}
+  navigate('dashboard');
+}
+
+function handleLogout() {
+  localStorage.removeItem('lmsSession');
+  document.getElementById('loginUsername').value = '';
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById('loginView').classList.remove('hidden');
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebarOverlay');
+  if (sb.classList.contains('-translate-x-full')) {
+    sb.classList.remove('-translate-x-full');
+    ov.classList.remove('hidden');
+  } else {
+    sb.classList.add('-translate-x-full');
+    ov.classList.add('hidden');
+  }
+}
+
+window.val = function(id) { return document.getElementById(id)?.value?.trim() || ''; };
+window.setPageHeader = function(title, sub) { document.getElementById('pageTitle').textContent = title; document.getElementById('pageSubtitle').textContent = sub; };
+
+window.openModal = function(title, body, footer='', sizeClass='max-w-lg') {
+  const dialog = document.getElementById('modalDialog');
+  dialog.className = `glass-strong rounded-2xl w-full ${sizeClass} max-h-[92dvh] overflow-hidden flex flex-col shadow-2xl border border-white/20 transition-all`;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modalFooter').innerHTML = footer;
+  document.getElementById('modal').classList.remove('hidden');
+  try { lucide.createIcons(); } catch(e){}
+};
+
+window.closeModal = function() {
+  document.getElementById('modal').classList.add('hidden');
+  APP.quillInstance = null;
+};
+
+async function navigate(viewId) {
+  APP.currentView = viewId;
+  document.querySelectorAll('[data-nav]').forEach(el => el.classList.remove('active', 'bg-white/10', 'text-emerald-400'));
+  const activeLink = document.querySelector(`[data-nav="${viewId}"]`);
+  if (activeLink) activeLink.classList.add('active', 'bg-white/5', 'text-emerald-400');
+  
+  if (APP.session.role === 'admin') {
+    switch(viewId) {
+      case 'dashboard': return renderAdminDashboard();
+      case 'profile': return renderProfile();
+      case 'settings': return renderSettings();
+      case 'classes': return renderClasses();
+      case 'students': return renderStudents();
+      case 'attendance': return renderAttendance();
+      case 'journals': return renderTeachingJournals();
+      case 'questions': return renderQuestions();
+      case 'quizzes': return renderQuizzes();
+      case 'materials': return renderMaterials();
+      case 'references': return renderReferences();
+      case 'announcements': return renderAnnouncements();
+      case 'reports': return renderReports();
+    }
+  } else {
+    switch(viewId) {
+      case 'dashboard': return renderStudentDashboard();
+      case 'student-quizzes': return renderStudentQuizzes();
+      case 'student-materials': return renderStudentMaterials();
+      case 'student-references': return renderStudentReferences();
+      case 'student-announcements': return renderStudentAnnouncements();
+      case 'student-scores': return renderStudentScores();
+    }
+  }
+}
+
+async function renderAdminDashboard() {
+  setPageHeader('Dashboard Utama', 'Statistik Pembelajaran PAI'); showLoadingContent();
+  const res = await serverCall('getDashboard', ['admin', APP.session.userId]);
+  if (!res.success) return showToast(res.message, 'error');
+  const d = res.data;
+  
+  const stats = [
+    { label:'Siswa Aktif', value:d.totalStudents, icon:'users', color:'from-emerald-500 to-teal-500' },
+    { label:'Total Kuis', value:d.totalQuizzes, icon:'file-question', color:'from-indigo-500 to-purple-500' },
+    { label:'Total Materi', value:d.totalMaterials, icon:'book-text', color:'from-orange-500 to-rose-500' },
+    { label:'Rata Nilai', value:d.avgScore, icon:'trending-up', color:'from-blue-500 to-cyan-500' }
+  ];
+  
+  document.getElementById('mainContent').innerHTML = `
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 mb-5 sm:mb-6">
+      ${stats.map(s => `
+        <div class="glass glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-center">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br ${s.color} flex items-center justify-center shrink-0 shadow-lg">
+              <i data-lucide="${s.icon}" class="w-4 h-4 sm:w-5 sm:h-5 text-white"></i>
+            </div>
+            <p class="text-[10px] sm:text-xs text-slate-400 uppercase font-bold leading-tight">${s.label}</p>
+          </div>
+          <p class="text-2xl sm:text-3xl font-extrabold font-display">${s.value}</p>
+        </div>
+      `).join('')}
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+      <div class="glass rounded-2xl p-4 sm:p-5">
+        <h3 class="font-bold mb-4 flex items-center gap-2 text-sm sm:text-base"><i data-lucide="zap" class="w-4 h-4 text-amber-400"></i> Menu Cepat Guru PAI</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          ${[
+            {id:'journals', label:'Jurnal Mengajar', icon:'notebook-pen'},
+            {id:'questions', label:'Generator Soal AI', icon:'sparkles'},
+            {id:'materials', label:'Ketik Materi Word', icon:'file-text'},
+            {id:'attendance', label:'Absensi Harian', icon:'calendar-check'},
+            {id:'quizzes', label:'Rilis Kuis', icon:'file-plus'},
+            {id:'reports', label:'Rekap Nilai', icon:'bar-chart-3'}
+          ].map(a => `
+            <button onclick="navigate('${a.id}')" class="p-3 sm:p-4 rounded-xl btn-secondary flex flex-col items-center justify-center gap-2 text-center h-24 hover:border-emerald-500/40">
+              <i data-lucide="${a.icon}" class="w-6 h-6 text-emerald-400"></i><span class="text-xs font-semibold">${a.label}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+      <div class="glass rounded-2xl p-4 sm:p-5">
+        <h3 class="font-bold mb-4 flex items-center gap-2 text-sm sm:text-base"><i data-lucide="activity" class="w-4 h-4 text-cyan-400"></i> Terakhir Ditambahkan</h3>
+        <div class="space-y-3">
+          ${(d.recentItems||[]).length === 0 ? '<div class="p-6 text-center text-slate-500 text-sm border border-dashed border-white/10 rounded-xl">Belum ada aktivitas baru</div>' : d.recentItems.map(it => `
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
+              <div class="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center shrink-0"><i data-lucide="${it.icon}" class="w-4 h-4 text-white"></i></div>
+              <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate text-white">${it.title}</p><p class="text-[10px] text-slate-400">${it.subtitle} &bull; ${it.date}</p></div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+  try { lucide.createIcons(); } catch(e){}
+}
+
+async function renderProfile() {
+  setPageHeader('Profil Guru', 'Pengaturan akun dan identitas sekolah'); showLoadingContent();
+  const res = await serverCall('getTeacherProfile', [APP.session.userId]);
+  if (!res.success) return showToast(res.message, 'error');
+  const d = res.data;
+  APP.teacherProfile = d;
+  document.getElementById('mainContent').innerHTML = `
+    <div class="glass rounded-2xl p-5 sm:p-8 max-w-2xl mx-auto shadow-2xl border border-white/10 mt-6">
+      <h3 class="font-display font-bold text-xl mb-6 flex items-center gap-3"><i data-lucide="user" class="w-6 h-6 text-emerald-400"></i> Informasi Identitas Guru & Sekolah</h3>
+      <div class="space-y-5">
+        <div><label class="text-xs font-semibold uppercase text-slate-300 mb-2 block">Nama Guru Lengkap</label><input id="prof_fullName" class="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10" value="${d.fullName}"></div>
+        <div><label class="text-xs font-semibold uppercase text-slate-300 mb-2 block">NIP</label><input id="prof_nip" class="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10" value="${d.nip}"></div>
+        <div><label class="text-xs font-semibold uppercase text-slate-300 mb-2 block">Satuan Pendidikan / Nama Sekolah</label><input id="prof_schoolName" class="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10" value="${d.schoolName}"></div>
+        <div class="pt-6 border-t border-white/10 flex justify-end"><button id="btnSaveProfile" onclick="saveProfile()" class="btn-primary w-full sm:w-auto px-8 py-3.5 rounded-xl text-sm font-bold text-white shadow-lg">Simpan Perubahan</button></div>
+      </div>
+    </div>
+  `;
+  try { lucide.createIcons(); } catch(e){}
+}
+
+async function saveProfile() {
+  const fn = val('prof_fullName'), nip = val('prof_nip'), sn = val('prof_schoolName');
+  if (!fn || !sn) return showToast('Nama & Sekolah wajib diisi', 'error');
+  setLoadingButton('btnSaveProfile', true);
+  const res = await serverCall('updateTeacherProfile', [APP.session.userId, fn, nip, sn]);
+  setLoadingButton('btnSaveProfile', false);
+  if (res.success) {
+    APP.teacherProfile = { fullName: fn, nip, schoolName: sn };
+    showToast('Profil berhasil disimpan');
+    document.getElementById('userName').textContent = fn;
+    APP.session.fullName = fn;
+    localStorage.setItem('lmsSession', JSON.stringify(APP.session));
+  } else showToast(res.message, 'error');
+}
+
+async function renderSettings() {
+  setPageHeader('Pengaturan', 'Konfigurasi Kepala Sekolah, Logo, dan Identitas Sistem');
+  showLoadingContent('Memuat pengaturan...');
+  const res = await serverCall('getAppSettings');
+  if (res.success && res.data) APP.appSettings = res.data;
+  const s = APP.appSettings || { principalName: '', principalNip: '', appLogoUrl: '' };
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="glass rounded-2xl p-5 sm:p-8 max-w-2xl mx-auto shadow-2xl border border-white/10 mt-6 space-y-6">
+      <h3 class="font-display font-bold text-xl flex items-center gap-3">
+        <i data-lucide="settings" class="w-6 h-6 text-emerald-400"></i> Pengaturan Sistem & Kepala Sekolah
+      </h3>
+      
+      <!-- Bagian 1: Kepala Sekolah -->
+      <div class="space-y-4 pb-6 border-b border-white/10">
+        <h4 class="font-bold text-sm text-emerald-300 uppercase">1. Pengesahan Kepala Sekolah</h4>
+        <div>
+          <label class="text-xs font-semibold uppercase text-slate-300 mb-2 block">Nama Kepala Sekolah <span class="text-red-400">*</span></label>
+          <input id="set_principalName" class="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10" value="${(s.principalName || '').replace(/"/g, '&quot;')}" placeholder="Contoh: Hj. Siti Aminah, S.Pd., M.Pd.">
+        </div>
+        <div>
+          <label class="text-xs font-semibold uppercase text-slate-300 mb-2 block">NIP Kepala Sekolah (Opsional)</label>
+          <input id="set_principalNip" class="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10" value="${(s.principalNip || '').replace(/"/g, '&quot;')}" placeholder="Contoh: 197504122005012003">
+        </div>
+        <p class="text-xs text-slate-400">Tampil otomatis pada tanda tangan cetak Kisi-Kisi Soal dan Jurnal Mengajar.</p>
+      </div>
+
+      <!-- Bagian 2: Logo Aplikasi -->
+      <div class="space-y-4">
+        <h4 class="font-bold text-sm text-cyan-300 uppercase">2. Logo Aplikasi LMS (Halaman Login & Kiri Atas)</h4>
+        <div class="flex flex-col sm:flex-row items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
+          <img id="settingsLogoPreview" src="${s.appLogoUrl || 'https://jhlryjdhotxtndavacpd.supabase.co/storage/v1/object/public/logo/logo.png'}" class="w-16 h-16 object-contain rounded-lg bg-black/20 p-1" onerror="this.src='https://placehold.co/100x100/10b981/ffffff?text=Logo'">
+          <div class="flex-1 space-y-2 w-full">
+            <label class="text-xs font-bold text-slate-300 uppercase block">Upload Gambar Logo Baru</label>
+            <div class="flex gap-2">
+              <input type="file" id="set_logoFileInput" accept="image/*" class="w-full text-xs text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-cyan-500/20 file:text-cyan-300 hover:file:bg-cyan-500/30 cursor-pointer">
+              <button type="button" onclick="resetAppLogo()" class="px-3 py-2 rounded-xl bg-rose-500/20 text-rose-300 text-xs font-bold hover:bg-rose-500/30 shrink-0">Reset Default</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-4 flex justify-end">
+        <button id="btnSaveSettings" onclick="saveSettings()" class="btn-primary w-full sm:w-auto px-8 py-3.5 rounded-xl text-sm font-bold text-white shadow-lg flex items-center justify-center gap-2">
+          <i data-lucide="save" class="w-4 h-4"></i> Simpan Pengaturan
+        </button>
+      </div>
+    </div>
+  `;
+  try { lucide.createIcons(); } catch(e){}
+}
+
+async function saveSettings() {
+  const principalName = val('set_principalName');
+  const principalNip = val('set_principalNip');
+  if (!principalName) return showToast('Nama Kepala Sekolah wajib diisi!', 'error');
+
+  let appLogoUrl = APP.appSettings?.appLogoUrl || '';
+  const fileInput = document.getElementById('set_logoFileInput');
+  if (fileInput && fileInput.files[0]) {
+    appLogoUrl = await new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = e => resolve(e.target.result);
+      reader.readAsDataURL(fileInput.files[0]);
+    });
+  }
+
+  setLoadingButton('btnSaveSettings', true, 'Menyimpan...');
+  const settingsData = { principalName, principalNip, appLogoUrl };
+  const res = await serverCall('saveAppSettings', [settingsData]);
+  setLoadingButton('btnSaveSettings', false);
+
+  if (res.success) {
+    APP.appSettings = settingsData;
+    if (appLogoUrl) {
+      const loginLogo = document.getElementById('loginLogoImg');
+      const sidebarLogo = document.getElementById('sidebarLogoImg');
+      if (loginLogo) loginLogo.src = appLogoUrl;
+      if (sidebarLogo) sidebarLogo.src = appLogoUrl;
+    }
+    showToast('Pengaturan berhasil disimpan!', 'success');
+  } else {
+    showToast(res.message || 'Gagal menyimpan pengaturan', 'error');
+  }
+}
+
+window.resetAppLogo = function() {
+  if (APP.appSettings) APP.appSettings.appLogoUrl = '';
+  const prev = document.getElementById('settingsLogoPreview');
+  if (prev) prev.src = 'https://jhlryjdhotxtndavacpd.supabase.co/storage/v1/object/public/logo/logo.png';
+  showToast('Logo dikembalikan ke default. Klik Simpan Pengaturan.', 'info');
+};
+
+async function renderClasses() {
+  setPageHeader('Daftar Kelas', 'Manajemen rombongan belajar'); showLoadingContent();
+  const res = await serverCall('getClasses'); APP.data.classes = res.success ? res.data : [];
+  document.getElementById('mainContent').innerHTML = `
+    <div class="glass rounded-2xl p-4 sm:p-5 flex flex-col h-full">
+      <div class="flex flex-col sm:flex-row gap-3 items-center justify-between mb-4">
+        <div class="relative w-full sm:w-64"><i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i><input id="searchClass" onkeyup="renderClassesTable()" placeholder="Cari nama kelas..." class="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm bg-white/5 border border-white/10"></div>
+        <button onclick="openClassModal()" class="w-full sm:w-auto btn-primary px-4 py-2.5 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> Tambah Kelas</button>
+      </div>
+      <div class="overflow-x-auto w-full flex-1 border border-white/10 rounded-xl bg-black/20">
+        <table class="w-full text-sm text-left min-w-[500px]">
+          <thead class="bg-white/5 text-xs text-slate-400 uppercase font-semibold"><tr><th class="py-3 px-4">Kelas</th><th class="py-3 px-4">Wali Kelas</th><th class="py-3 px-4 text-center">Siswa</th><th class="py-3 px-4 text-right">Aksi</th></tr></thead>
+          <tbody id="classesTableBody" class="divide-y divide-white/5"></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  renderClassesTable();
+}
+
+function renderClassesTable() {
+  const search = val('searchClass').toLowerCase();
+  const filtered = APP.data.classes.filter(c => c.className.toLowerCase().includes(search) || (c.homeroom||'').toLowerCase().includes(search));
+  document.getElementById('classesTableBody').innerHTML = filtered.length === 0 ? '<tr><td colspan="4" class="text-center py-10 text-slate-500 italic">Tidak ada data kelas</td></tr>' :
+    filtered.map(c => `
+      <tr class="hover:bg-white/5">
+        <td class="py-3 px-4 font-bold text-emerald-400">${c.className}</td>
+        <td class="py-3 px-4 text-slate-300">${c.homeroom||'-'}</td>
+        <td class="py-3 px-4 text-center"><span class="badge bg-white/10 text-slate-300">${c.studentCount||0} anak</span></td>
+        <td class="py-3 px-4 text-right">
+          <button onclick="openClassModal('${c.id}')" class="p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 mr-1"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+          <button onclick="deleteClass('${c.id}')" class="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/40"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </td>
+      </tr>
+    `).join('');
+  try { lucide.createIcons(); } catch(e){}
+}
+
+function openClassModal(id=null) {
+  const c = id ? APP.data.classes.find(x => x.id===id) : null;
+  openModal(id ? 'Edit Kelas' : 'Tambah Kelas', `
+    <div class="space-y-4">
+      <div><label class="text-xs font-bold text-slate-400 mb-1.5 block">Nama Kelas <span class="text-red-400">*</span></label><input id="f_className" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10" value="${c?.className||''}"></div>
+      <div><label class="text-xs font-bold text-slate-400 mb-1.5 block">Wali Kelas</label><input id="f_homeroom" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10" value="${c?.homeroom||''}"></div>
+      <div><label class="text-xs font-bold text-slate-400 mb-1.5 block">Tahun Ajaran</label><input id="f_academicYear" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10" value="${c?.academicYear||'2026/2027'}"></div>
+    </div>
+  `, `<button onclick="closeModal()" class="btn-secondary px-5 py-2.5 rounded-xl text-sm font-semibold">Batal</button><button id="btnSaveClass" onclick="saveClass('${id||''}')" class="btn-primary px-5 py-2.5 rounded-xl text-sm font-bold text-white">Simpan</button>`);
+}
+
+async function saveClass(id='') {
+  const data = { className: val('f_className'), homeroom: val('f_homeroom'), academicYear: val('f_academicYear') };
+  if (!data.className) return showToast('Nama kelas wajib', 'error');
+  setLoadingButton('btnSaveClass', true);
+  const res = await serverCall(id ? 'updateClass' : 'createClass', id ? [id, data.className, data.homeroom, data.academicYear] : [data.className, data.homeroom, data.academicYear]);
+  setLoadingButton('btnSaveClass', false);
+  if (res.success) { showToast('Disimpan'); closeModal(); renderClasses(); } else showToast(res.message, 'error');
+}
+
+function deleteClass(id) {
+  askConfirm('Hapus kelas ini beserta keterkaitannya?', async () => {
+    const res = await serverCall('deleteClass', [id]);
+    if(res.success) { showToast('Kelas dihapus'); renderClasses(); }
+  });
+}
+
+async function renderStudents() {
+  setPageHeader('Data Siswa', 'Kelola daftar siswa dan akun login'); showLoadingContent();
+  const [clsRes, stdRes] = await Promise.all([serverCall('getClasses'), serverCall('getStudents')]);
+  APP.data.classes = clsRes.success ? clsRes.data : []; APP.data.students = stdRes.success ? stdRes.data : [];
+  
+  document.getElementById('mainContent').innerHTML = `
+    <div class="glass rounded-2xl p-4 sm:p-5 flex flex-col h-full">
+      <div class="flex flex-col xl:flex-row gap-3 items-center justify-between mb-4">
+        <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto flex-1">
+          <div class="relative w-full sm:w-64"><i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i><input id="searchStudent" onkeyup="renderStudentsTable()" placeholder="Cari nama / NIS..." class="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm bg-white/5 border border-white/10"></div>
+          <select id="filterStudentClass" onchange="renderStudentsTable()" class="w-full sm:w-40 px-3 py-2.5 rounded-xl text-sm bg-white/5 border border-white/10 text-white border-l-4 border-l-emerald-500">
+            <option value="">Pilih Kelas</option>${APP.data.classes.map(c => `<option value="${c.id}">${c.className}</option>`).join('')}
+          </select>
+        </div>
+        <div class="flex flex-wrap gap-2 w-full xl:w-auto justify-end">
+          <button onclick="printLoginCards()" class="flex-1 sm:flex-none btn-secondary px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 text-indigo-400 border-indigo-500/30"><i data-lucide="printer" class="w-4 h-4"></i> Cetak Kartu</button>
+          <button onclick="document.getElementById('importExcelInput').click()" class="flex-1 sm:flex-none btn-secondary px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 text-cyan-400 border-cyan-500/30"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Upload Excel</button>
+          <input type="file" id="importExcelInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleImportExcel(event)">
+          <button onclick="openStudentModal()" class="w-full sm:flex-none btn-primary px-4 py-2.5 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2"><i data-lucide="user-plus" class="w-4 h-4"></i> Tambah Siswa</button>
+        </div>
+      </div>
+      <div class="overflow-x-auto w-full flex-1 border border-white/10 rounded-xl bg-black/20">
+        <table class="w-full text-sm text-left min-w-[750px]">
+          <thead class="bg-white/5 text-xs text-slate-400 uppercase font-semibold">
+            <tr>
+              <th class="py-3 px-4 w-16 text-center">No</th>
+              <th class="py-3 px-4 w-24">NIS</th>
+              <th class="py-3 px-4">Nama Lengkap</th>
+              <th class="py-3 px-4 w-28">Kelas</th>
+              <th class="py-3 px-4 w-40">Username / Login</th>
+              <th class="py-3 px-4 w-32">Password</th>
+              <th class="py-3 px-4 text-right w-24">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="studentsTableBody" class="divide-y divide-white/5"></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  renderStudentsTable();
+}
+
+function renderStudentsTable() {
+  const search = val('searchStudent').toLowerCase(), classFilter = val('filterStudentClass');
+  let filtered = APP.data.students.filter(s => (s.fullName.toLowerCase().includes(search) || (s.nis||'').toLowerCase().includes(search)) && (!classFilter || s.classId === classFilter));
+  filtered.sort((a,b) => a.fullName.localeCompare(b.fullName));
+  
+  document.getElementById('studentsTableBody').innerHTML = filtered.length === 0 ? '<tr><td colspan="7" class="text-center py-10 text-slate-500 italic">Tidak ada siswa</td></tr>' :
+    filtered.map((s, index) => `
+      <tr class="hover:bg-white/5">
+        <td class="py-3 px-4 text-center font-mono text-slate-500 text-xs">${index + 1}</td>
+        <td class="py-3 px-4 font-mono text-slate-400 text-xs">${s.nis === '-' ? 'Kosong' : s.nis}</td>
+        <td class="py-3 px-4 font-bold text-slate-200">${s.fullName}</td>
+        <td class="py-3 px-4"><span class="badge bg-white/10 text-emerald-300 border border-emerald-500/30">${s.className||'-'}</span></td>
+        <td class="py-3 px-4 text-cyan-300 text-sm font-bold tracking-widest">${s.username}</td>
+        <td class="py-3 px-4 text-amber-400 text-sm font-mono tracking-widest font-bold">${s.password}</td>
+        <td class="py-3 px-4 text-right">
+          <button onclick="openStudentModal('${s.id}')" class="p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 mr-1"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+          <button onclick="deleteStudent('${s.id}')" class="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/40"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </td>
+      </tr>
+    `).join('');
+  try { lucide.createIcons(); } catch(e){}
+}
+
+function openStudentModal(id=null) {
+  const s = id ? APP.data.students.find(x => x.id===id) : null;
+  openModal(id ? 'Edit Siswa' : 'Siswa Baru', `
+    <div class="space-y-4">
+      <div><label class="text-xs font-bold text-slate-400 mb-1.5 block">Nama Lengkap <span class="text-red-400">*</span></label><input id="f_fullName" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10" value="${s?.fullName||''}" placeholder="Nama Sesuai Akta"></div>
+      <div><label class="text-xs font-bold text-slate-400 mb-1.5 block">NIS (Opsional)</label><input id="f_nis" type="number" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10" value="${s?.nis==='-'?'':(s?.nis||'')}"></div>
+      <div><label class="text-xs font-bold text-slate-400 mb-1.5 block">Kelas <span class="text-red-400">*</span></label><select id="f_classId" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white"><option value="">-- Pilih Kelas --</option>${APP.data.classes.map(c => `<option value="${c.id}" ${s?.classId===c.id?'selected':''}>${c.className}</option>`).join('')}</select></div>
+      ${!id ? '<div class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 flex items-start gap-2 mt-2"><i data-lucide="info" class="w-4 h-4 text-emerald-400 mt-0.5 shrink-0"></i><p class="text-[11px] text-emerald-200/80 leading-relaxed"><b>Username</b> akan otomatis dibuatkan dari kombinasi Kelas + Nomor Urut.</p></div>' : ''}
+    </div>
+  `, `<button onclick="closeModal()" class="btn-secondary px-5 py-2.5 rounded-xl text-sm font-semibold">Batal</button><button id="btnSaveStudent" onclick="saveStudent('${id||''}')" class="btn-primary px-5 py-2.5 rounded-xl text-sm font-bold text-white">Simpan</button>`);
+}
+
+async function saveStudent(id='') {
+  const data = { nis: val('f_nis'), fullName: val('f_fullName'), classId: val('f_classId') };
+  if (!data.fullName || !data.classId) return showToast('Nama & Kelas wajib', 'error');
+  setLoadingButton('btnSaveStudent', true);
+  const res = await serverCall(id ? 'updateStudent' : 'createStudent', id ? [id, data.nis, data.fullName, data.classId] : [data.nis, data.fullName, data.classId]);
+  setLoadingButton('btnSaveStudent', false);
+  if (res.success) { showToast('Disimpan'); closeModal(); renderStudents(); } else showToast(res.message, 'error');
+}
+
+window.handleImportExcel = async function(e) {
+  const file = e.target.files[0]; if(!file) return;
+  const classId = val('filterStudentClass');
+  if(!classId) { e.target.value = ''; return showToast('PILIH KELAS DULU di filter atas!', 'error'); }
+  showToast('Membaca Excel...', 'info'); const reader = new FileReader();
+  reader.onload = async function(evt) {
+    try {
+      const workbook = XLSX.read(new Uint8Array(evt.target.result), {type: 'array'});
+      const excelRows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+      const studentsToInsert = excelRows.map(row => {
+        const keys = Object.keys(row);
+        const nameKey = keys.find(k => k.toLowerCase().includes('nama'));
+        const nisKey = keys.find(k => k.toLowerCase().includes('nis'));
+        return nameKey ? { fullName: String(row[nameKey]).trim(), nis: nisKey ? String(row[nisKey]).trim() : '', classId } : null;
+      }).filter(s => s !== null);
+      if(studentsToInsert.length === 0) return showToast('Harus ada judul kolom "Nama".', 'error');
+      
+      showToast('Membuat Username urut...', 'info');
+      const res = await serverCall('uploadStudentsBulk', [studentsToInsert]);
+      if(res.success) { showToast(`Selesai tambah ${studentsToInsert.length} siswa!`); renderStudents(); } else showToast(res.message, 'error');
+    } catch(err) { showToast('Gagal: ' + err.message, 'error'); }
+    document.getElementById('importExcelInput').value = '';
+  };
+  reader.readAsArrayBuffer(file);
+};
+
+function deleteStudent(id) {
+  askConfirm('Hapus data siswa ini?', async () => {
+    const res = await serverCall('deleteStudent', [id]);
+    if (res.success) renderStudents();
+  });
+}
+
+window.printLoginCards = function() {
+  const classId = val('filterStudentClass');
+  let studentsToPrint = classId ? APP.data.students.filter(s => s.classId === classId) : APP.data.students;
+  if (studentsToPrint.length === 0) return showToast('Tidak ada data siswa.', 'error');
+  studentsToPrint.sort((a,b) => a.fullName.localeCompare(b.fullName));
+  
+  const printWin = window.open('', '_blank');
+  let html = `<!DOCTYPE html><html lang="id"><head><title>Kartu Login</title><style>body { font-family: 'Arial', sans-serif; padding: 20px; background: #f0f0f0; margin: 0; } .print-btn { display: block; width: 220px; margin: 0 auto 30px; padding: 12px; background: #10b981; color: white; text-align: center; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; } .card-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; } .card { background: white; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 15px 20px; color: #0f172a; page-break-inside: avoid; } .school-header { text-align: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 12px; } .school-title { font-weight: bold; font-size: 15px; margin: 0 0 4px 0; } .school-subtitle { font-size: 11px; color: #64748b; margin: 0; text-transform: uppercase; } .info-row { margin-bottom: 8px; display: flex; font-size: 13px; align-items: center; } .label { width: 75px; font-weight: 600; color: #475569; } .colon { margin-right: 8px; font-weight: 600; color: #475569; } .val { flex: 1; font-weight: bold; word-break: break-all; } .pwd-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 6px; font-family: monospace; letter-spacing: 2px; font-size: 14px; color: #d97706; } @media print { body { background: white; padding: 0; } .print-btn { display: none; } .card-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; } .card { border: 1px solid #000; break-inside: avoid; margin-bottom: 10px; } }</style></head><body><button class="print-btn" onclick="window.print()">🖨️ Cetak Kartu Sekarang</button><div class="card-container">`;
+  studentsToPrint.forEach(s => {
+    html += `<div class="card"><div class="school-header"><p class="school-title">SDN CIKETING UDIK 2</p><p class="school-subtitle">KARTU LOGIN LMS PAI</p></div><div class="info-row"><div class="label">Nama</div><div class="colon">:</div><div class="val">${s.fullName}</div></div><div class="info-row"><div class="label">Kelas</div><div class="colon">:</div><div class="val">${s.className||'-'}</div></div><div class="info-row"><div class="label">Username</div><div class="colon">:</div><div class="val" style="color:#0284c7; font-size:16px;">${s.username}</div></div><div class="info-row"><div class="label">Password</div><div class="colon">:</div><div class="val"><span class="pwd-box">${s.password}</span></div></div></div>`;
+  });
+  printWin.document.write(html + `</div></body></html>`);
+  printWin.document.close();
+};
+
+async function renderAttendance() {
+  setPageHeader('Absensi Siswa', 'Kelola kehadiran harian dan rekap bulanan'); showLoadingContent();
+  const res = await serverCall('getClasses'); APP.data.classes = res.success ? res.data : [];
+  const today = new Date().toISOString().split('T')[0]; const currMonth = today.substring(0,7);
+  
+  document.getElementById('mainContent').innerHTML = `
+    <div class="glass rounded-2xl p-4 sm:p-5 flex flex-col h-full">
+      <div class="flex gap-2 border-b border-white/10 mb-5">
+        <button onclick="switchAttTab('daily')" id="tabAttDaily" class="px-4 py-2 border-b-2 border-emerald-400 text-emerald-400 font-bold text-sm">Isi Kehadiran</button>
+        <button onclick="switchAttTab('monthly')" id="tabAttMonthly" class="px-4 py-2 border-b-2 border-transparent text-slate-400 hover:text-slate-300 font-semibold text-sm">Rekap Bulanan</button>
+      </div>
+      <div id="viewAttDaily" class="space-y-4">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <select id="attClass" class="w-full sm:w-48 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white"><option value="">Pilih Kelas</option>${APP.data.classes.map(c => `<option value="${c.id}">${c.className}</option>`).join('')}</select>
+          <input type="date" id="attDate" value="${today}" class="w-full sm:w-48 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white">
+          <button onclick="loadDailyAttendance()" class="btn-primary px-5 py-3 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2"><i data-lucide="search" class="w-4 h-4"></i> Tampilkan</button>
+        </div>
+        <div id="attDailyArea" class="bg-black/20 rounded-xl border border-white/10 p-4 min-h-[300px] flex items-center justify-center text-slate-500">Pilih kelas dan tanggal.</div>
+      </div>
+      <div id="viewAttMonthly" class="hidden space-y-4">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <select id="attMonthClass" class="w-full sm:w-48 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white"><option value="">Pilih Kelas</option>${APP.data.classes.map(c => `<option value="${c.id}">${c.className}</option>`).join('')}</select>
+          <input type="month" id="attMonth" value="${currMonth}" class="w-full sm:w-48 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white">
+          <button onclick="loadMonthlyAttendance()" class="btn-primary px-5 py-3 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2"><i data-lucide="file-text" class="w-4 h-4"></i> Lihat Rekap</button>
+        </div>
+        <div id="attMonthlyArea" class="bg-black/20 rounded-xl border border-white/10 p-4 min-h-[300px] flex items-center justify-center text-slate-500">Pilih kelas dan bulan.</div>
+      </div>
+    </div>
+  `;
+  try { lucide.createIcons(); } catch(e){}
+}
+
+window.switchAttTab = function(tab) {
+  document.getElementById('viewAttDaily').classList.toggle('hidden', tab !== 'daily');
+  document.getElementById('viewAttMonthly').classList.toggle('hidden', tab !== 'monthly');
+  const act = "px-4 py-2 border-b-2 border-emerald-400 text-emerald-400 font-bold text-sm";
+  const inact = "px-4 py-2 border-b-2 border-transparent text-slate-400 hover:text-slate-300 font-semibold text-sm";
+  document.getElementById('tabAttDaily').className = tab === 'daily' ? act : inact;
+  document.getElementById('tabAttMonthly').className = tab === 'monthly' ? act : inact;
+};
+
+window.loadDailyAttendance = async function() {
+  const c = val('attClass'), d = val('attDate'); if(!c || !d) return showToast('Pilih kelas & tanggal', 'error');
+  document.getElementById('attDailyArea').innerHTML = '<div class="spinner w-8 h-8"></div>';
+  const res = await serverCall('getDailyAttendance', [c, d]);
+  if(!res.success) return document.getElementById('attDailyArea').innerHTML = `<p class="text-rose-400">${res.message}</p>`;
+  if(res.data.length === 0) return document.getElementById('attDailyArea').innerHTML = '<p class="text-slate-400">Tidak ada data siswa.</p>';
+  
+  document.getElementById('attDailyArea').innerHTML = `
+    <div class="overflow-x-auto w-full">
+      <table class="w-full text-sm text-left"><thead class="bg-white/5 text-xs text-slate-400 uppercase font-semibold"><tr><th class="py-3 px-4">Nama Siswa</th><th class="py-3 px-4 w-40 text-center">Status</th><th class="py-3 px-4">Catatan</th></tr></thead>
+        <tbody class="divide-y divide-white/5">
+          ${res.data.map(s => `
+            <tr class="hover:bg-white/5 att-row" data-sid="${s.studentId}">
+              <td class="py-3 px-4 font-semibold text-slate-200">${s.fullName}<div class="text-[10px] text-slate-500 font-mono mt-0.5">NIS: ${s.nis==='-'?'Kosong':s.nis}</div></td>
+              <td class="py-3 px-4">
+                <select class="att-status w-full px-3 py-2 rounded-lg text-xs font-bold border ${getStatusColor(s.status)} outline-none cursor-pointer" onchange="updateStatusColor(this)">
+                  <option value="Hadir" class="bg-slate-800 text-emerald-400" ${s.status==='Hadir'?'selected':''}>Hadir</option><option value="Sakit" class="bg-slate-800 text-blue-400" ${s.status==='Sakit'?'selected':''}>Sakit</option><option value="Izin" class="bg-slate-800 text-amber-400" ${s.status==='Izin'?'selected':''}>Izin</option><option value="Alpa" class="bg-slate-800 text-rose-400" ${s.status==='Alpa'?'selected':''}>Alpa</option>
+                </select>
+              </td>
+              <td class="py-3 px-4"><input type="text" class="att-notes w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-xs" placeholder="Keterangan..." value="${s.notes||''}"></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="mt-4 flex justify-end"><button id="btnSaveAtt" onclick="saveDaily()" class="btn-primary px-8 py-3 rounded-xl text-sm font-bold text-white">Simpan Absensi</button></div>
+  `;
+};
+
+window.getStatusColor = function(status) { return status === 'Sakit' ? 'bg-blue-500/10 border-blue-500/30 text-blue-400' : (status === 'Izin' ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : (status === 'Alpa' ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400')); };
+window.updateStatusColor = function(sel) { sel.className = `att-status w-full px-3 py-2 rounded-lg text-xs font-bold border ${getStatusColor(sel.value)} outline-none cursor-pointer`; };
+
+window.saveDaily = async function() {
+  const c = val('attClass'), d = val('attDate');
+  const payload = Array.from(document.querySelectorAll('.att-row')).map(r => ({ studentId: r.dataset.sid, status: r.querySelector('.att-status').value, notes: r.querySelector('.att-notes').value }));
+  setLoadingButton('btnSaveAtt', true); 
+  const res = await serverCall('saveDailyAttendance', [c, d, JSON.stringify(payload)]); 
+  setLoadingButton('btnSaveAtt', false);
+  if(res.success) showToast('Absensi tersimpan'); else showToast(res.message, 'error');
+};
+
+window.loadMonthlyAttendance = async function() {
+  const c = val('attMonthClass'), m = val('attMonth'); if(!c || !m) return showToast('Pilih kelas dan bulan', 'error');
+  document.getElementById('attMonthlyArea').innerHTML = '<div class="spinner w-8 h-8"></div>'; 
+  const res = await serverCall('getMonthlyRecap', [c, m]);
+  if(!res.success) return document.getElementById('attMonthlyArea').innerHTML = `<p class="text-rose-400">${res.message}</p>`;
+  
+  document.getElementById('attMonthlyArea').innerHTML = res.data.students.length === 0 ? '<p class="text-slate-400">Tidak ada rekap.</p>' : `
+    <div class="overflow-x-auto w-full">
+      <table class="w-full text-sm text-left"><thead class="bg-white/5 text-xs text-slate-400 uppercase font-semibold"><tr><th class="py-3 px-4">Nama Siswa</th><th class="py-3 px-4 text-center">Hadir</th><th class="py-3 px-4 text-center">Sakit</th><th class="py-3 px-4 text-center">Izin</th><th class="py-3 px-4 text-center">Alpa</th></tr></thead>
+        <tbody class="divide-y divide-white/5">
+          ${res.data.students.map(s => `<tr class="hover:bg-white/5"><td class="py-3 px-4 font-semibold text-slate-200">${s.fullName}</td><td class="py-3 px-4 text-center font-bold text-emerald-400">${s.hadir}</td><td class="py-3 px-4 text-center font-bold text-blue-400">${s.sakit}</td><td class="py-3 px-4 text-center font-bold text-amber-400">${s.izin}</td><td class="py-3 px-4 text-center font-bold text-rose-400">${s.alpa}</td></tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+};
+
+async function renderTeachingJournals() {
+  setPageHeader('Jurnal Mengajar Guru PAI', 'Catatan pelaksanaan pembelajaran harian berbantuan AI');
+  showLoadingContent('Memuat jurnal mengajar...');
+
+  const [profRes, setRes, clsRes, stdRes, jrnRes] = await Promise.all([
+    serverCall('getTeacherProfile', [APP.session.userId]),
+    serverCall('getAppSettings'),
+    serverCall('getClasses'),
+    serverCall('getStudents'),
+    serverCall('getTeachingJournals')
+  ]);
+
+  APP.teacherProfile = profRes.success ? profRes.data : { fullName: APP.session.fullName || 'Guru PAI', nip: '-', schoolName: 'SDN Ciketing Udik 2 Bantargebang' };
+  if (setRes.success && setRes.data) APP.appSettings = setRes.data;
+  APP.data.classes = clsRes.success ? clsRes.data : [];
+  APP.data.students = stdRes.success ? stdRes.data : [];
+  APP.data.journals = jrnRes.success ? jrnRes.data : [];
+
+  const today = new Date().toISOString().split('T')[0];
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="space-y-5">
+      <div class="glass-strong rounded-2xl p-5 border border-emerald-500/25 shadow-xl">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+          <div class="flex items-center gap-3.5 bg-white/5 p-3.5 rounded-xl border border-white/10">
+            <div class="w-11 h-11 rounded-xl gradient-bg flex items-center justify-center text-white shrink-0 shadow">
+              <i data-lucide="user-check" class="w-6 h-6"></i>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">Identitas Nama Guru (Otomatis)</p>
+              <p class="font-bold text-white text-sm truncate">${APP.teacherProfile.fullName}</p>
+              <p class="text-[11px] text-slate-400 font-mono">NIP: ${APP.teacherProfile.nip || '-'}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3.5 bg-white/5 p-3.5 rounded-xl border border-white/10">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white shrink-0 shadow">
+              <i data-lucide="building-2" class="w-6 h-6"></i>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-cyan-400">Satuan Pendidikan (Otomatis)</p>
+              <p class="font-bold text-white text-sm truncate">${APP.teacherProfile.schoolName || 'SDN Ciketing Udik 2 Bantargebang'}</p>
+              <p class="text-[11px] text-slate-400">Mata Pelajaran: PAI & Budi Pekerti</p>
+            </div>
+          </div>
+
+          <div class="bg-white/5 p-3.5 rounded-xl border border-amber-500/30">
+            <label class="text-[10px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5 mb-1">
+              <i data-lucide="calendar-days" class="w-3.5 h-3.5"></i> Hari / Tanggal Jurnal
+            </label>
+            <div class="flex items-center gap-2">
+              <input type="date" id="journalFilterDate" value="${today}" onchange="updateJournalDateBanner(); renderJournalsTable();" class="flex-1 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer">
+              <button onclick="document.getElementById('journalFilterDate').value=''; updateJournalDateBanner(); renderJournalsTable();" class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] text-slate-200 font-semibold" title="Tampilkan Semua Tanggal">Semua</button>
+            </div>
+            <p id="journalDateBannerText" class="text-[11px] text-amber-300 font-semibold mt-1">${formatHariTanggalIndo(today)}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass rounded-2xl p-4 sm:p-5 border border-white/10">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="journalFilterClass" onchange="renderJournalsTable()" class="px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-white/5 border border-white/10 text-white">
+              <option value="">Semua Kelas</option>
+              ${APP.data.classes.map(c => `<option value="${c.id}">Kelas ${c.className}</option>`).join('')}
+            </select>
+            <select id="journalFilterStatus" onchange="renderJournalsTable()" class="px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-white/5 border border-white/10 text-white">
+              <option value="">Semua Keterangan</option>
+              <option value="Tuntas">Tuntas</option>
+              <option value="Belum Tuntas">Belum Tuntas</option>
+            </select>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button onclick="printTeachingJournals()" class="btn-secondary px-4 py-2.5 rounded-xl text-xs font-bold text-cyan-300 border-cyan-500/30 flex items-center gap-1.5">
+              <i data-lucide="printer" class="w-4 h-4"></i> Cetak Jurnal
+            </button>
+            <button onclick="exportTeachingJournalsExcel()" class="btn-secondary px-4 py-2.5 rounded-xl text-xs font-bold text-emerald-300 border-emerald-500/30 flex items-center gap-1.5">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export Excel
+            </button>
+            <button onclick="openJournalModal()" class="btn-primary px-4 py-2.5 rounded-xl text-xs font-extrabold text-white flex items-center gap-1.5 shadow-lg">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i> + Isi Jurnal Mengajar
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto w-full border border-white/10 rounded-xl bg-black/20">
+          <table class="w-full text-xs sm:text-sm text-left min-w-[980px]">
+            <thead class="bg-white/5 text-[11px] text-slate-300 uppercase font-bold">
+              <tr>
+                <th class="py-3.5 px-3 w-12 text-center">No</th>
+                <th class="py-3.5 px-3 w-36">Hari / Tanggal</th>
+                <th class="py-3.5 px-3 w-24">Kelas</th>
+                <th class="py-3.5 px-4 w-44">Materi Pokok</th>
+                <th class="py-3.5 px-4">Tujuan Pembelajaran</th>
+                <th class="py-3.5 px-4">Refleksi Pembelajaran</th>
+                <th class="py-3.5 px-3 w-44">Siswa Tidak Hadir</th>
+                <th class="py-3.5 px-3 w-28 text-center">Keterangan</th>
+                <th class="py-3.5 px-3 w-24 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="journalsTableBody" class="divide-y divide-white/5"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+
+  renderJournalsTable();
+  try { lucide.createIcons(); } catch(e){}
+}
+
+window.updateJournalDateBanner = function() {
+  const d = val('journalFilterDate');
+  const el = document.getElementById('journalDateBannerText');
+  if (el) el.textContent = d ? formatHariTanggalIndo(d) : 'Menampilkan Semua Hari / Tanggal';
+};
+
+window.renderJournalsTable = function() {
+  const tbody = document.getElementById('journalsTableBody');
+  if (!tbody) return;
+  const fDate = val('journalFilterDate');
+  const fClass = val('journalFilterClass');
+  const fStatus = val('journalFilterStatus');
+
+  let list = (APP.data.journals || []).filter(j => {
+    return (!fDate || j.date === fDate) && (!fClass || j.classId === fClass) && (!fStatus || j.status === fStatus);
+  });
+
+  list.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" class="text-center py-10 text-slate-400 italic">Belum ada catatan jurnal pada filter tanggal/kelas ini. Klik <b>"+ Isi Jurnal Mengajar"</b> untuk menambahkan.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map((j, idx) => {
+    const absentBadges = Array.isArray(j.absentStudents) && j.absentStudents.length > 0
+      ? j.absentStudents.map(s => `<span class="inline-block bg-rose-500/15 text-rose-300 border border-rose-500/30 rounded px-2 py-0.5 text-[10px] mr-1 mb-1">${s}</span>`).join('')
+      : `<span class="text-emerald-400 text-xs font-semibold">NIHIL (Hadir Semua)</span>`;
+
+    const isTuntas = j.status === 'Tuntas';
+    return `
+      <tr class="hover:bg-white/5 align-top">
+        <td class="py-3 px-3 text-center font-mono text-slate-400">${idx + 1}</td>
+        <td class="py-3 px-3 font-semibold text-amber-300 text-xs">${formatHariTanggalIndo(j.date)}</td>
+        <td class="py-3 px-3"><span class="badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">${j.className || '-'}</span></td>
+        <td class="py-3 px-4 font-bold text-white">${j.topic || '-'}</td>
+        <td class="py-3 px-4 text-slate-300 text-xs leading-relaxed whitespace-pre-line">${j.learningObjective || '-'}</td>
+        <td class="py-3 px-4 text-slate-300 text-xs leading-relaxed whitespace-pre-line">${j.reflection || '-'}</td>
+        <td class="py-3 px-3">${absentBadges}</td>
+        <td class="py-3 px-3 text-center">
+          <span class="badge ${isTuntas ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">${j.status || 'Tuntas'}</span>
+        </td>
+        <td class="py-3 px-3 text-right whitespace-nowrap">
+          <button onclick="openJournalModal('${j.id}')" class="p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 mr-1"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+          <button onclick="deleteJournalEntry('${j.id}')" class="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/40"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  try { lucide.createIcons(); } catch(e){}
+};
+
+window.openJournalModal = function(id = null) {
+  const j = id ? (APP.data.journals || []).find(x => x.id === id) : null;
+  const defaultDate = j?.date || val('journalFilterDate') || new Date().toISOString().split('T')[0];
+  const defaultClassId = j?.classId || (APP.data.classes[0]?.id || '');
+  APP._tempJournalAbsent = Array.isArray(j?.absentStudents) ? [...j.absentStudents] : [];
+
+  openModal(id ? 'Edit Jurnal Mengajar' : 'Isi Jurnal Mengajar Baru', `
+    <div class="space-y-4">
+      <div class="bg-emerald-500/10 border border-emerald-500/25 p-3.5 rounded-xl text-xs space-y-1">
+        <div><span class="text-slate-400">Nama Guru:</span> <b class="text-white">${APP.teacherProfile.fullName}</b></div>
+        <div><span class="text-slate-400">NIP:</span> <b class="text-white">${APP.teacherProfile.nip || '-'}</b></div>
+        <div><span class="text-slate-400">Mata Pelajaran:</span> <b class="text-white">Pendidikan Agama Islam & Budi Pekerti</b></div>
+        <div><span class="text-slate-400">Satuan Pendidikan:</span> <b class="text-white">${APP.teacherProfile.schoolName}</b></div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div>
+          <label class="text-xs font-bold text-slate-300 uppercase mb-1 flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-400"></i> Hari / Tanggal</label>
+          <input type="date" id="f_jDate" value="${defaultDate}" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white text-sm cursor-pointer">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-300 uppercase mb-1 block">Kelas <span class="text-red-400">*</span></label>
+          <select id="f_jClass" onchange="populateJournalStudentDropdown()" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white text-sm">
+            ${APP.data.classes.map(c => `<option value="${c.id}" ${defaultClassId === c.id ? 'selected' : ''}>Kelas ${c.className}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-300 uppercase mb-1 block">Keterangan</label>
+          <select id="f_jStatus" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white text-sm">
+            <option value="Tuntas" ${j?.status === 'Tuntas' ? 'selected' : ''}>Tuntas</option>
+            <option value="Belum Tuntas" ${j?.status === 'Belum Tuntas' ? 'selected' : ''}>Belum Tuntas</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-xs font-bold text-slate-300 uppercase mb-1 block">Materi Pembelajaran <span class="text-red-400">*</span></label>
+        <input id="f_jTopic" value="${(j?.topic || '').replace(/"/g, '&quot;')}" class="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white text-sm" placeholder="Contoh: Membaca dan Mengamalkan Surah Al-Ma'un">
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-xs font-bold text-slate-300 uppercase">Tujuan Pembelajaran <span class="text-red-400">*</span></label>
+          <button type="button" onclick="generateJournalFieldAI('objective')" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 text-[11px] font-bold flex items-center gap-1">
+            <i data-lucide="sparkles" class="w-3 h-3"></i> ✨ Bantu Isi dengan AI
+          </button>
+        </div>
+        <textarea id="f_jObjective" rows="3" class="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/15 text-sm text-white" placeholder="Klik 'Bantu Isi dengan AI' atau ketik tujuan pembelajaran...">${j?.learningObjective || ''}</textarea>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-xs font-bold text-slate-300 uppercase">Refleksi Pembelajaran <span class="text-red-400">*</span></label>
+          <button type="button" onclick="generateJournalFieldAI('reflection')" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30 text-[11px] font-bold flex items-center gap-1">
+            <i data-lucide="sparkles" class="w-3 h-3"></i> ✨ Bantu Isi dengan AI
+          </button>
+        </div>
+        <textarea id="f_jReflection" rows="3" class="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/15 text-sm text-white" placeholder="Klik 'Bantu Isi dengan AI' atau ketik refleksi guru...">${j?.reflection || ''}</textarea>
+      </div>
+
+      <div class="bg-black/25 p-3.5 rounded-xl border border-white/10">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <label class="text-xs font-bold text-rose-300 uppercase flex items-center gap-1.5">
+            <i data-lucide="user-x" class="w-4 h-4"></i> Siswa Tidak Hadir (Sesuai Kelas)
+          </label>
+          <button type="button" onclick="syncAbsentFromDailyAttendance()" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold flex items-center gap-1">
+            <i data-lucide="refresh-cw" class="w-3 h-3"></i> Ambil dari Absensi Harian
+          </button>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-2 mb-2.5">
+          <select id="f_jStudentSelect" class="flex-1 px-3 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white"></select>
+          <select id="f_jAbsentReason" class="sm:w-28 px-2.5 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white">
+            <option value="Sakit">Sakit</option>
+            <option value="Izin">Izin</option>
+            <option value="Alpa">Alpa</option>
+          </select>
+          <button type="button" onclick="addAbsentStudentToJournal()" class="btn-secondary px-3 py-2 rounded-xl text-xs font-bold text-rose-300 border-rose-500/30">+ Tambah</button>
+        </div>
+        <div id="f_jAbsentListContainer" class="flex flex-wrap gap-1.5"></div>
+      </div>
+    </div>
+  `, `
+    <button onclick="closeModal()" class="btn-secondary px-5 py-2.5 rounded-xl text-sm font-semibold">Batal</button>
+    <button id="btnSaveJournal" onclick="saveJournalEntry('${id || ''}')" class="btn-primary px-6 py-2.5 rounded-xl text-sm font-bold text-white">Simpan Jurnal</button>
+  `, 'max-w-2xl');
+
+  populateJournalStudentDropdown();
+  renderTempJournalAbsentChips();
+  try { lucide.createIcons(); } catch(e){}
+};
+
+window.populateJournalStudentDropdown = function() {
+  const cid = val('f_jClass');
+  const sel = document.getElementById('f_jStudentSelect');
+  if (!sel) return;
+  const students = (APP.data.students || []).filter(s => s.classId === cid).sort((a,b) => a.fullName.localeCompare(b.fullName));
+  if (students.length === 0) {
+    sel.innerHTML = `<option value="">-- Belum ada siswa di kelas ini --</option>`;
+  } else {
+    sel.innerHTML = `<option value="">-- Pilih Nama Siswa --</option>` + students.map(s => `<option value="${s.fullName}">${s.fullName}</option>`).join('');
+  }
+};
+
+window.addAbsentStudentToJournal = function() {
+  const name = val('f_jStudentSelect');
+  const reason = val('f_jAbsentReason') || 'Sakit';
+  if (!name) return showToast('Pilih nama siswa terlebih dahulu', 'info');
+  const entry = `${name} (${reason})`;
+  if (!APP._tempJournalAbsent.includes(entry)) {
+    APP._tempJournalAbsent.push(entry);
+  }
+  renderTempJournalAbsentChips();
+};
+
+window.removeAbsentStudentFromJournal = function(idx) {
+  APP._tempJournalAbsent.splice(idx, 1);
+  renderTempJournalAbsentChips();
+};
+
+window.renderTempJournalAbsentChips = function() {
+  const box = document.getElementById('f_jAbsentListContainer');
+  if (!box) return;
+  if (!APP._tempJournalAbsent || APP._tempJournalAbsent.length === 0) {
+    box.innerHTML = `<span class="text-xs text-emerald-400 italic">Nihil — Semua siswa hadir.</span>`;
+    return;
+  }
+  box.innerHTML = APP._tempJournalAbsent.map((item, idx) => `
+    <span class="inline-flex items-center gap-1.5 bg-rose-500/20 text-rose-200 border border-rose-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold">
+      ${item}
+      <button type="button" onclick="removeAbsentStudentFromJournal(${idx})" class="text-rose-400 hover:text-white font-bold">&times;</button>
+    </span>
+  `).join('');
+};
+
+window.syncAbsentFromDailyAttendance = async function() {
+  const cid = val('f_jClass');
+  const dateStr = val('f_jDate');
+  if (!cid || !dateStr) return showToast('Pilih kelas dan tanggal terlebih dahulu', 'error');
+  const res = await serverCall('getDailyAttendance', [cid, dateStr]);
+  if (res.success && Array.isArray(res.data)) {
+    const absents = res.data.filter(s => s.status && s.status !== 'Hadir').map(s => `${s.fullName} (${s.status})`);
+    APP._tempJournalAbsent = absents;
+    renderTempJournalAbsentChips();
+    showToast(absents.length ? `Ditemukan ${absents.length} siswa tidak hadir` : 'Semua siswa tercatat Hadir pada tanggal ini', 'info');
+  }
+};
+
+window.generateJournalFieldAI = function(mode) {
+  const topic = val('f_jTopic') || 'Pendidikan Agama Islam dan Budi Pekerti';
+  const cid = val('f_jClass');
+  const status = val('f_jStatus') || 'Tuntas';
+  const clsObj = (APP.data.classes || []).find(c => c.id === cid);
+  const className = clsObj ? clsObj.className : 'SD';
+
+  if (mode === 'objective') {
+    const objectives = [
+      `Melalui kegiatan diskusi, tanya jawab, dan pengamatan kisah teladan pada materi "${topic}", peserta didik kelas ${className} mampu memahami makna pokok materi dengan benar, menunjukkan sikap santun serta tanggung jawab, dan mempraktikkan nilai-nilai "${topic}" dalam kehidupan sehari-hari di rumah maupun di sekolah.`,
+      `Setelah mengikuti pembelajaran berbasis pengalaman kontekstual tentang "${topic}", peserta didik kelas ${className} diharapkan mampu menjelaskan konsep dasar materi secara runtut serta membiasakan perilaku mulia sesuai ajaran Islam dalam pergaulan sehari-hari.`
+    ];
+    document.getElementById('f_jObjective').value = objectives[Math.floor(Math.random() * objectives.length)];
+    showToast('Tujuan Pembelajaran berhasil dirumuskan oleh AI ✨', 'success');
+  } else {
+    const reflectionText = status === 'Tuntas'
+      ? `Pembelajaran materi "${topic}" di kelas ${className} berjalan dengan sangat baik, interaktif, dan menyenangkan. Sebagian besar peserta didik antusias berdiskusi serta mampu mengaitkan materi dengan pengalaman keseharian mereka. Tindak lanjut: memberikan pengayaan dan pembiasaan amal shalih di rumah.`
+      : `Sebagian peserta didik kelas ${className} sudah memahami materi "${topic}", namun masih terdapat beberapa siswa yang memerlukan bimbingan lebih lanjut dalam memahami penerapan materi secara mendalam. Tindak lanjut: melaksanakan pendampingan remedial dan latihan terbimbing pada pertemuan berikutnya.`;
+    document.getElementById('f_jReflection').value = reflectionText;
+    showToast('Refleksi Pembelajaran berhasil dirumuskan oleh AI ✨', 'success');
+  }
+};
+
+window.saveJournalEntry = async function(id = '') {
+  const date = val('f_jDate');
+  const classId = val('f_jClass');
+  const status = val('f_jStatus') || 'Tuntas';
+  const topic = val('f_jTopic');
+  const learningObjective = val('f_jObjective');
+  const reflection = val('f_jReflection');
+
+  if (!date || !classId || !topic || !learningObjective) {
+    return showToast('Harap lengkapi Tanggal, Kelas, Materi, dan Tujuan Pembelajaran!', 'error');
+  }
+
+  const clsObj = (APP.data.classes || []).find(c => c.id === classId);
+  const entry = {
+    id: id || uuidv4(),
+    date,
+    classId,
+    className: clsObj ? clsObj.className : '',
+    topic,
+    learningObjective,
+    reflection,
+    absentStudents: APP._tempJournalAbsent || [],
+    status,
+    teacherName: APP.teacherProfile.fullName,
+    schoolName: APP.teacherProfile.schoolName
+  };
+
+  setLoadingButton('btnSaveJournal', true, 'Menyimpan...');
+  let list = Array.isArray(APP.data.journals) ? [...APP.data.journals] : [];
+  const idx = list.findIndex(x => x.id === id);
+  if (idx >= 0) list[idx] = entry;
+  else list.unshift(entry);
+
+  APP.data.journals = list;
+  await serverCall('saveTeachingJournals', [list]);
+  setLoadingButton('btnSaveJournal', false);
+  closeModal();
+  renderJournalsTable();
+  showToast('Jurnal Mengajar berhasil disimpan!', 'success');
+};
+
+window.deleteJournalEntry = function(id) {
+  askConfirm('Hapus catatan jurnal mengajar ini?', async () => {
+    APP.data.journals = (APP.data.journals || []).filter(x => x.id !== id);
+    await serverCall('saveTeachingJournals', [APP.data.journals]);
+    renderJournalsTable();
+    showToast('Jurnal dihapus', 'info');
+  });
+};
+
+window.printTeachingJournals = function() {
+  const list = APP.data.journals || [];
+  if (list.length === 0) return showToast('Belum ada data jurnal untuk dicetak', 'error');
+  const win = window.open('', '_blank');
+  const rowsHtml = list.map((j, i) => `
+    <tr>
+      <td style="text-align:center;">${i + 1}</td>
+      <td>${formatHariTanggalIndo(j.date)}</td>
+      <td style="text-align:center;">${j.className || '-'}</td>
+      <td>${j.topic || '-'}</td>
+      <td>${j.learningObjective || '-'}</td>
+      <td>${j.reflection || '-'}</td>
+      <td>${(j.absentStudents && j.absentStudents.length) ? j.absentStudents.join(', ') : 'Nihil'}</td>
+      <td style="text-align:center;">${j.status || 'Tuntas'}</td>
+    </tr>
+  `).join('');
+
+  win.document.write(`
+    <!DOCTYPE html><html lang="id"><head><title>Cetak Jurnal Mengajar PAI</title>
+    <style>
+      body { font-family: 'Times New Roman', serif; padding: 20px; color: #000; }
+      h2, h3 { margin: 2px 0; text-align: center; text-transform: uppercase; }
+      table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11pt; }
+      th, td { border: 1px solid #000; padding: 6px 8px; vertical-align: top; }
+      th { background: #f1f5f9; }
+      .identitas-block { margin: 12px 0 15px 0; font-size: 11.5pt; line-height: 1.6; }
+      @media print { .no-print { display: none; } }
+    </style></head><body>
+      <div class="no-print" style="margin-bottom:15px;"><button onclick="window.print()" style="padding:8px 16px;background:#10b981;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">🖨️ Cetak Sekarang</button></div>
+      <h3>JURNAL MENGAJAR PENDIDIKAN AGAMA ISLAM & BUDI PEKERTI</h3>
+      <h2>${APP.teacherProfile.schoolName || 'SDN CIKETING UDIK 2 BANTARGEBANG'}</h2>
+      
+      <div class="identitas-block">
+        <div>Nama Guru &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ${APP.teacherProfile.fullName}</div>
+        <div>NIP &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp
