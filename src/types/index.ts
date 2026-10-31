@@ -40,16 +40,48 @@ export interface AttendanceRecord {
 
 export interface TeachingJournal {
   id: string;
+  teacherId?: string;
   date: string; // YYYY-MM-DD
   classId: string;
   className: string;
+  semester?: 'Ganjil' | 'Genap';
+  academicYear?: string;
+  jamKe?: string; // e.g. '1 - 4'
+  alokasiWaktuJP?: number; // e.g. 4
+  pertemuanKe?: number; // e.g. 1
+  elemenDomain?: string; // Al-Qur'an & Hadis, Akidah, Akhlak, Fikih, Sejarah Peradaban Islam, Tematik, dll.
   topic: string;
+  subTopic?: string;
   learningObjective: string;
-  reflection: string;
+  metodePembelajaran?: string;
+  mediaSumberBelajar?: string;
+  kegiatanPembelajaran?: {
+    pendahuluan: string;
+    inti: string;
+    penutup: string;
+  };
+  asesmenPenilaian?: string;
+  attendanceSummary?: {
+    totalStudents: number;
+    hadir: number;
+    sakit: number;
+    izin: number;
+    alpa: number;
+  };
   absentStudents: string[];
+  reflection: string;
+  tindakLanjut: string;
   status: 'Tuntas' | 'Belum Tuntas';
   teacherName: string;
+  teacherNip?: string;
+  principalName?: string;
+  principalNip?: string;
   schoolName: string;
+  photos?: EKinerjaPhotoItem[];
+  linkedEKinerjaActivityId?: string;
+  linkedPeriodId?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type QuestionType =

@@ -379,29 +379,87 @@ export const INITIAL_ANNOUNCEMENTS: Announcement[] = [
 export const INITIAL_TEACHING_JOURNALS: TeachingJournal[] = [
   {
     id: 'jrn-01',
+    teacherId: 'guru-1',
     date: '2026-10-23',
     classId: 'c-5a',
     className: '5A',
-    topic: 'Membaca dan Menghafal Surah Al-Ma\'un dengan Tajwid yang Benar',
-    learningObjective: 'Melalui kegiatan demonstrasi lafaz dan tutor sebaya pada materi "Membaca Surah Al-Ma\'un", peserta didik kelas 5A mampu melafalkan ayat 1-7 dengan makharijul huruf yang fasih, menunjukkan rasa tanggung jawab, serta membiasakan tadarus Al-Qur\'an secara rutin.',
-    reflection: 'Pembelajaran berjalan interaktif dan kondusif. Mayoritas siswa telah mampu menghafal ayat 1-4 dengan baik. Terdapat 3 siswa yang perlu bimbingan khusus pada bacaan mad thabi\'i. Tindak lanjut: pendampingan talaqqi mandiri sebelum waktu istirahat.',
+    semester: 'Ganjil',
+    academicYear: '2026/2027',
+    jamKe: '1 - 4',
+    alokasiWaktuJP: 4,
+    pertemuanKe: 1,
+    elemenDomain: "Al-Qur'an & Hadis",
+    topic: "Membaca dan Menghafal Surah Al-Ma'un dengan Tajwid yang Benar",
+    subTopic: 'Lafaz, Hukum Bacaan Mim Sukun/Nun Sukun, dan Pesan Pokok Kepedulian Anak Yatim',
+    learningObjective: 'Melalui kegiatan demonstrasi lafaz (talaqqi) dan tutor sebaya pada materi Surah Al-Ma\'un, peserta didik kelas 5A mampu melafalkan ayat 1-7 dengan makharijul huruf dan tajwid yang fasih, menunjukkan sikap kasih sayang terhadap sesama (KBC), serta membiasakan tadarus Al-Qur\'an secara rutin.',
+    metodePembelajaran: 'Demonstrasi Talaqqi, Tutor Sebaya (Peer Teaching), Diskusi Kontekstual KBC',
+    mediaSumberBelajar: 'Mushaf Al-Qur\'an Juz Amma, Poster Tajwid Interaktif, Proyektor Audio Murattal, Buku Teks PAI Kelas 5 Kemendikdasmen',
+    kegiatanPembelajaran: {
+      pendahuluan: 'Guru membuka pelajaran dengan salam, sapaan kasih sayang (KBC), doa belajar bersama, mengecek kehadiran & kerapihan siswa, serta apersepsi mengaitkan kepedulian sosial di sekolah dengan Surah Al-Ma\'un.',
+      inti: 'Guru mencontohkan bacaan Surah Al-Ma\'un ayat 1-7 secara tartil (talaqqi). Siswa menirukan bersama-sama dan berpasangan (tutor sebaya) mengidentifikasi hukum bacaan tajwid serta mendiskusikan makna menyantuni anak yatim dan fakir miskin.',
+      penutup: 'Siswa bersama guru menyimpulkan pesan utama Surah Al-Ma\'un, melakukan refleksi pembiasaan infaq & menolong teman, penyampaian rencana materi pekan depan, dan doa kafaratul majelis.'
+    },
+    asesmenPenilaian: 'Asesmen Formatif: Unjuk Kerja Praktik Membaca & Hafalan Surah Al-Ma\'un (Rubrik Tajwid & Fashahah) serta Observasi Sikap Peduli.',
+    attendanceSummary: {
+      totalStudents: 32,
+      hadir: 31,
+      sakit: 1,
+      izin: 0,
+      alpa: 0
+    },
     absentStudents: ['Bilqis Humaira Zahrani (Sakit)'],
+    reflection: 'Pembelajaran berjalan interaktif, khidmat, dan kondusif. Mayoritas siswa (90%) telah mampu melafalkan dan menghafal ayat 1-5 dengan lancar. Terdapat 3 siswa yang perlu penguatan pada bacaan dengung (ghunnah) dan mad \'arid lissukun.',
+    tindakLanjut: 'Melaksanakan pendampingan talaqqi mandiri 10 menit sebelum istirahat bagi 3 siswa serta menugaskan murajaah hafalan Surah Al-Ma\'un bersama orang tua di rumah.',
     status: 'Tuntas',
-    teacherName: 'Guru PAI',
-    schoolName: 'SDN Ciketing Udik 2 Bantargebang'
+    teacherName: 'Drs. H. Ahmad Syarifuddin, M.Pd.I.',
+    teacherNip: '197908152006041008',
+    principalName: 'Hj. Siti Rohmah, M.Pd.',
+    principalNip: '197405101998022001',
+    schoolName: 'SDN Ciketing Udik 2 Bantargebang',
+    linkedEKinerjaActivityId: 'eka-1',
+    linkedPeriodId: 'ekp-2026-10',
+    createdAt: '2026-10-23T08:15:00.000Z'
   },
   {
     id: 'jrn-02',
+    teacherId: 'guru-1',
     date: '2026-10-21',
     classId: 'c-4a',
     className: '4A',
+    semester: 'Ganjil',
+    academicYear: '2026/2027',
+    jamKe: '1 - 4',
+    alokasiWaktuJP: 4,
+    pertemuanKe: 2,
+    elemenDomain: 'Akidah',
     topic: 'Mengenal Rukun Iman dan Hikmah Beriman kepada Malaikat Allah',
-    learningObjective: 'Setelah menyimak tayangan kisah dan peta konsep malaikat Allah, peserta didik kelas 4A dapat menyebutkan nama-nama 10 malaikat beserta tugasnya dengan benar serta meneladani sifat taat malaikat dalam kehidupan sehari-hari.',
-    reflection: 'Peserta didik antusias membuat lagu/tepuk 10 malaikat. Seluruh siswa aktif bertanya mengenai tugas Malaikat Raqib dan Atid. Evaluasi lisan menunjukkan pemahaman materi mencapai 92%.',
+    subTopic: 'Nama-nama 10 Malaikat Allah, Tugasnya, dan Perilaku Jujur/Amanah dalam Keseharian',
+    learningObjective: 'Setelah menyimak tayangan kisah hikmah dan peta konsep malaikat Allah, peserta didik kelas 4A dapat menguraikan nama-nama 10 malaikat beserta tugasnya dengan tepat serta meneladani sifat ketaatan dan kejujuran dalam kehidupan sehari-hari di sekolah maupun di rumah.',
+    metodePembelajaran: 'Discovery Learning, Mind Mapping (Peta Konsep), Tanya Jawab Interaktif',
+    mediaSumberBelajar: 'Slide Presentasi Visual 10 Malaikat, Lembar Kerja Peserta Didik (LKPD), Kartu Pasangan (Make a Match)',
+    kegiatanPembelajaran: {
+      pendahuluan: 'Mengucapkan salam, doa bersama, tadarus Surah Al-Ikhlas, presensi kehadiran siswa, dan pertanyaan pemantik tentang siapakah makhluk Allah yang selalu mencatat amal baik kita.',
+      inti: 'Siswa dibagi dalam kelompok kolaboratif untuk menyusun peta konsep 10 Malaikat Allah beserta tugasnya menggunakan kartu Make a Match, dilanjutkan presentasi kelompok dan penguatan konsep integritas/kejujuran karena merasa diawasi Malaikat Raqib & Atid.',
+      penutup: 'Evaluasi formatif lisan singkat, apresiasi kelompok terbaik, refleksi karakter jujur (Kurikulum Berbasis Cinta), dan doa penutup.'
+    },
+    asesmenPenilaian: 'Asesmen Formatif: Penilaian LKPD Peta Konsep & Kuis Lisan Menjodohkan Nama Malaikat dan Tugasnya.',
+    attendanceSummary: {
+      totalStudents: 32,
+      hadir: 32,
+      sakit: 0,
+      izin: 0,
+      alpa: 0
+    },
     absentStudents: [],
+    reflection: 'Peserta didik sangat antusias bekerja sama dalam permainan kartu pasangan 10 malaikat. Seluruh siswa hadir (100%) dan hasil evaluasi formatif menunjukkan rata-rata ketuntasan kelas mencapai 92%.',
+    tindakLanjut: 'Memberikan pengayaan kisah teladan kejujuran dan mengarsipkan hasil karya peta konsep siswa pada portofolio kelas.',
     status: 'Tuntas',
-    teacherName: 'Guru PAI',
-    schoolName: 'SDN Ciketing Udik 2 Bantargebang'
+    teacherName: 'Drs. H. Ahmad Syarifuddin, M.Pd.I.',
+    teacherNip: '197908152006041008',
+    principalName: 'Hj. Siti Rohmah, M.Pd.',
+    principalNip: '197405101998022001',
+    schoolName: 'SDN Ciketing Udik 2 Bantargebang',
+    createdAt: '2026-10-21T09:00:00.000Z'
   }
 ];
 

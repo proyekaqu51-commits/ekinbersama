@@ -6,10 +6,11 @@ import { LoginView } from './components/LoginView';
 import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
 
-// Admin Components (4 Selected Views)
+// Admin Components
 import { AdminDashboard } from './components/admin/AdminDashboard';
 import { ProfileAndSettingsView } from './components/admin/ProfileAndSettingsView';
 import { EKinerjaHarianView } from './components/admin/EKinerjaHarianView';
+import { TeachingJournalView } from './components/admin/TeachingJournalView';
 import { OfflineIndicator } from './components/pwa/OfflineIndicator';
 
 export default function App() {
@@ -65,13 +66,13 @@ export default function App() {
     setCurrentView('dashboard');
   };
 
-  // Dynamic header titles based on 4 allowed views
+  // Dynamic header titles
   const getHeaderInfo = () => {
     switch (currentView) {
       case 'dashboard':
         return {
           title: 'Dashboard Utama',
-          subtitle: 'Ringkasan Kinerja Pendidik PAI, Kalender Akademik & E-Kinerja SDN Ciketing Udik 2'
+          subtitle: 'Ringkasan Kinerja Pendidik PAI, Jurnal Mengajar & E-Kinerja SDN Ciketing Udik 2'
         };
       case 'profile':
         return {
@@ -82,6 +83,11 @@ export default function App() {
         return {
           title: 'E-Kinerja Harian Pegawai / Guru PAI',
           subtitle: 'Identitas otomatis, periode bulan & tahun, RKH, Rencana Aksi, Tindak Lanjut & Multi-Foto'
+        };
+      case 'jurnal-mengajar':
+        return {
+          title: 'Jurnal Mengajar Harian Guru (Bukti Fisik E-Kinerja)',
+          subtitle: 'Penyusunan jurnal pelaksanaan pembelajaran profesional, presensi kelas, refleksi & pengesahan Kepala Sekolah'
         };
       case 'master-rhk':
         return {
@@ -162,6 +168,12 @@ export default function App() {
               }}
             />
           )}
+          {currentView === 'jurnal-mengajar' && (
+            <TeachingJournalView
+              onNavigate={view => setCurrentView(view)}
+              showToast={showToast}
+            />
+          )}
           {currentView === 'master-rhk' && (
             <EKinerjaHarianView
               initialTab="master_rhk"
@@ -174,7 +186,7 @@ export default function App() {
           {currentView === 'settings' && (
             <ProfileAndSettingsView mode="settings" showToast={showToast} />
           )}
-          {!['dashboard', 'profile', 'e-kinerja', 'master-rhk', 'settings'].includes(currentView) && (
+          {!['dashboard', 'profile', 'e-kinerja', 'jurnal-mengajar', 'master-rhk', 'settings'].includes(currentView) && (
             <AdminDashboard
               onNavigate={view => setCurrentView(view)}
               showToast={showToast}

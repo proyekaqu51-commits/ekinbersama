@@ -2423,6 +2423,10 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
         ? allAttachedDocs
             .map(item => {
               const isPdf = item.doc.fileType === 'pdf';
+              const isHtmlDoc =
+                item.doc.mimeType === 'text/html' ||
+                item.doc.fileName.toLowerCase().endsWith('.html') ||
+                item.doc.dataUrl.startsWith('data:text/html');
               return `
                 <div class="page attachment-page lampiran2-page">
                   <div class="lampiran-banner">
@@ -2440,10 +2444,10 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                   </div>
 
                   ${
-                    isPdf
+                    isPdf || isHtmlDoc
                       ? `
                         <div class="lampiran2-full-doc-frame">
-                          <iframe src="${item.doc.dataUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH" title="${item.doc.fileName}" class="lampiran2-full-iframe"></iframe>
+                          <iframe src="${item.doc.dataUrl}${isPdf ? '#toolbar=0&navpanes=0&scrollbar=0&view=FitH' : ''}" title="${item.doc.fileName}" class="lampiran2-full-iframe"></iframe>
                         </div>
                       `
                       : `

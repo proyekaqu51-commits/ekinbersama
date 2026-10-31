@@ -1088,22 +1088,38 @@ export const StorageService = {
     };
   },
 
-  getJournals: (): TeachingJournal[] => {
-    return getStorage<TeachingJournal[]>(STORAGE_KEYS.JOURNALS, INITIAL_TEACHING_JOURNALS);
+  getJournals: (teacherId?: string): TeachingJournal[] => {
+    const all = getStorage<TeachingJournal[]>(STORAGE_KEYS.JOURNALS, INITIAL_TEACHING_JOURNALS);
+    if (!teacherId) return all;
+    return all.filter(
+      j => j.teacherId === teacherId || (!j.teacherId && teacherId === 'guru-1')
+    );
   },
 
-  saveJournal: (entry: Omit<TeachingJournal, 'id'> & { id?: string }): TeachingJournal => {
+  saveJournal: (entry: Omit<TeachingJournal, 'id'> & { id?: string }, teacherId?: string): TeachingJournal => {
+    const targetTeacherId = entry.teacherId || teacherId || StorageService.getActiveTeacherId();
     const journals = getStorage<TeachingJournal[]>(STORAGE_KEYS.JOURNALS, INITIAL_TEACHING_JOURNALS);
+    const nowIso = new Date().toISOString();
     let updated: TeachingJournal;
     if (entry.id) {
-      updated = { ...entry, id: entry.id };
+      const existing = journals.find(j => j.id === entry.id);
+      updated = {
+        ...entry,
+        id: entry.id,
+        teacherId: targetTeacherId,
+        createdAt: entry.createdAt || existing?.createdAt || nowIso,
+        updatedAt: nowIso
+      };
       const idx = journals.findIndex(j => j.id === entry.id);
       if (idx !== -1) journals[idx] = updated;
       else journals.unshift(updated);
     } else {
       updated = {
         ...entry,
-        id: 'jrn-' + Math.random().toString(36).substring(2, 9)
+        id: 'jrn-' + Math.random().toString(36).substring(2, 9),
+        teacherId: targetTeacherId,
+        createdAt: nowIso,
+        updatedAt: nowIso
       };
       journals.unshift(updated);
     }

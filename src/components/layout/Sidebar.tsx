@@ -5,6 +5,7 @@ import {
   Settings,
   ClipboardCheck,
   ListChecks,
+  BookOpen,
   LogOut,
   X
 } from 'lucide-react';
@@ -45,6 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'profile', label: 'Profil Guru', icon: User },
     { id: 'e-kinerja', label: 'E-Kinerja Harian', icon: ClipboardCheck },
+    { id: 'jurnal-mengajar', label: 'Jurnal Mengajar', icon: BookOpen },
     { id: 'master-rhk', label: 'Daftar Master RHK', icon: ListChecks },
     { id: 'settings', label: 'Pengaturan', icon: Settings }
   ];

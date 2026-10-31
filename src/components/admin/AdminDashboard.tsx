@@ -367,7 +367,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, show
       {/* ============================================================================
           PINTASAN CEPAT MENU E-KINERJA
          ============================================================================ */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <button
           onClick={() => onNavigate('e-kinerja')}
           className="glass rounded-2xl p-5 border border-emerald-500/30 hover:border-emerald-400/60 transition-all text-left group flex items-start gap-4 shadow-lg hover:bg-emerald-500/5 cursor-pointer"
@@ -384,6 +384,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, show
             </div>
             <p className="text-xs text-slate-400 mt-1 leading-relaxed">
               Input RKH harian, uraian kegiatan, rencana aksi, tindak lanjut, dan unggah foto dokumentasi kegiatan.
+            </p>
+          </div>
+        </button>
+
+        <button
+          onClick={() => onNavigate('jurnal-mengajar')}
+          className="glass rounded-2xl p-5 border border-teal-500/30 hover:border-teal-400/60 transition-all text-left group flex items-start gap-4 shadow-lg hover:bg-teal-500/5 cursor-pointer"
+        >
+          <div className="w-12 h-12 rounded-2xl bg-teal-500/20 border border-teal-500/40 text-teal-300 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+            <FileText className="w-6 h-6" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-sm text-white group-hover:text-teal-300 transition-colors">
+                Jurnal Mengajar Guru
+              </h3>
+              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-teal-400 group-hover:translate-x-1 transition-all" />
+            </div>
+            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+              Buat jurnal pelaksanaan KBM profesional, presensi siswa, refleksi &amp; cetak sebagai bukti fisik E-Kinerja.
             </p>
           </div>
         </button>
