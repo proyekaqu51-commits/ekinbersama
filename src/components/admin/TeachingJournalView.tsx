@@ -89,6 +89,25 @@ const MEDIA_TEMPLATES = [
   'Poster Tata Cara Wudhu & Shalat, LKPD Berdiferensiasi, Lingkungan Musholla Sekolah'
 ];
 
+const GRADE_LEVELS = ['1', '2', '3', '4', '5', '6'];
+const ROMBEL_LETTERS = ['A', 'B', 'C'];
+
+const STANDARD_ROMBEL_CLASSES: Array<{
+  id: string;
+  className: string;
+  grade: string;
+  rombel: string;
+  defaultStudents: number;
+}> = GRADE_LEVELS.flatMap(grade =>
+  ROMBEL_LETTERS.map(rombel => ({
+    id: `c-${grade}${rombel.toLowerCase()}`,
+    className: `${grade}${rombel}`,
+    grade,
+    rombel,
+    defaultStudents: grade === '1' ? 28 : grade === '2' || grade === '6' ? 30 : 32
+  }))
+);
+
 function formatHariTanggalIndo(dateStr: string): string {
   if (!dateStr) return '-';
   const parts = dateStr.split('-');
@@ -612,18 +631,44 @@ export const TeachingJournalView: React.FC<TeachingJournalViewProps> = ({
     showToast(`Beralih ke Jurnal Mengajar: ${prof.fullName}`, 'info');
   };
 
+  // Gabungkan daftar Kelas 1-6 Rombel A, B, C dengan data kelas tersimpan agar seluruh 18 rombel (1A-6C) selalu tersedia
+  const allClassOptions = useMemo<ClassItem[]>(() => {
+    const mergedMap = new Map<string, ClassItem>();
+    STANDARD_ROMBEL_CLASSES.forEach(std => {
+      mergedMap.set(std.id, {
+        id: std.id,
+        className: std.className,
+        homeroom: `Wali Kelas ${std.className}`,
+        academicYear: '2026/2027',
+        studentCount: std.defaultStudents
+      });
+    });
+    classes.forEach(c => {
+      const normalizedId = `c-${c.className.toLowerCase().replace(/\s+/g, '')}`;
+      const targetKey = mergedMap.has(c.id) ? c.id : mergedMap.has(normalizedId) ? normalizedId : c.id;
+      const existing = mergedMap.get(targetKey);
+      mergedMap.set(targetKey, {
+        ...existing,
+        ...c,
+        id: targetKey,
+        studentCount: c.studentCount || existing?.studentCount || 30
+      });
+    });
+    return Array.from(mergedMap.values());
+  }, [classes]);
+
   // Filtered topics for the chosen class grade
   const matchingCurriculumTopics = useMemo(() => {
-    const cls = classes.find(c => c.id === formClassId);
-    const grade = cls ? cls.className.replace(/\D/g, '') : '5';
+    const cls = allClassOptions.find(c => c.id === formClassId || c.className === formClassId);
+    const grade = cls ? cls.className.replace(/\D/g, '') : formClassId.replace(/\D/g, '') || '5';
     return classTopics.filter(t => t.classGrade === grade && t.semester === formSemester);
-  }, [classTopics, classes, formClassId, formSemester]);
+  }, [classTopics, allClassOptions, formClassId, formSemester]);
 
   const handleApplyCurriculumTopic = (topicId: string) => {
     const found = matchingCurriculumTopics.find(t => t.id === topicId);
     if (!found) return;
-    const cls = classes.find(c => c.id === formClassId);
-    const classNameLabel = cls ? cls.className : `Kelas ${found.classGrade}`;
+    const cls = allClassOptions.find(c => c.id === formClassId || c.className === formClassId);
+    const classNameLabel = cls ? cls.className : `${found.classGrade}A`;
 
     setFormElemen(found.domain);
     setFormTopic(`Bab ${found.chapterNo}: ${found.chapterTitle}`);
@@ -651,7 +696,7 @@ export const TeachingJournalView: React.FC<TeachingJournalViewProps> = ({
   };
 
   const handleSmartGenerateNarratives = () => {
-    const cls = classes.find(c => c.id === formClassId);
+    const cls = allClassOptions.find(c => c.id === formClassId || c.className === formClassId);
     const classNameLabel = cls ? cls.className : '5A';
     const topicTitle = formTopic.trim() || 'Materi Pembelajaran PAI & Budi Pekerti';
 
@@ -683,7 +728,9 @@ export const TeachingJournalView: React.FC<TeachingJournalViewProps> = ({
     setEditingJournal(null);
     const today = new Date().toISOString().split('T')[0];
     setFormDate(today);
-    const defaultCls = classes[4] || classes[0] || { id: 'c-5a', className: '5A', studentCount: 32 };
+    const defaultCls =
+      allClassOptions.find(c => c.id === 'c-5a') ||
+      allClassOptions[0] || { id: 'c-5a', className: '5A', studentCount: 32 };
     setFormClassId(defaultCls.id);
     setFormSemester('Ganjil');
     setFormJamKe('1 - 4');
@@ -888,8 +935,8 @@ export const TeachingJournalView: React.FC<TeachingJournalViewProps> = ({
       return;
     }
 
-    const cls = classes.find(c => c.id === formClassId);
-    const className = cls ? cls.className : '5A';
+    const cls = allClassOptions.find(c => c.id === formClassId || c.className === formClassId);
+    const className = cls ? cls.className : formClassId.replace(/^c-/i, '').toUpperCase() || '5A';
     const hadirCount = Math.max(0, formTotalStudents - formSakit - formIzin - formAlpa);
     const absentArray = formAbsentText
       .split(',')
@@ -1477,11 +1524,19 @@ export const TeachingJournalView: React.FC<TeachingJournalViewProps> = ({
             onChange={e => setFilterClass(e.target.value)}
             className="px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-xs text-white font-semibold focus:outline-none focus:border-emerald-500"
           >
-            <option value="all">Semua Kelas</option>
-            {classes.map(c => (
-              <option key={c.id} value={c.id}>
-                Kelas {c.className}
-              </option>
+            <option value="all">Semua Kelas &amp; Rombel (1A - 6C)</option>
+            {GRADE_LEVELS.map(grade => (
+              <optgroup key={grade} label={`Tingkat Kelas ${grade}`}>
+                {ROMBEL_LETTERS.map(rombel => {
+                  const classId = `c-${grade}${rombel.toLowerCase()}`;
+                  const className = `${grade}${rombel}`;
+                  return (
+                    <option key={classId} value={classId}>
+                      Kelas {className} (Tingkat {grade} - Rombel {rombel})
+                    </option>
+                  );
+                })}
+              </optgroup>
             ))}
           </select>
 
@@ -1777,17 +1832,29 @@ export const TeachingJournalView: React.FC<TeachingJournalViewProps> = ({
                     onChange={e => {
                       const cId = e.target.value;
                       setFormClassId(cId);
-                      const found = classes.find(c => c.id === cId);
+                      const found = allClassOptions.find(c => c.id === cId || c.className === cId);
                       if (found && found.studentCount) {
                         setFormTotalStudents(found.studentCount);
                       }
                     }}
                     className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-white/15 text-white font-semibold focus:outline-none focus:border-emerald-500"
                   >
-                    {classes.map(c => (
-                      <option key={c.id} value={c.id}>
-                        Kelas {c.className} ({c.studentCount || 30} Siswa)
-                      </option>
+                    {GRADE_LEVELS.map(grade => (
+                      <optgroup key={grade} label={`Tingkat Kelas ${grade}`}>
+                        {ROMBEL_LETTERS.map(rombel => {
+                          const classId = `c-${grade}${rombel.toLowerCase()}`;
+                          const className = `${grade}${rombel}`;
+                          const found = allClassOptions.find(
+                            c => c.id === classId || c.className === className
+                          );
+                          const studentTotal = found?.studentCount || 30;
+                          return (
+                            <option key={classId} value={classId}>
+                              Kelas {className} — Rombel {rombel} ({studentTotal} Siswa)
+                            </option>
+                          );
+                        })}
+                      </optgroup>
                     ))}
                   </select>
                 </div>

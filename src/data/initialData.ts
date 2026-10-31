@@ -16,11 +16,23 @@ import {
 
 export const INITIAL_CLASSES: ClassItem[] = [
   { id: 'c-1a', className: '1A', homeroom: 'Ibu Nurlaila, S.Pd.I.', academicYear: '2026/2027', studentCount: 28 },
+  { id: 'c-1b', className: '1B', homeroom: 'Ibu Rina Kartika, S.Pd.', academicYear: '2026/2027', studentCount: 28 },
+  { id: 'c-1c', className: '1C', homeroom: 'Ibu Dewi Sartika, S.Pd.', academicYear: '2026/2027', studentCount: 28 },
   { id: 'c-2a', className: '2A', homeroom: 'Ibu Fatimah, S.Pd.', academicYear: '2026/2027', studentCount: 30 },
+  { id: 'c-2b', className: '2B', homeroom: 'Ibu Sri Wahyuni, S.Pd.', academicYear: '2026/2027', studentCount: 30 },
+  { id: 'c-2c', className: '2C', homeroom: 'Bapak Hendra Wijaya, S.Pd.', academicYear: '2026/2027', studentCount: 30 },
   { id: 'c-3a', className: '3A', homeroom: 'Bapak Ahmad Fauzi, S.Pd.', academicYear: '2026/2027', studentCount: 32 },
+  { id: 'c-3b', className: '3B', homeroom: 'Ibu Ratna Sari, S.Pd.', academicYear: '2026/2027', studentCount: 32 },
+  { id: 'c-3c', className: '3C', homeroom: 'Bapak Lukman Hakim, S.Pd.', academicYear: '2026/2027', studentCount: 32 },
   { id: 'c-4a', className: '4A', homeroom: 'Ibu Siti Rahmawati, S.Pd.I.', academicYear: '2026/2027', studentCount: 32 },
+  { id: 'c-4b', className: '4B', homeroom: 'Ibu Indah Permatasari, S.Pd.', academicYear: '2026/2027', studentCount: 32 },
+  { id: 'c-4c', className: '4C', homeroom: 'Bapak Ridwan Kamil, S.Pd.', academicYear: '2026/2027', studentCount: 32 },
   { id: 'c-5a', className: '5A', homeroom: 'Bapak Muhammad Hasan, S.Pd.I.', academicYear: '2026/2027', studentCount: 32 },
-  { id: 'c-6a', className: '6A', homeroom: 'Ibu Dra. Hj. Maryam', academicYear: '2026/2027', studentCount: 30 }
+  { id: 'c-5b', className: '5B', homeroom: 'Ibu Nurhayati, S.Pd.', academicYear: '2026/2027', studentCount: 32 },
+  { id: 'c-5c', className: '5C', homeroom: 'Bapak Taufik Hidayat, S.Pd.', academicYear: '2026/2027', studentCount: 32 },
+  { id: 'c-6a', className: '6A', homeroom: 'Ibu Dra. Hj. Maryam', academicYear: '2026/2027', studentCount: 30 },
+  { id: 'c-6b', className: '6B', homeroom: 'Bapak Drs. H. Suparman', academicYear: '2026/2027', studentCount: 30 },
+  { id: 'c-6c', className: '6C', homeroom: 'Ibu Hj. Aminah, S.Pd.', academicYear: '2026/2027', studentCount: 30 }
 ];
 
 export const INITIAL_STUDENTS: Student[] = [
