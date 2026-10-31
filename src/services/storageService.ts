@@ -888,12 +888,26 @@ export const StorageService = {
   },
 
   getClasses: (): ClassItem[] => {
-    const classes = getStorage<ClassItem[]>(STORAGE_KEYS.CLASSES, INITIAL_CLASSES);
+    let classes = getStorage<ClassItem[]>(STORAGE_KEYS.CLASSES, INITIAL_CLASSES);
+    const hasDefaultDemo = classes.some(c => c && DEMO_CLASS_IDS.has(c.id));
+    if (hasDefaultDemo && classes.length < INITIAL_CLASSES.length) {
+      const existingNames = new Set(classes.map(c => (c.className || '').trim().toUpperCase()));
+      const missing = INITIAL_CLASSES.filter(ic => !existingNames.has(ic.className.toUpperCase()));
+      if (missing.length > 0) {
+        classes = [...classes, ...missing].sort((a, b) =>
+          a.className.localeCompare(b.className, 'id', { numeric: true })
+        );
+        setStorage(STORAGE_KEYS.CLASSES, classes);
+      }
+    }
     const students = getStorage<Student[]>(STORAGE_KEYS.STUDENTS, INITIAL_STUDENTS);
-    return classes.map(c => ({
-      ...c,
-      studentCount: students.filter(s => s.classId === c.id).length
-    }));
+    return classes.map(c => {
+      const count = students.filter(s => s.classId === c.id).length;
+      return {
+        ...c,
+        studentCount: count > 0 ? count : (c.studentCount || 30)
+      };
+    });
   },
 
   saveClass: (classItem: Omit<ClassItem, 'id'> & { id?: string }): ClassItem => {
