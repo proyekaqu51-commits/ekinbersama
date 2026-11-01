@@ -727,7 +727,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
     });
   }, [masterRhkList, masterFilterCategory, masterSearchQuery]);
 
-  // Automatic Identity Fields (#1, #2, #3, #4)
+  // Automatic Identity Fields (#1, #2, #3, #4) + Manual Jam Kerja (#5)
   const autoNamaPegawai = teacherProfile.fullName || '-';
   const autoNip = teacherProfile.nip || '-';
   const autoJabatan =
@@ -736,6 +736,32 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       ? `Guru ${teacherProfile.subject}`
       : 'Guru Pendidikan Agama Islam & Budi Pekerti');
   const autoUnitKerja = teacherProfile.schoolName || appSettings.schoolName || '-';
+  const resolvedJamKerja =
+    (activePeriod?.jamKerja !== undefined
+      ? activePeriod.jamKerja
+      : teacherProfile.jamKerja !== undefined
+      ? teacherProfile.jamKerja
+      : '07.00-15.30') || '07.00-15.30';
+
+  const handleUpdateJamKerja = (rawVal: string) => {
+    const updatedProf: TeacherProfile = {
+      ...teacherProfile,
+      jamKerja: rawVal
+    };
+    StorageService.saveTeacherProfile(updatedProf);
+    setTeacherProfile(updatedProf);
+
+    if (activePeriod) {
+      StorageService.saveEKinerjaPeriod(
+        {
+          ...activePeriod,
+          jamKerja: rawVal
+        },
+        activeTeacherId
+      );
+      setPeriods(StorageService.getEKinerjaPeriods(activeTeacherId));
+    }
+  };
 
   const notaDinasSectionRef = useRef<HTMLDivElement | null>(null);
 
@@ -2500,6 +2526,11 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                                 <td>${autoJabatan} — ${autoUnitKerja}</td>
                               </tr>
                               <tr>
+                                <td class="label">Jam Kerja</td>
+                                <td class="colon">:</td>
+                                <td>${resolvedJamKerja}</td>
+                              </tr>
+                              <tr>
                                 <td class="label">Hari / Tanggal Kegiatan</td>
                                 <td class="colon">:</td>
                                 <td><b>Kegiatan No. ${item.activityNo} — ${item.dateFormatted}</b></td>
@@ -2874,6 +2905,11 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
               <td class="label">Unit Kerja</td>
               <td class="colon">:</td>
               <td>${autoUnitKerja}</td>
+            </tr>
+            <tr>
+              <td class="label">Jam Kerja</td>
+              <td class="colon">:</td>
+              <td>${resolvedJamKerja}</td>
             </tr>
             <tr>
               <td class="label">Periode Bulan &amp; Tahun</td>
@@ -3508,6 +3544,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       ['NIP', ':', autoNip],
       ['Jabatan', ':', autoJabatan],
       ['Unit Kerja', ':', autoUnitKerja],
+      ['Jam Kerja', ':', resolvedJamKerja],
       ['Periode Bulan', ':', activePeriod.month],
       ['Periode Tahun', ':', activePeriod.year],
       [],
@@ -3838,6 +3875,42 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                 placeholder="2026"
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-xs font-semibold font-mono focus:outline-none focus:border-emerald-500"
               />
+            </div>
+          </div>
+
+          {/* Input Manual Jam Kerja */}
+          <div className="pt-2 border-t border-white/10 space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-bold text-emerald-300 uppercase">
+                Jam Kerja (Diisi Manual)
+              </label>
+              <span className="text-[10px] text-slate-400">Contoh: 07.00-15.30</span>
+            </div>
+            <input
+              type="text"
+              value={
+                activePeriod?.jamKerja !== undefined
+                  ? activePeriod.jamKerja
+                  : teacherProfile.jamKerja !== undefined
+                  ? teacherProfile.jamKerja
+                  : '07.00-15.30'
+              }
+              onChange={e => handleUpdateJamKerja(e.target.value)}
+              placeholder="Contoh: 07.00-15.30"
+              className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-white text-xs font-bold font-mono focus:outline-none focus:border-emerald-400"
+            />
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+              <span className="text-[10px] text-slate-400">Pilih Cepat:</span>
+              {['07.00-15.30', '07.00-14.00', '06.30-15.00'].map(preset => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => handleUpdateJamKerja(preset)}
+                  className="px-2 py-0.5 rounded-md bg-white/5 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/30 text-[10px] font-mono text-slate-300 hover:text-emerald-300 cursor-pointer transition-all"
+                >
+                  {preset}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -4364,9 +4437,34 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
               </div>
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-1 sm:gap-3 py-1.5 border-b border-white/5 items-center">
+              <div className="sm:col-span-3 font-bold text-slate-300 flex items-center justify-between">
+                <span>5. Jam Kerja</span>
+                <span className="hidden sm:inline">:</span>
+              </div>
+              <div className="sm:col-span-9 flex flex-wrap items-center gap-2">
+                <input
+                  type="text"
+                  value={
+                    activePeriod?.jamKerja !== undefined
+                      ? activePeriod.jamKerja
+                      : teacherProfile.jamKerja !== undefined
+                      ? teacherProfile.jamKerja
+                      : '07.00-15.30'
+                  }
+                  onChange={e => handleUpdateJamKerja(e.target.value)}
+                  placeholder="Contoh: 07.00-15.30"
+                  className="px-3 py-1.5 rounded-xl bg-slate-950 border border-emerald-500/40 text-white text-xs sm:text-sm font-mono font-bold focus:outline-none focus:border-emerald-400 w-48"
+                />
+                <span className="text-[10px] px-2 py-0.5 rounded bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-semibold">
+                  Diisi Manual (Contoh: 07.00-15.30)
+                </span>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-1 sm:gap-3 py-1.5">
               <div className="sm:col-span-3 font-bold text-slate-300 flex items-center justify-between">
-                <span>5. Periode Kinerja</span>
+                <span>6. Periode Bulan &amp; Tahun</span>
                 <span className="hidden sm:inline">:</span>
               </div>
               <div className="sm:col-span-9 font-bold text-emerald-300 flex flex-wrap items-center gap-2">
@@ -6567,6 +6665,20 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                   }
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-sm"
                   required
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-300 uppercase block mb-1">
+                  5. Jam Kerja (Diisi Manual)
+                </label>
+                <input
+                  type="text"
+                  value={editProfileForm.jamKerja ?? resolvedJamKerja}
+                  onChange={e =>
+                    setEditProfileForm({ ...editProfileForm, jamKerja: e.target.value })
+                  }
+                  placeholder="Contoh: 07.00-15.30"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-sm font-mono"
                 />
               </div>
 

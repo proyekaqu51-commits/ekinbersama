@@ -202,6 +202,7 @@ export interface TeacherProfile {
   pangkatGolongan?: string;
   jabatan?: string;
   schoolName: string;
+  jamKerja?: string;
   subject?: string;
   signatureDataUrl?: string;
   principalName?: string;
@@ -654,6 +655,7 @@ export interface EKinerjaPeriod {
   teacherId?: string;
   month: string; // 'Januari' .. 'Desember'
   year: string;  // '2026', '2027', dll.
+  jamKerja?: string; // e.g. '07.00-15.30'
   rkhList: EKinerjaRKHItem[];
   rencanaAksiList: EKinerjaRencanaAksiItem[];
   tindakLanjutList: EKinerjaTindakLanjutItem[];
