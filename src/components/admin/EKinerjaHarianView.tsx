@@ -2613,7 +2613,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       <html lang="id">
       <head>
         <meta charset="UTF-8" />
-        <title>LAPORAN E-KINERJA HARIAN - ${schoolNameUpper} - ${activePeriod.month} ${activePeriod.year}</title>
+        <title>LAPORAN HARIAN KINERJA PEGAWAI - ${schoolNameUpper} - ${activePeriod.month} ${activePeriod.year}</title>
         <style>
           @page { size: A4 portrait; margin: 10mm 12mm; }
           * { box-sizing: border-box; }
@@ -2878,11 +2878,10 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
           </div>
         </div>
 
-        <!-- HALAMAN UTAMA: LAPORAN E-KINERJA HARIAN -->
+        <!-- HALAMAN UTAMA: LAPORAN HARIAN KINERJA PEGAWAI -->
         <div class="page">
           <div class="header-title">
-            <h2>LAPORAN E-KINERJA HARIAN</h2>
-            <p>${schoolNameUpper}</p>
+            <h2>LAPORAN HARIAN KINERJA PEGAWAI</h2>
           </div>
 
           <table class="identity-table">
@@ -3537,8 +3536,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
   const handleExportExcel = () => {
     if (!activePeriod) return;
     const rows: any[][] = [
-      ['LAPORAN E-KINERJA HARIAN'],
-      [(autoUnitKerja || '-').toUpperCase()],
+      ['LAPORAN HARIAN KINERJA PEGAWAI'],
       [],
       ['Nama Pegawai', ':', autoNamaPegawai],
       ['NIP', ':', autoNip],
