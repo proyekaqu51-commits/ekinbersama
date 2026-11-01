@@ -2568,67 +2568,89 @@ export const StorageService = {
   getEKinerjaPeriods: (teacherId?: string): EKinerjaPeriod[] => {
     const targetTeacherId = teacherId || StorageService.getActiveTeacherId();
     const all = getStorage<EKinerjaPeriod[]>(STORAGE_KEYS.E_KINERJA_PERIODS, INITIAL_E_KINERJA_PERIODS);
+
+    // Ambil Master RKH, Rencana Aksi, dan Tindak Lanjut bersama yang berlaku untuk semua guru
+    let sharedMaster: {
+      rkhList: EKinerjaPeriod['rkhList'];
+      rencanaAksiList: EKinerjaPeriod['rencanaAksiList'];
+      tindakLanjutList: EKinerjaPeriod['tindakLanjutList'];
+    } | null = null;
+
+    try {
+      const rawShared = localStorage.getItem('lms_e_kinerja_shared_master_rkh');
+      if (rawShared) {
+        const parsed = JSON.parse(rawShared);
+        if (parsed && Array.isArray(parsed.rkhList)) {
+          sharedMaster = parsed;
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    if (!sharedMaster) {
+      const sourcePeriod = all.find(p => p.rkhList && p.rkhList.length > 0) || INITIAL_E_KINERJA_PERIODS[0];
+      if (sourcePeriod) {
+        sharedMaster = {
+          rkhList: sourcePeriod.rkhList || [],
+          rencanaAksiList: sourcePeriod.rencanaAksiList || [],
+          tindakLanjutList: sourcePeriod.tindakLanjutList || []
+        };
+        try {
+          localStorage.setItem('lms_e_kinerja_shared_master_rkh', JSON.stringify(sharedMaster));
+        } catch {
+          // ignore
+        }
+      }
+    }
+
     let teacherPeriods = all.filter(
       p => p.teacherId === targetTeacherId || (!p.teacherId && targetTeacherId === 'guru-1')
     );
 
-    // If this teacher doesn't have any periods yet, auto-generate an initial period template
+    // Jika guru ini belum memiliki periode, buat periode baru dengan Master RHK bersama
     if (teacherPeriods.length === 0) {
-      const activeTeacher = StorageService.getTeacherProfile(targetTeacherId);
-      const isGuruKelas = (activeTeacher.jabatan || '').toLowerCase().includes('kelas');
       const newPeriodId = `ekp-${targetTeacherId}-${new Date().toISOString().substring(0, 7)}`;
       const defaultPeriod: EKinerjaPeriod = {
         id: newPeriodId,
         teacherId: targetTeacherId,
         month: 'Oktober',
         year: '2026',
-        rkhList: [
-          {
-            id: `rkh-${targetTeacherId}-1`,
-            code: 'RKH 1',
-            title: isGuruKelas
-              ? `Terlaksananya pengelolaan dan pelaksanaan pembelajaran tematik kelas di ${activeTeacher.schoolName}`
-              : `Terlaksananya perencanaan dan pelaksanaan pembelajaran ${activeTeacher.subject || 'PAI & Budi Pekerti'} di ${activeTeacher.schoolName}`
-          },
-          {
-            id: `rkh-${targetTeacherId}-2`,
-            code: 'RKH 2',
-            title: 'Terlaksananya pembimbingan pembiasaan ibadah, karakter budi pekerti, dan evaluasi hasil belajar siswa'
-          }
-        ],
-        rencanaAksiList: [
-          {
-            id: `ra-${targetTeacherId}-1`,
-            rkhId: `rkh-${targetTeacherId}-1`,
-            title: `Menyusun Perangkat Ajar, Modul Ajar, dan LKPD ${activeTeacher.subject || 'PAI'} semester berjalan`
-          },
-          {
-            id: `ra-${targetTeacherId}-2`,
-            rkhId: `rkh-${targetTeacherId}-1`,
-            title: 'Melaksanakan pembelajaran tatap muka di kelas serta pengisian Jurnal Mengajar dan Presensi Siswa'
-          },
-          {
-            id: `ra-${targetTeacherId}-3`,
-            rkhId: `rkh-${targetTeacherId}-2`,
-            title: 'Membimbing pembiasaan ibadah harian, literasi pagi, dan pembinaan karakter siswa'
-          }
-        ],
-        tindakLanjutList: [
-          {
-            id: `tl-${targetTeacherId}-1`,
-            title: `Melakukan koordinasi dan telaah modul ajar bersama Kepala Sekolah (${activeTeacher.principalName || 'Kepala Sekolah'})`
-          },
-          {
-            id: `tl-${targetTeacherId}-2`,
-            title: 'Mencatat perkembangan kehadiran, keaktifan, dan pembiasaan adab siswa pada Jurnal Harian'
-          }
-        ],
+        rkhList: sharedMaster ? [...sharedMaster.rkhList] : [],
+        rencanaAksiList: sharedMaster ? [...sharedMaster.rencanaAksiList] : [],
+        tindakLanjutList: sharedMaster ? [...sharedMaster.tindakLanjutList] : [],
         createdAt: new Date().toISOString()
       };
 
       all.unshift(defaultPeriod);
       setStorage(STORAGE_KEYS.E_KINERJA_PERIODS, all);
       teacherPeriods = [defaultPeriod];
+    } else if (sharedMaster) {
+      // Pastikan setiap periode guru menggunakan Master RHK, Rencana Aksi, dan Tindak Lanjut yang sudah diinput bersama
+      let hasSyncChange = false;
+      teacherPeriods = teacherPeriods.map(tp => {
+        const sameRkh = JSON.stringify(tp.rkhList) === JSON.stringify(sharedMaster!.rkhList);
+        const sameRa = JSON.stringify(tp.rencanaAksiList) === JSON.stringify(sharedMaster!.rencanaAksiList);
+        const sameTl = JSON.stringify(tp.tindakLanjutList) === JSON.stringify(sharedMaster!.tindakLanjutList);
+        if (!sameRkh || !sameRa || !sameTl) {
+          hasSyncChange = true;
+          return {
+            ...tp,
+            rkhList: [...sharedMaster!.rkhList],
+            rencanaAksiList: [...sharedMaster!.rencanaAksiList],
+            tindakLanjutList: [...sharedMaster!.tindakLanjutList]
+          };
+        }
+        return tp;
+      });
+
+      if (hasSyncChange) {
+        const updatedAll = all.map(p => {
+          const matched = teacherPeriods.find(tp => tp.id === p.id);
+          return matched || p;
+        });
+        setStorage(STORAGE_KEYS.E_KINERJA_PERIODS, updatedAll);
+      }
     }
 
     return teacherPeriods;
@@ -2662,7 +2684,28 @@ export const StorageService = {
       };
       list.unshift(updated);
     }
-    setStorage(STORAGE_KEYS.E_KINERJA_PERIODS, list);
+
+    // Simpan Master RKH, Rencana Aksi & Tindak Lanjut sebagai acuan bersama untuk semua guru
+    const sharedMaster = {
+      rkhList: updated.rkhList || [],
+      rencanaAksiList: updated.rencanaAksiList || [],
+      tindakLanjutList: updated.tindakLanjutList || []
+    };
+    try {
+      localStorage.setItem('lms_e_kinerja_shared_master_rkh', JSON.stringify(sharedMaster));
+    } catch {
+      // ignore
+    }
+
+    // Sinkronkan Master RKH, Rencana Aksi & Tindak Lanjut ke seluruh periode guru lain agar tetap sama saat ganti guru
+    const syncedList = list.map(p => ({
+      ...p,
+      rkhList: [...sharedMaster.rkhList],
+      rencanaAksiList: [...sharedMaster.rencanaAksiList],
+      tindakLanjutList: [...sharedMaster.tindakLanjutList]
+    }));
+
+    setStorage(STORAGE_KEYS.E_KINERJA_PERIODS, syncedList);
     return updated;
   },
 
@@ -2762,36 +2805,50 @@ export const StorageService = {
   },
 
   // ============================================================================
-  // BANK MASTER RHK, RENCANA AKSI & TINDAK LANJUT STANDAR & KUSTOM
+  // BANK MASTER RHK, RENCANA AKSI & TINDAK LANJUT STANDAR & KUSTOM (BERLAKU UNTUK SEMUA GURU)
   // ============================================================================
-  getMasterRhkList: (teacherId?: string): EKinerjaMasterItem[] => {
+  getMasterRhkList: (_teacherId?: string): EKinerjaMasterItem[] => {
     const list = getStorage<EKinerjaMasterItem[]>(STORAGE_KEYS.MASTER_RHK, INITIAL_MASTER_RHK);
-    if (!teacherId) return list;
-    return list.filter(item => !item.teacherId || item.teacherId === teacherId);
+    // Master RHK berlaku untuk semua guru: kembalikan semua item tanpa filter teacherId
+    let hasTeacherScopedItem = false;
+    const normalized = list.map(item => {
+      if (item.teacherId) {
+        hasTeacherScopedItem = true;
+        const copy = { ...item };
+        delete copy.teacherId;
+        return copy;
+      }
+      return item;
+    });
+    if (hasTeacherScopedItem) {
+      setStorage(STORAGE_KEYS.MASTER_RHK, normalized);
+    }
+    return normalized;
   },
 
-  saveMasterRhkItem: (item: EKinerjaMasterItem, teacherId?: string): EKinerjaMasterItem => {
+  saveMasterRhkItem: (item: EKinerjaMasterItem, _teacherId?: string): EKinerjaMasterItem => {
     const list = getStorage<EKinerjaMasterItem[]>(STORAGE_KEYS.MASTER_RHK, INITIAL_MASTER_RHK);
-    const targetTeacherId = item.teacherId || teacherId;
     let updated: EKinerjaMasterItem;
 
     if (item.id) {
       const idx = list.findIndex(m => m.id === item.id);
       updated = {
         ...item,
-        teacherId: targetTeacherId,
+        teacherId: undefined,
         createdAt: item.createdAt || new Date().toISOString()
       };
+      delete updated.teacherId;
       if (idx !== -1) list[idx] = updated;
       else list.unshift(updated);
     } else {
       updated = {
         ...item,
         id: 'm-rhk-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 6),
-        teacherId: targetTeacherId,
+        teacherId: undefined,
         isCustom: true,
         createdAt: new Date().toISOString()
       };
+      delete updated.teacherId;
       list.unshift(updated);
     }
 

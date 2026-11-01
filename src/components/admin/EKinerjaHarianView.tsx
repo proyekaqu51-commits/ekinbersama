@@ -263,8 +263,9 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
     setSelectedPeriodId(teacherPeriods[0]?.id || '');
     const teacherActs = StorageService.getEKinerjaActivities(undefined, newTeacherId);
     setActivities(teacherActs);
+    setMasterRhkList(StorageService.getMasterRhkList());
     if (onProfileUpdated) onProfileUpdated(newProf.fullName);
-    showToast(`Mengisi E-Kinerja untuk: ${newProf.fullName} (${newProf.schoolName})`, 'success');
+    showToast(`Mengisi E-Kinerja untuk: ${newProf.fullName} (Master RHK berlaku untuk semua guru)`, 'success');
   };
 
   useEffect(() => {
@@ -278,6 +279,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       setPeriods(pers);
       setSelectedPeriodId(prev => (pers.some(p => p.id === prev) ? prev : pers[0]?.id || ''));
       setActivities(StorageService.getEKinerjaActivities(undefined, curActive));
+      setMasterRhkList(StorageService.getMasterRhkList());
     };
     window.addEventListener('lms-teacher-changed', onTeacherChanged);
     return () => window.removeEventListener('lms-teacher-changed', onTeacherChanged);
@@ -392,11 +394,11 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
   }, [initialTab]);
 
   const [masterRhkList, setMasterRhkList] = useState<EKinerjaMasterItem[]>(() =>
-    StorageService.getMasterRhkList(activeTeacherId)
+    StorageService.getMasterRhkList()
   );
 
   useEffect(() => {
-    setMasterRhkList(StorageService.getMasterRhkList(activeTeacherId));
+    setMasterRhkList(StorageService.getMasterRhkList());
   }, [activeTeacherId]);
 
   const [masterFilterCategory, setMasterFilterCategory] = useState<'all' | 'Utama' | 'Tambahan'>('all');
@@ -588,7 +590,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       setMasterForm({
         code: itemToEdit.code,
         category: itemToEdit.category,
-        targetTeacherScope: itemToEdit.teacherId ? 'current' : 'all',
+        targetTeacherScope: 'all',
         title: itemToEdit.title,
         aspek: itemToEdit.aspek || 'Kualitas',
         indikator: itemToEdit.indikator || '',
@@ -601,7 +603,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       setMasterForm({
         code: `RHK ${masterRhkList.length + 1}`,
         category: 'Utama',
-        targetTeacherScope: 'current',
+        targetTeacherScope: 'all',
         title: '',
         aspek: 'Kualitas',
         indikator: 'Persentase keterlaksanaan kegiatan yang diverifikasi Kepala Sekolah',
@@ -617,15 +619,15 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
     const copyItem: EKinerjaMasterItem = {
       ...item,
       id: `m-rhk-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
-      code: `${item.code} (${teacherProfile.fullName.split(' ')[0] || 'Khusus'})`,
+      code: `${item.code} (Salinan)`,
       title: item.title,
       isCustom: true,
-      teacherId: activeTeacherId,
+      teacherId: undefined,
       createdAt: new Date().toISOString()
     };
-    StorageService.saveMasterRhkItem(copyItem, activeTeacherId);
-    setMasterRhkList(StorageService.getMasterRhkList(activeTeacherId));
-    showToast(`RHK "${item.code}" berhasil diduplikat khusus untuk ${teacherProfile.fullName}!`, 'success');
+    StorageService.saveMasterRhkItem(copyItem);
+    setMasterRhkList(StorageService.getMasterRhkList());
+    showToast(`RHK "${item.code}" berhasil diduplikat untuk semua guru!`, 'success');
   };
 
   const handleSaveMasterItemSubmit = (e: React.FormEvent) => {
@@ -673,21 +675,23 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       rencanaAksiList,
       tindakLanjutTemplates: tlLines,
       isCustom: true,
-      teacherId: masterForm.targetTeacherScope === 'current' ? activeTeacherId : undefined
+      teacherId: undefined
     };
 
-    StorageService.saveMasterRhkItem(newItem, activeTeacherId);
-    setMasterRhkList(StorageService.getMasterRhkList(activeTeacherId));
+    StorageService.saveMasterRhkItem(newItem);
+    setMasterRhkList(StorageService.getMasterRhkList());
     setCreateMasterModalOpen(false);
     showToast(
-      editingMasterId ? 'Master RHK berhasil diperbarui!' : 'Master RHK baru berhasil disimpan ke Bank Master!',
+      editingMasterId
+        ? 'Master RHK berhasil diperbarui (berlaku untuk semua guru)!'
+        : 'Master RHK baru berhasil disimpan (berlaku untuk semua guru)!',
       'success'
     );
   };
 
   const handleDeleteMasterItem = (id: string) => {
     StorageService.deleteMasterRhkItem(id);
-    setMasterRhkList(StorageService.getMasterRhkList(activeTeacherId));
+    setMasterRhkList(StorageService.getMasterRhkList());
     showToast('Item RHK berhasil dihapus dari Bank Master.', 'info');
   };
 
@@ -705,16 +709,10 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
     }, 60);
   };
 
-  // Filtered Master Items
+  // Filtered Master Items (Berlaku untuk semua guru tanpa filter teacherId)
   const filteredMasterRhk = useMemo(() => {
     return masterRhkList.filter(item => {
       if (masterFilterCategory !== 'all' && item.category !== masterFilterCategory) {
-        return false;
-      }
-      if (masterOwnershipFilter === 'custom' && item.teacherId !== activeTeacherId) {
-        return false;
-      }
-      if (masterOwnershipFilter === 'shared' && item.teacherId) {
         return false;
       }
       if (masterSearchQuery.trim()) {
@@ -727,7 +725,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       }
       return true;
     });
-  }, [masterRhkList, masterFilterCategory, masterOwnershipFilter, masterSearchQuery, activeTeacherId]);
+  }, [masterRhkList, masterFilterCategory, masterSearchQuery]);
 
   // Automatic Identity Fields (#1, #2, #3, #4)
   const autoNamaPegawai = teacherProfile.fullName || '-';
@@ -1160,20 +1158,48 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
     }
     const targetPeriod = ensureActivePeriod();
     let updatedList = [...targetPeriod.rkhList];
+    const cleanTitle = newRkhTitle.trim();
 
     if (editingRkhId) {
       updatedList = updatedList.map(item =>
-        item.id === editingRkhId ? { ...item, title: newRkhTitle.trim() } : item
+        item.id === editingRkhId ? { ...item, title: cleanTitle } : item
       );
-      showToast('Butir RKH berhasil diperbarui!', 'success');
+      showToast('Butir RKH berhasil diperbarui (berlaku untuk semua guru)!', 'success');
     } else {
       const nextNum = updatedList.length + 1;
       updatedList.push({
         id: 'rkh-' + Math.random().toString(36).substring(2, 8),
         code: `RKH ${nextNum}`,
-        title: newRkhTitle.trim()
+        title: cleanTitle
       });
-      showToast('RKH baru berhasil ditambahkan!', 'success');
+      // Simpan juga ke Bank Master RHK jika belum ada, agar berlaku untuk semua guru
+      const currentMaster = StorageService.getMasterRhkList();
+      const existsInMaster = currentMaster.some(
+        m => m.title.trim().toLowerCase() === cleanTitle.toLowerCase()
+      );
+      if (!existsInMaster) {
+        StorageService.saveMasterRhkItem({
+          id: '',
+          code: `RHK ${currentMaster.length + 1}`,
+          category: 'Utama',
+          title: cleanTitle,
+          aspek: 'Kualitas',
+          indikator: 'Persentase keterlaksanaan kegiatan yang diverifikasi Kepala Sekolah',
+          target: '100% / 12 Dokumen',
+          rencanaAksiList: [
+            {
+              id: `ra-custom-${Date.now().toString(36)}`,
+              title: `Melaksanakan kegiatan ${cleanTitle.slice(0, 60)}`,
+              defaultTindakLanjut: ['Melakukan koordinasi dan telaah dokumen bersama Kepala Sekolah'],
+              defaultOutput: `1 Dokumen Laporan Pelaksanaan ${cleanTitle.slice(0, 50)}`
+            }
+          ],
+          tindakLanjutTemplates: ['Melakukan koordinasi dan telaah dokumen bersama Kepala Sekolah'],
+          isCustom: true
+        });
+        setMasterRhkList(StorageService.getMasterRhkList());
+      }
+      showToast('RKH baru berhasil ditambahkan & disimpan untuk semua guru!', 'success');
     }
 
     StorageService.saveEKinerjaPeriod({
@@ -3558,59 +3584,57 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      {/* Multi-Guru Switcher Bar (Hanya tampil saat pengisian kinerja & nota dinas; Disembunyikan pada Data Master RHK) */}
-      {activeMainTab !== 'master_rhk' && (
-        <div className="glass rounded-3xl p-5 sm:p-6 border border-emerald-500/30 bg-gradient-to-r from-emerald-950/40 via-teal-950/30 to-slate-900/60 shadow-xl">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex items-start sm:items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-slate-950 shadow-lg shadow-emerald-500/25 shrink-0">
-                <UserCheck className="w-6 h-6" />
-              </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
-                    Guru Pengisi Kinerja Aktif
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-semibold border border-emerald-500/30">
-                    Data Terisolasi Per Guru
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[11px] font-semibold border border-blue-500/30">
-                    {teacherProfile.pangkatGolongan || 'PNS / ASN'}
-                  </span>
-                </div>
-                <h3 className="font-display font-extrabold text-lg sm:text-xl text-white mt-0.5">
-                  {teacherProfile.fullName}
-                </h3>
-                <div className="text-xs text-slate-300 flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
-                  <span>NIP: <strong className="text-white">{teacherProfile.nip || '-'}</strong></span>
-                  <span>•</span>
-                  <span>Satuan Pendidikan: <strong className="text-emerald-300 font-semibold">{teacherProfile.schoolName || 'SD Negeri'}</strong></span>
-                </div>
-              </div>
+      {/* Multi-Guru Switcher Bar (Tampil di semua tab termasuk Daftar Master RHK; Master RHK tetap sama untuk semua guru) */}
+      <div className="glass rounded-3xl p-5 sm:p-6 border border-emerald-500/30 bg-gradient-to-r from-emerald-950/40 via-teal-950/30 to-slate-900/60 shadow-xl">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-slate-950 shadow-lg shadow-emerald-500/25 shrink-0">
+              <UserCheck className="w-6 h-6" />
             </div>
-
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-              <div className="bg-slate-900/90 p-2.5 rounded-2xl border border-white/10 flex flex-col gap-1">
-                <label htmlFor="guru-select-ekinerja" className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                  Ganti Guru Pengisi:
-                </label>
-                <select
-                  id="guru-select-ekinerja"
-                  value={activeTeacherId}
-                  onChange={e => handleSwitchTeacher(e.target.value)}
-                  className="px-3 py-2 rounded-xl bg-slate-800 border border-emerald-500/40 text-white text-xs font-bold focus:ring-2 focus:ring-emerald-400 focus:outline-none cursor-pointer"
-                >
-                  {teachers.map(t => (
-                    <option key={t.id || t.fullName} value={t.id}>
-                      {t.fullName} ({t.schoolName})
-                    </option>
-                  ))}
-                </select>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+                  Guru Pengisi Kinerja Aktif
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[11px] font-semibold border border-cyan-500/30">
+                  Master RHK Berlaku untuk Semua Guru
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[11px] font-semibold border border-blue-500/30">
+                  {teacherProfile.pangkatGolongan || 'PNS / ASN'}
+                </span>
+              </div>
+              <h3 className="font-display font-extrabold text-lg sm:text-xl text-white mt-0.5">
+                {teacherProfile.fullName}
+              </h3>
+              <div className="text-xs text-slate-300 flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
+                <span>NIP: <strong className="text-white">{teacherProfile.nip || '-'}</strong></span>
+                <span>•</span>
+                <span>Satuan Pendidikan: <strong className="text-emerald-300 font-semibold">{teacherProfile.schoolName || 'SD Negeri'}</strong></span>
               </div>
             </div>
           </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            <div className="bg-slate-900/90 p-2.5 rounded-2xl border border-white/10 flex flex-col gap-1">
+              <label htmlFor="guru-select-ekinerja" className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                Ganti Guru Pengisi:
+              </label>
+              <select
+                id="guru-select-ekinerja"
+                value={activeTeacherId}
+                onChange={e => handleSwitchTeacher(e.target.value)}
+                className="px-3 py-2 rounded-xl bg-slate-800 border border-emerald-500/40 text-white text-xs font-bold focus:ring-2 focus:ring-emerald-400 focus:outline-none cursor-pointer"
+              >
+                {teachers.map(t => (
+                  <option key={t.id || t.fullName} value={t.id}>
+                    {t.fullName} ({t.schoolName})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
-      )}
+      </div>
 
       {/* Tab Navigasi Menu E-Kinerja */}
       <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-slate-900/90 border border-white/10 shadow-lg">
