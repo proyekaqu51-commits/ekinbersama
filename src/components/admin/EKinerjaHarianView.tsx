@@ -2343,11 +2343,6 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                   </td>
                   <td>
                     <div style="font-weight:600; color:#0f172a;">${act.rencanaAksiText}</div>
-                    ${
-                      act.rkhText
-                        ? `<div style="font-size:10.5px; color:#047857; margin-top:3px;"><b>RKH:</b> ${act.rkhText}</div>`
-                        : ''
-                    }
                   </td>
                   <td>${tlFormatted}</td>
                   <td>${outputFormatted}</td>
@@ -2508,11 +2503,6 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                                 <td class="label">Hari / Tanggal Kegiatan</td>
                                 <td class="colon">:</td>
                                 <td><b>Kegiatan No. ${item.activityNo} — ${item.dateFormatted}</b></td>
-                              </tr>
-                              <tr>
-                                <td class="label">Rencana Hasil Kerja (RKH)</td>
-                                <td class="colon">:</td>
-                                <td>${item.rkhText}</td>
                               </tr>
                               <tr>
                                 <td class="label">Jenis Kegiatan (Rencana Aksi)</td>
@@ -2889,11 +2879,6 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
               <td class="label">Periode Bulan &amp; Tahun</td>
               <td class="colon">:</td>
               <td><b>Bulan ${activePeriod.month} — Tahun ${activePeriod.year}</b></td>
-            </tr>
-            <tr>
-              <td class="label">Rencana Hasil Kerja (RKH)</td>
-              <td class="colon">:</td>
-              <td>${rkhHtmlList}</td>
             </tr>
           </table>
 
@@ -3525,11 +3510,6 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       ['Unit Kerja', ':', autoUnitKerja],
       ['Periode Bulan', ':', activePeriod.month],
       ['Periode Tahun', ':', activePeriod.year],
-      [
-        'RKH Periode Ini',
-        ':',
-        activePeriod.rkhList.map((r, i) => `${i + 1}. ${r.title}`).join(' | ') || '-'
-      ],
       [],
       [
         'No',
@@ -4307,7 +4287,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                 Identitas Pegawai & Ringkasan Periode E-Kinerja Harian
               </h3>
               <p className="text-[11px] text-slate-400">
-                Terisi otomatis dari Profil Guru PAI (Poin 6 RKH ditampilkan otomatis pada Versi Cetak)
+                Terisi otomatis dari Profil Guru Aktif
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
