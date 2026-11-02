@@ -588,9 +588,14 @@ function isRealUserWorkspace(): boolean {
   return false;
 }
 
+const quotaFallbackCache = new Map<string, any>();
+
 function getStorage<T>(key: string, defaultValue: T): T {
   try {
     const isRealOrFresh = isRealUserWorkspace();
+    if (quotaFallbackCache.has(key)) {
+      return quotaFallbackCache.get(key) as T;
+    }
     const raw = localStorage.getItem(key);
     if (!raw) {
       let fallbackValue: T = defaultValue;
@@ -614,7 +619,11 @@ function getStorage<T>(key: string, defaultValue: T): T {
         fallbackValue !== undefined &&
         key !== STORAGE_KEYS.SESSION
       ) {
-        localStorage.setItem(key, JSON.stringify(fallbackValue));
+        try {
+          localStorage.setItem(key, JSON.stringify(fallbackValue));
+        } catch {
+          // ignore quota error
+        }
         IndexedDbService.putCache(key, fallbackValue, true).catch(() => {});
       }
       return fallbackValue;
@@ -651,6 +660,9 @@ function getStorage<T>(key: string, defaultValue: T): T {
     return parsed;
   } catch (err) {
     console.error(`Error reading ${key} from localStorage:`, err);
+    if (quotaFallbackCache.has(key)) {
+      return quotaFallbackCache.get(key) as T;
+    }
     return defaultValue;
   }
 }
@@ -658,6 +670,7 @@ function getStorage<T>(key: string, defaultValue: T): T {
 function setStorage<T>(key: string, value: T): void {
   try {
     localStorage.setItem(key, JSON.stringify(value));
+    quotaFallbackCache.delete(key);
     if (key !== STORAGE_KEYS.SESSION) {
       // Offline-first write: persists to IndexedDB cache/outbox and pushes to Cloud & Supabase when online
       SupabaseService.pushKeyToCloud(key, value).catch(() => {});
@@ -666,6 +679,8 @@ function setStorage<T>(key: string, value: T): void {
     }
   } catch (err) {
     console.error(`Error saving ${key} to localStorage:`, err);
+    quotaFallbackCache.set(key, value);
+    IndexedDbService.putCache(key, value, false).catch(() => {});
     if (key !== STORAGE_KEYS.SESSION) {
       SupabaseService.pushKeyToCloud(key, value).catch(() => {});
     }
@@ -2979,9 +2994,69 @@ export const StorageService = {
   getEKinerjaActivities: (periodId?: string, teacherId?: string): EKinerjaDailyActivity[] => {
     const targetTeacherId = teacherId || StorageService.getActiveTeacherId();
     const list = getStorage<EKinerjaDailyActivity[]>(STORAGE_KEYS.E_KINERJA_ACTIVITIES, INITIAL_E_KINERJA_ACTIVITIES);
+    const teacherPeriods = StorageService.getEKinerjaPeriods(targetTeacherId);
+    const teacherPeriodIds = new Set(teacherPeriods.map(p => p.id));
+
+    const MONTHS_INDO = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember'
+    ];
+
+    let hasHealedActivity = false;
+    const healedList = list.map(a => {
+      const belongsToTeacher =
+        a.teacherId === targetTeacherId ||
+        (!a.teacherId && targetTeacherId === 'guru-1') ||
+        (a.periodId && teacherPeriodIds.has(a.periodId) && !a.teacherId);
+
+      if (!belongsToTeacher) return a;
+
+      // Jika periodId kegiatan ini tidak ada di daftar periode milik guru ini (misal tersimpan saat pergantian guru),
+      // tautkan otomatis ke periode guru ini yang sesuai bulan/tahunnya atau periode pertama guru ini.
+      if (!teacherPeriodIds.has(a.periodId) && teacherPeriods.length > 0) {
+        let matchedPeriod = teacherPeriods[0];
+        if (a.date) {
+          const [yStr, mStr] = a.date.split('-');
+          const mIdx = parseInt(mStr, 10) - 1;
+          const mName = MONTHS_INDO[mIdx];
+          if (mName && yStr) {
+            const byMonthYear = teacherPeriods.find(
+              p => p.month.toLowerCase() === mName.toLowerCase() && p.year.trim() === yStr.trim()
+            );
+            if (byMonthYear) matchedPeriod = byMonthYear;
+          }
+        }
+        hasHealedActivity = true;
+        return {
+          ...a,
+          teacherId: targetTeacherId,
+          periodId: matchedPeriod.id
+        };
+      }
+
+      if (a.teacherId !== targetTeacherId) {
+        hasHealedActivity = true;
+        return { ...a, teacherId: targetTeacherId };
+      }
+      return a;
+    });
+
+    if (hasHealedActivity) {
+      setStorage(STORAGE_KEYS.E_KINERJA_ACTIVITIES, healedList);
+    }
 
     // Filter strictly by teacher
-    let filtered = list.filter(
+    let filtered = healedList.filter(
       a => a.teacherId === targetTeacherId || (!a.teacherId && targetTeacherId === 'guru-1')
     );
 
@@ -2990,9 +3065,9 @@ export const StorageService = {
     }
 
     return filtered.sort((a, b) => {
-      const dateCmp = a.date.localeCompare(b.date);
+      const dateCmp = (a.date || '').localeCompare(b.date || '');
       if (dateCmp !== 0) return dateCmp;
-      return a.createdAt.localeCompare(b.createdAt);
+      return (a.createdAt || '').localeCompare(b.createdAt || '');
     });
   },
 
@@ -3043,7 +3118,12 @@ export const StorageService = {
         teacherId: act.teacherId || targetTeacherId,
         createdAt: act.createdAt || new Date(Date.now() + idx * 100).toISOString()
       };
-      list.push(updated);
+      const existingIdx = list.findIndex(a => a.id === updated.id);
+      if (existingIdx !== -1) {
+        list[existingIdx] = updated;
+      } else {
+        list.push(updated);
+      }
       savedItems.push(updated);
     });
     setStorage(STORAGE_KEYS.E_KINERJA_ACTIVITIES, list);

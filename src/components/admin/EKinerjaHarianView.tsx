@@ -351,14 +351,15 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
   // Filtered Activities for Active Period
   const periodActivities = useMemo(() => {
     if (!activePeriod) return [];
+    const periodIdsSet = new Set(periods.map(p => p.id));
     return activities
-      .filter(a => a.periodId === activePeriod.id)
+      .filter(a => a.periodId === activePeriod.id || !periodIdsSet.has(a.periodId))
       .sort((a, b) => {
-        const cmp = a.date.localeCompare(b.date);
+        const cmp = (a.date || '').localeCompare(b.date || '');
         if (cmp !== 0) return cmp;
-        return a.createdAt.localeCompare(b.createdAt);
+        return (a.createdAt || '').localeCompare(b.createdAt || '');
       });
-  }, [activities, activePeriod]);
+  }, [activities, activePeriod, periods]);
 
   // WFA Filter & Geotagging State
   const [workModeFilter, setWorkModeFilter] = useState<'all' | 'WFA' | 'WFO' | 'WFH'>('all');
@@ -898,11 +899,15 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
     }
   };
 
-  const refreshData = () => {
-    const updatedPeriods = StorageService.getEKinerjaPeriods();
+  const refreshData = (overrideTeacherId?: string) => {
+    const targetId = overrideTeacherId || activeTeacherId || StorageService.getActiveTeacherId();
+    const updatedPeriods = StorageService.getEKinerjaPeriods(targetId);
     setPeriods(updatedPeriods);
-    setActivities(StorageService.getEKinerjaActivities());
-    setTeacherProfile(StorageService.getTeacherProfile());
+    setSelectedPeriodId(prev =>
+      updatedPeriods.some(p => p.id === prev) ? prev : updatedPeriods[0]?.id || ''
+    );
+    setActivities(StorageService.getEKinerjaActivities(undefined, targetId));
+    setTeacherProfile(StorageService.getTeacherProfile(targetId));
   };
 
   const formatHariTanggalIndo = (dateStr: string): string => {
@@ -1187,15 +1192,28 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
 
   // Ensure an active period exists before adding RKH/Rencana Aksi/Tindak Lanjut
   const ensureActivePeriod = (): EKinerjaPeriod => {
-    if (activePeriod) return activePeriod;
-    const created = StorageService.saveEKinerjaPeriod({
-      month: newPeriodMonth || 'Oktober',
-      year: newPeriodYear || String(new Date().getFullYear()),
-      rkhList: [],
-      rencanaAksiList: [],
-      tindakLanjutList: []
-    });
-    setPeriods(StorageService.getEKinerjaPeriods());
+    if (activePeriod && (!activePeriod.teacherId || activePeriod.teacherId === activeTeacherId)) {
+      return activePeriod;
+    }
+    const existingForTeacher = StorageService.getEKinerjaPeriods(activeTeacherId);
+    if (existingForTeacher.length > 0) {
+      setPeriods(existingForTeacher);
+      setSelectedPeriodId(existingForTeacher[0].id);
+      return existingForTeacher[0];
+    }
+    const created = StorageService.saveEKinerjaPeriod(
+      {
+        teacherId: activeTeacherId,
+        month: newPeriodMonth || 'Oktober',
+        year: newPeriodYear || String(new Date().getFullYear()),
+        rkhList: [],
+        rencanaAksiList: [],
+        tindakLanjutList: []
+      },
+      activeTeacherId
+    );
+    const updatedList = StorageService.getEKinerjaPeriods(activeTeacherId);
+    setPeriods(updatedList);
     setSelectedPeriodId(created.id);
     return created;
   };
@@ -2164,10 +2182,10 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
     }
 
     if (editingActivity && preparedPayloads.length === 1) {
-      StorageService.saveEKinerjaActivity(preparedPayloads[0]);
+      StorageService.saveEKinerjaActivity(preparedPayloads[0], activeTeacherId);
       showToast('Kegiatan E-Kinerja Harian berhasil diperbarui!', 'success');
     } else {
-      StorageService.saveBulkEKinerjaActivities(preparedPayloads);
+      StorageService.saveBulkEKinerjaActivities(preparedPayloads, activeTeacherId);
       showToast(
         `${preparedPayloads.length} Kegiatan (Rencana Aksi) pada ${formatHariTanggalIndo(
           formDate
@@ -2178,14 +2196,14 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
 
     setActivityModalOpen(false);
     setEditingActivity(null);
-    refreshData();
+    refreshData(activeTeacherId);
   };
 
   const confirmDeleteActivity = () => {
     if (!deleteActivityConfirmId) return;
     StorageService.deleteEKinerjaActivity(deleteActivityConfirmId);
     setDeleteActivityConfirmId(null);
-    refreshData();
+    refreshData(activeTeacherId);
     showToast('Baris kegiatan E-Kinerja berhasil dihapus.', 'info');
   };
 
@@ -2196,21 +2214,30 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
     const targetPeriod = ensureActivePeriod();
     const nowIso = new Date().toISOString();
 
-    const savedPeriod = StorageService.saveEKinerjaPeriod({
-      ...targetPeriod,
-      savedAt: nowIso
-    });
+    const savedPeriod = StorageService.saveEKinerjaPeriod(
+      {
+        ...targetPeriod,
+        teacherId: activeTeacherId,
+        savedAt: nowIso
+      },
+      activeTeacherId
+    );
 
     // Pastikan seluruh aktivitas pada periode ini ikut tersimpan & tersinkronisasi
     periodActivities.forEach(act => {
-      StorageService.saveEKinerjaActivity({
-        ...act,
-        outputText: resolveActivityOutput(act)
-      });
+      StorageService.saveEKinerjaActivity(
+        {
+          ...act,
+          periodId: savedPeriod.id,
+          teacherId: activeTeacherId,
+          outputText: resolveActivityOutput(act)
+        },
+        activeTeacherId
+      );
     });
 
     StorageService.saveTeacherProfile(teacherProfile);
-    refreshData();
+    refreshData(activeTeacherId);
     setSelectedPeriodId(savedPeriod.id);
 
     if (typeof navigator !== 'undefined' && navigator.onLine) {
@@ -2234,22 +2261,28 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
   // - LAMPIRAN 2: Dokumen Bukti Fisik (Dokumen Utuh 1 Halaman Penuh per Dokumen)
   // ============================================================================
   const handlePrintEKinerjaNewTab = () => {
-    if (!activePeriod) {
-      showToast('Belum ada periode E-Kinerja yang aktif!', 'error');
-      return;
-    }
+    const targetPeriod = activePeriod || ensureActivePeriod();
+    const currentTeacherId =
+      teacherProfile.id || activeTeacherId || StorageService.getActiveTeacherId();
 
     const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      showToast('Pop-up diblokir browser. Izinkan tab baru untuk mencetak.', 'error');
-      return;
-    }
 
     const schoolNameUpper = (autoUnitKerja || '-').toUpperCase();
 
     persistNotaDinasConfig(notaDinasForm, false);
     const latestProfile = StorageService.getTeacherProfile(currentTeacherId);
     const latestSettings = StorageService.getAppSettings();
+
+    const latestTeacherActivities = StorageService.getEKinerjaActivities(
+      undefined,
+      currentTeacherId
+    );
+    const printActivities =
+      periodActivities.length > 0
+        ? periodActivities
+        : latestTeacherActivities.filter(
+            a => a.periodId === targetPeriod.id || periods.length <= 1
+          );
 
     const isDemoPrincipalName = (name?: string) =>
       !name ||
@@ -2289,17 +2322,19 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
 
     const resolvedPrincipalSigUrl =
       notaDinasForm.principalSignatureDataUrl ||
+      latestProfile.principalSignatureDataUrl ||
       teacherProfile.principalSignatureDataUrl ||
       DEFAULT_PRINCIPAL_SIGNATURE;
 
     const resolvedTeacherSigUrl =
       notaDinasForm.signatureDataUrl ||
+      latestProfile.signatureDataUrl ||
       teacherProfile.signatureDataUrl ||
       DEFAULT_TEACHER_SIGNATURE;
 
     const rkhHtmlList =
-      activePeriod.rkhList.length > 0
-        ? `<ol style="margin:0; padding-left:18px;">${activePeriod.rkhList
+      targetPeriod.rkhList.length > 0
+        ? `<ol style="margin:0; padding-left:18px;">${targetPeriod.rkhList
             .map(r => `<li style="margin-bottom:3px;">${r.title}</li>`)
             .join('')}</ol>`
         : '-';
@@ -2317,13 +2352,14 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
     }> = [];
 
     let runningPhotoNo = 1;
-    periodActivities.forEach((act, idx) => {
+    printActivities.forEach((act, idx) => {
       const photos = act.photos || [];
       const tlJoined =
         act.tindakLanjutList && act.tindakLanjutList.length > 0
           ? act.tindakLanjutList.join(' • ')
           : act.tindakLanjutText || '-';
       photos.forEach(p => {
+        if (!p || !p.dataUrl) return;
         allAttachedPhotos.push({
           photoNo: runningPhotoNo++,
           activityNo: idx + 1,
@@ -2356,13 +2392,14 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
     }> = [];
 
     let runningAttachmentNo = 1;
-    periodActivities.forEach((act, idx) => {
+    printActivities.forEach((act, idx) => {
       const docs = act.documents || [];
       const tlJoined =
         act.tindakLanjutList && act.tindakLanjutList.length > 0
           ? act.tindakLanjutList.join(' • ')
           : act.tindakLanjutText || '-';
       docs.forEach(d => {
+        if (!d) return;
         allAttachedDocs.push({
           attachmentNo: runningAttachmentNo++,
           activityNo: idx + 1,
@@ -2378,8 +2415,8 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
 
     // Baris Tabel Utama: Kolom ke-6 adalah "Bukti Fisik" (isi Dropdown: Foto Kegiatan / Dokumen / Foto Kegiatan dan Dokumen)
     const rowsHtml =
-      periodActivities.length > 0
-        ? periodActivities
+      printActivities.length > 0
+        ? printActivities
             .map((act, idx) => {
               const tlItems =
                 act.tindakLanjutList && act.tindakLanjutList.length > 0
@@ -2452,7 +2489,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                   <div class="lampiran-banner">
                     <div>
                       <div class="lampiran-banner-title">LAMPIRAN 1 : DOKUMENTASI FOTO KEGIATAN</div>
-                      <div class="lampiran-banner-sub">${schoolNameUpper} • Periode Bulan ${activePeriod.month} Tahun ${activePeriod.year} • Pegawai: ${autoNamaPegawai}</div>
+                      <div class="lampiran-banner-sub">${schoolNameUpper} • Periode Bulan ${targetPeriod.month} Tahun ${targetPeriod.year} • Pegawai: ${autoNamaPegawai}</div>
                     </div>
                     <div class="lampiran-banner-page">
                       Halaman ${pageIdx + 1} dari ${photoPages.length}
@@ -2471,7 +2508,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
             <div class="lampiran-banner">
               <div>
                 <div class="lampiran-banner-title">LAMPIRAN 1 : DOKUMENTASI FOTO KEGIATAN</div>
-                <div class="lampiran-banner-sub">${schoolNameUpper} • Periode Bulan ${activePeriod.month} Tahun ${activePeriod.year} • Pegawai: ${autoNamaPegawai}</div>
+                <div class="lampiran-banner-sub">${schoolNameUpper} • Periode Bulan ${targetPeriod.month} Tahun ${targetPeriod.year} • Pegawai: ${autoNamaPegawai}</div>
               </div>
               <div class="lampiran-banner-page">Halaman 1 dari 1</div>
             </div>
@@ -2479,7 +2516,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
               <div class="lampiran1-photo-box">
                 <div class="lampiran1-photo-header">
                   <span>FOTO KEGIATAN #1</span>
-                  <span>Periode ${activePeriod.month} ${activePeriod.year}</span>
+                  <span>Periode ${targetPeriod.month} ${targetPeriod.year}</span>
                 </div>
                 <div class="lampiran1-photo-frame" style="color:#64748b; font-size:13px;">
                   Belum ada foto kegiatan yang diunggah (Ukuran Bingkai Foto Diperbesar 1/2 Halaman A4)
@@ -2491,7 +2528,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
               <div class="lampiran1-photo-box">
                 <div class="lampiran1-photo-header">
                   <span>FOTO KEGIATAN #2</span>
-                  <span>Periode ${activePeriod.month} ${activePeriod.year}</span>
+                  <span>Periode ${targetPeriod.month} ${targetPeriod.year}</span>
                 </div>
                 <div class="lampiran1-photo-frame" style="color:#64748b; font-size:13px;">
                   Belum ada foto kegiatan yang diunggah (Ukuran Bingkai Foto Diperbesar 1/2 Halaman A4)
@@ -2509,16 +2546,18 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       allAttachedDocs.length > 0
         ? allAttachedDocs
             .map(item => {
+              const docFileName = item.doc.fileName || 'Dokumen_Bukti_Fisik';
+              const docDataUrl = item.doc.dataUrl || '';
               const isPdf = item.doc.fileType === 'pdf';
               const isHtmlDoc =
                 item.doc.mimeType === 'text/html' ||
-                item.doc.fileName.toLowerCase().endsWith('.html') ||
-                item.doc.dataUrl.startsWith('data:text/html');
+                docFileName.toLowerCase().endsWith('.html') ||
+                docDataUrl.startsWith('data:text/html');
 
-              let resolvedDocDataUrl = item.doc.dataUrl;
-              if (isHtmlDoc && item.doc.dataUrl.startsWith('data:text/html;base64,')) {
+              let resolvedDocDataUrl = docDataUrl;
+              if (isHtmlDoc && docDataUrl.startsWith('data:text/html;base64,')) {
                 try {
-                  const base64Part = item.doc.dataUrl.slice('data:text/html;base64,'.length);
+                  const base64Part = docDataUrl.slice('data:text/html;base64,'.length);
                   const decodedHtml = decodeURIComponent(escape(window.atob(base64Part)));
                   const updatedHtml = decodedHtml
                     .replace(/Hj\.\s*Siti\s*Rohmah,\s*M\.Pd\./g, resolvedPrincipalName)
@@ -2530,7 +2569,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                   resolvedDocDataUrl =
                     'data:text/html;base64,' + window.btoa(unescape(encodeURIComponent(updatedHtml)));
                 } catch {
-                  resolvedDocDataUrl = item.doc.dataUrl;
+                  resolvedDocDataUrl = docDataUrl;
                 }
               }
 
@@ -2540,11 +2579,11 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                     <div>
                       <div class="lampiran-banner-title">LAMPIRAN 2 : DOKUMEN BUKTI FISIK (DOKUMEN UTUH #${item.attachmentNo})</div>
                       <div class="lampiran-banner-sub">
-                        Kegiatan No. ${item.activityNo} (${item.dateFormatted}) — ${item.rencanaAksiText} • Berkas: <b>${item.doc.fileName}</b>
+                        Kegiatan No. ${item.activityNo} (${item.dateFormatted}) — ${item.rencanaAksiText} • Berkas: <b>${docFileName}</b>
                       </div>
                     </div>
                     <div class="no-print" style="display:flex; align-items:center; gap:8px;">
-                      <a href="${resolvedDocDataUrl}" download="${item.doc.fileName}" class="download-doc-btn">
+                      <a href="${resolvedDocDataUrl}" download="${docFileName}" class="download-doc-btn">
                         📥 Unduh Dokumen Asli
                       </a>
                     </div>
@@ -2554,7 +2593,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                     isPdf || isHtmlDoc
                       ? `
                         <div class="lampiran2-full-doc-frame">
-                          <iframe src="${resolvedDocDataUrl}${isPdf ? '#toolbar=0&navpanes=0&scrollbar=0&view=FitH' : ''}" title="${item.doc.fileName}" class="lampiran2-full-iframe"></iframe>
+                          <iframe src="${resolvedDocDataUrl}${isPdf ? '#toolbar=0&navpanes=0&scrollbar=0&view=FitH' : ''}" title="${docFileName}" class="lampiran2-full-iframe"></iframe>
                         </div>
                       `
                       : `
@@ -2565,7 +2604,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                                 DOKUMEN BUKTI FISIK PELAKSANAAN E-KINERJA HARIAN
                               </div>
                               <div style="font-size:13px; font-weight:700; color:#334155; margin-top:4px;">
-                                ${schoolNameUpper} — PERIODE BULAN ${activePeriod.month.toUpperCase()} TAHUN ${activePeriod.year}
+                                ${schoolNameUpper} — PERIODE BULAN ${(targetPeriod.month || 'OKTOBER').toUpperCase()} TAHUN ${targetPeriod.year}
                               </div>
                             </div>
 
@@ -2573,7 +2612,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                               <tr>
                                 <td class="label">Nama Berkas Dokumen</td>
                                 <td class="colon">:</td>
-                                <td><b>${item.doc.fileName}</b> (${item.doc.fileType.toUpperCase()} • ${item.doc.fileSizeKb} KB)</td>
+                                <td><b>${docFileName}</b> (${(item.doc.fileType || 'dokumen').toUpperCase()} • ${item.doc.fileSizeKb || 1} KB)</td>
                               </tr>
                               <tr>
                                 <td class="label">Nama Pegawai / NIP</td>
@@ -2614,10 +2653,10 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
 
                             <div style="padding:18px; border:1.5px solid #cbd5e1; border-radius:8px; background:#f8fafc; min-height:95mm;">
                               <div style="font-weight:800; font-size:12.5px; color:#0f172a; text-transform:uppercase; margin-bottom:8px;">
-                                Naskah Utuh Bukti Fisik Dokumen (${item.doc.fileName})
+                                Naskah Utuh Bukti Fisik Dokumen (${docFileName})
                               </div>
                               <p style="font-size:12.5px; line-height:1.65; color:#1e293b; text-align:justify; margin:0 0 12px 0;">
-                                Dokumen <b>${item.doc.fileName}</b> ini merupakan bagian utuh yang tidak terpisahkan dari Laporan Pelaksanaan Tugas Pokok dan Fungsi (E-Kinerja Harian) <b>${autoNamaPegawai}</b> (NIP. ${autoNip}) selaku <b>${autoJabatan}</b> pada <b>${autoUnitKerja}</b> untuk pelaksanaan kegiatan <b>"${item.rencanaAksiText}"</b> pada hari <b>${item.dateFormatted}</b>.
+                                Dokumen <b>${docFileName}</b> ini merupakan bagian utuh yang tidak terpisahkan dari Laporan Pelaksanaan Tugas Pokok dan Fungsi (E-Kinerja Harian) <b>${autoNamaPegawai}</b> (NIP. ${autoNip}) selaku <b>${autoJabatan}</b> pada <b>${autoUnitKerja}</b> untuk pelaksanaan kegiatan <b>"${item.rencanaAksiText}"</b> pada hari <b>${item.dateFormatted}</b>.
                               </p>
                               <p style="font-size:12.5px; line-height:1.65; color:#1e293b; text-align:justify; margin:0;">
                                 Tindak lanjut kegiatan telah dilaksanakan melalui: <b>${item.tindakLanjutText}</b>, dengan menghasilkan output nyata berupa: <b>${item.outputText}</b>.
@@ -2651,7 +2690,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
             <div class="lampiran-banner">
               <div>
                 <div class="lampiran-banner-title">LAMPIRAN 2 : DOKUMEN BUKTI FISIK (DOKUMEN UTUH)</div>
-                <div class="lampiran-banner-sub">${schoolNameUpper} • Periode Bulan ${activePeriod.month} Tahun ${activePeriod.year} • Pegawai: ${autoNamaPegawai}</div>
+                <div class="lampiran-banner-sub">${schoolNameUpper} • Periode Bulan ${targetPeriod.month} Tahun ${targetPeriod.year} • Pegawai: ${autoNamaPegawai}</div>
               </div>
               <div class="lampiran-banner-page">Lampiran 2</div>
             </div>
@@ -2673,7 +2712,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       <html lang="id">
       <head>
         <meta charset="UTF-8" />
-        <title>LAPORAN HARIAN KINERJA PEGAWAI - ${schoolNameUpper} - ${activePeriod.month} ${activePeriod.year}</title>
+        <title>LAPORAN HARIAN KINERJA PEGAWAI - ${schoolNameUpper} - ${targetPeriod.month} ${targetPeriod.year}</title>
         <style>
           @page { size: A4 portrait; margin: 10mm 12mm; }
           * { box-sizing: border-box; }
@@ -2926,7 +2965,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
           <div>
             <strong>Pratinjau Cetak Laporan E-Kinerja Harian + Lampiran 1 (2 Foto Besar/Halaman) &amp; Lampiran 2 (Dokumen Utuh)</strong>
             <div style="font-size:11.5px; color:#94a3b8; margin-top:2px;">
-              Periode: ${activePeriod.month} ${activePeriod.year} • Lampiran 1: ${allAttachedPhotos.length} Foto (${Math.max(1, photoPages.length)} Halaman) • Lampiran 2: ${allAttachedDocs.length} Dokumen Utuh
+              Periode: ${targetPeriod.month} ${targetPeriod.year} • Lampiran 1: ${allAttachedPhotos.length} Foto (${Math.max(1, photoPages.length)} Halaman) • Lampiran 2: ${allAttachedDocs.length} Dokumen Utuh
             </div>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -2973,7 +3012,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
             <tr>
               <td class="label">Periode Bulan &amp; Tahun</td>
               <td class="colon">:</td>
-              <td><b>Bulan ${activePeriod.month} — Tahun ${activePeriod.year}</b></td>
+              <td><b>Bulan ${targetPeriod.month} — Tahun ${targetPeriod.year}</b></td>
             </tr>
           </table>
 
@@ -3030,9 +3069,36 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       </html>
     `;
 
-    printWindow.document.open();
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
+    if (printWindow) {
+      printWindow.document.open();
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+    } else {
+      // Fallback cetak langsung melalui iframe tersembunyi jika pop-up tab baru diblokir browser
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+      document.body.appendChild(iframe);
+      const doc = iframe.contentWindow?.document;
+      if (doc) {
+        doc.open();
+        doc.write(htmlContent);
+        doc.close();
+        setTimeout(() => {
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+          setTimeout(() => {
+            if (document.body.contains(iframe)) {
+              document.body.removeChild(iframe);
+            }
+          }, 3000);
+        }, 400);
+      }
+    }
   };
 
   // ============================================================================
