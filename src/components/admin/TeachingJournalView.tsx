@@ -141,16 +141,92 @@ function buildOfficialJournalHtml(
   appSettings: AppSettings,
   includeToolbar = true
 ): string {
-  const schoolNameUpper = (journal.schoolName || teacher.schoolName || appSettings.schoolName || 'SDN CIKETING UDIK 2 BANTARGEBANG').toUpperCase();
-  const schoolAddress = teacher.schoolAddress || appSettings.schoolAddress || 'Jl. Raya Ciketing Udik No. 2, Kecamatan Bantargebang, Kota Bekasi';
-  const teacherName = journal.teacherName || teacher.fullName || 'Guru PAI';
-  const teacherNip = journal.teacherNip || teacher.nip || '-';
-  const teacherJabatan = teacher.jabatan || 'Guru PAI & Budi Pekerti';
-  const teacherPangkat = teacher.pangkatGolongan || 'Penata / III/c';
-  const principalName = journal.principalName || teacher.principalName || appSettings.principalName || 'Hj. Siti Rohmah, M.Pd.';
-  const principalNip = journal.principalNip || teacher.principalNip || appSettings.principalNip || '197405101998022001';
-  const teacherSig = teacher.signatureDataUrl || DEFAULT_TEACHER_SIGNATURE;
-  const principalSig = teacher.principalSignatureDataUrl || DEFAULT_PRINCIPAL_SIGNATURE;
+  const liveTeacher = StorageService.getTeacherProfile(teacher.id || journal.teacherId);
+  const liveSettings = StorageService.getAppSettings();
+
+  const isDemoPrincipal = (val?: string) => {
+    if (!val || !val.trim()) return true;
+    const lower = val.trim().toLowerCase();
+    return (
+      lower === 'hj. siti rohmah, m.pd.' ||
+      lower === 'hj. siti rohmah, m.pd' ||
+      lower === 'drs. h. subur, m.pd.' ||
+      lower === 'drs. h. subur, m.pd' ||
+      lower === 'drs. h. bambang sudibyo, m.pd.' ||
+      lower === 'drs. h. bambang sudibyo, m.pd' ||
+      lower === 'kepala sekolah' ||
+      lower === '-'
+    );
+  };
+
+  const isDemoNip = (val?: string) => {
+    if (!val || !val.trim()) return true;
+    const clean = val.trim();
+    return (
+      clean === '197405101998022001' ||
+      clean === '196903141994031005' ||
+      clean === '196904121994121003' ||
+      clean === '-'
+    );
+  };
+
+  const schoolNameUpper = (
+    liveTeacher.schoolName ||
+    teacher.schoolName ||
+    journal.schoolName ||
+    liveSettings.schoolName ||
+    appSettings.schoolName ||
+    'SDN CIKETING UDIK 2 BANTARGEBANG'
+  ).toUpperCase();
+  const schoolAddress =
+    liveTeacher.schoolAddress ||
+    teacher.schoolAddress ||
+    liveSettings.schoolAddress ||
+    appSettings.schoolAddress ||
+    'Jl. Raya Ciketing Udik No. 2, Kecamatan Bantargebang, Kota Bekasi';
+  const teacherName = liveTeacher.fullName || teacher.fullName || journal.teacherName || 'Guru PAI';
+  const teacherNip = liveTeacher.nip || teacher.nip || journal.teacherNip || '-';
+  const teacherJabatan = liveTeacher.jabatan || teacher.jabatan || 'Guru PAI & Budi Pekerti';
+  const teacherPangkat = liveTeacher.pangkatGolongan || teacher.pangkatGolongan || 'Penata / III/c';
+
+  const principalName = (
+    !isDemoPrincipal(liveTeacher.principalName)
+      ? liveTeacher.principalName!
+      : !isDemoPrincipal(teacher.principalName)
+      ? teacher.principalName!
+      : !isDemoPrincipal(journal.principalName)
+      ? journal.principalName!
+      : !isDemoPrincipal(liveSettings.principalName)
+      ? liveSettings.principalName!
+      : liveTeacher.principalName ||
+        teacher.principalName ||
+        journal.principalName ||
+        liveSettings.principalName ||
+        'Hj. Siti Rohmah, M.Pd.'
+  ).trim();
+
+  const principalNip = (
+    !isDemoNip(liveTeacher.principalNip)
+      ? liveTeacher.principalNip!
+      : !isDemoNip(teacher.principalNip)
+      ? teacher.principalNip!
+      : !isDemoNip(journal.principalNip)
+      ? journal.principalNip!
+      : !isDemoNip(liveSettings.principalNip)
+      ? liveSettings.principalNip!
+      : liveTeacher.principalNip ||
+        teacher.principalNip ||
+        journal.principalNip ||
+        liveSettings.principalNip ||
+        '197405101998022001'
+  ).trim();
+
+  const teacherSig =
+    liveTeacher.signatureDataUrl || teacher.signatureDataUrl || DEFAULT_TEACHER_SIGNATURE;
+  const principalSig =
+    liveTeacher.principalSignatureDataUrl ||
+    teacher.principalSignatureDataUrl ||
+    DEFAULT_PRINCIPAL_SIGNATURE;
 
   const att = journal.attendanceSummary || {
     totalStudents: 30,
@@ -526,7 +602,7 @@ function buildOfficialJournalHtml(
 
     <div class="sig-row">
       <div class="sig-col">
-        <div>Mengetahui,<br/>Kepala ${journal.schoolName || teacher.schoolName || 'Sekolah'}</div>
+        <div>Mengetahui,<br/>Kepala ${liveTeacher.schoolName || teacher.schoolName || journal.schoolName || 'Sekolah'}</div>
         <div class="sig-space">
           ${principalSig ? `<img src="${principalSig}" alt="TTD Kepsek" style="max-height: 58px; max-width: 150px; object-fit: contain;" />` : ''}
         </div>
@@ -1031,7 +1107,9 @@ export const TeachingJournalView: React.FC<TeachingJournalViewProps> = ({
   };
 
   const handlePrintSingleJournal = (jrn: TeachingJournal) => {
-    const html = buildOfficialJournalHtml(jrn, teacherProfile, appSettings, true);
+    const latestTeacher = StorageService.getTeacherProfile(activeTeacherId);
+    const latestSettings = StorageService.getAppSettings();
+    const html = buildOfficialJournalHtml(jrn, latestTeacher, latestSettings, true);
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -1050,12 +1128,24 @@ export const TeachingJournalView: React.FC<TeachingJournalViewProps> = ({
       return;
     }
 
-    const schoolNameUpper = (teacherProfile.schoolName || appSettings.schoolName || 'SDN CIKETING UDIK 2 BANTARGEBANG').toUpperCase();
-    const schoolAddress = teacherProfile.schoolAddress || appSettings.schoolAddress || 'Jl. Raya Ciketing Udik No. 2, Kecamatan Bantargebang, Kota Bekasi';
-    const principalName = teacherProfile.principalName || appSettings.principalName || 'Hj. Siti Rohmah, M.Pd.';
-    const principalNip = teacherProfile.principalNip || appSettings.principalNip || '197405101998022001';
-    const teacherSig = teacherProfile.signatureDataUrl || DEFAULT_TEACHER_SIGNATURE;
-    const principalSig = teacherProfile.principalSignatureDataUrl || DEFAULT_PRINCIPAL_SIGNATURE;
+    const latestTeacher = StorageService.getTeacherProfile(activeTeacherId);
+    const latestSettings = StorageService.getAppSettings();
+
+    const schoolNameUpper = (
+      latestTeacher.schoolName ||
+      latestSettings.schoolName ||
+      'SDN CIKETING UDIK 2 BANTARGEBANG'
+    ).toUpperCase();
+    const schoolAddress =
+      latestTeacher.schoolAddress ||
+      latestSettings.schoolAddress ||
+      'Jl. Raya Ciketing Udik No. 2, Kecamatan Bantargebang, Kota Bekasi';
+    const principalName =
+      latestTeacher.principalName || latestSettings.principalName || 'Hj. Siti Rohmah, M.Pd.';
+    const principalNip =
+      latestTeacher.principalNip || latestSettings.principalNip || '197405101998022001';
+    const teacherSig = latestTeacher.signatureDataUrl || DEFAULT_TEACHER_SIGNATURE;
+    const principalSig = latestTeacher.principalSignatureDataUrl || DEFAULT_PRINCIPAL_SIGNATURE;
 
     const sortedAsc = [...filteredJournals].sort((a, b) => a.date.localeCompare(b.date));
 

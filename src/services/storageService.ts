@@ -758,32 +758,118 @@ export const StorageService = {
 
   getActiveTeacher: (): TeacherProfile => {
     const activeId = StorageService.getActiveTeacherId();
-    const teachers = StorageService.getTeachers();
-    const found = teachers.find(t => t.id === activeId) || teachers[0] || INITIAL_TEACHER_PROFILE;
-    return {
-      ...found,
-      principalName: found.principalName?.trim() || INITIAL_TEACHER_PROFILE.principalName || 'Hj. Siti Rohmah, M.Pd.',
-      principalNip: found.principalNip?.trim() || INITIAL_TEACHER_PROFILE.principalNip || '197405101998022001',
-      signatureDataUrl: found.signatureDataUrl || DEFAULT_TEACHER_SIGNATURE,
-      principalSignatureDataUrl: found.principalSignatureDataUrl || DEFAULT_PRINCIPAL_SIGNATURE
-    };
+    return StorageService.getTeacherProfile(activeId);
   },
 
   getTeacherProfile: (teacherId?: string): TeacherProfile => {
-    if (teacherId) {
-      const teachers = StorageService.getTeachers();
-      const match = teachers.find(t => t.id === teacherId);
-      if (match) {
-        return {
-          ...match,
-          principalName: match.principalName?.trim() || INITIAL_TEACHER_PROFILE.principalName || 'Hj. Siti Rohmah, M.Pd.',
-          principalNip: match.principalNip?.trim() || INITIAL_TEACHER_PROFILE.principalNip || '197405101998022001',
-          signatureDataUrl: match.signatureDataUrl || DEFAULT_TEACHER_SIGNATURE,
-          principalSignatureDataUrl: match.principalSignatureDataUrl || DEFAULT_PRINCIPAL_SIGNATURE
-        };
-      }
-    }
-    return StorageService.getActiveTeacher();
+    const targetId = teacherId || StorageService.getActiveTeacherId();
+    const teachers = StorageService.getTeachers();
+    const found = teachers.find(t => t.id === targetId) || teachers[0] || INITIAL_TEACHER_PROFILE;
+
+    const isDemoPrincipalName = (val?: string) => {
+      if (!val || !val.trim()) return true;
+      const lower = val.trim().toLowerCase();
+      return (
+        lower === 'hj. siti rohmah, m.pd.' ||
+        lower === 'hj. siti rohmah, m.pd' ||
+        lower === 'drs. h. subur, m.pd.' ||
+        lower === 'drs. h. subur, m.pd' ||
+        lower === 'drs. h. bambang sudibyo, m.pd.' ||
+        lower === 'drs. h. bambang sudibyo, m.pd' ||
+        lower === 'kepala sekolah' ||
+        lower === '-'
+      );
+    };
+
+    const isDemoPrincipalNip = (val?: string) => {
+      if (!val || !val.trim()) return true;
+      const clean = val.trim();
+      return (
+        clean === '197405101998022001' ||
+        clean === '196903141994031005' ||
+        clean === '196904121994121003' ||
+        clean === '-'
+      );
+    };
+
+    // Periksa juga apakah ada nama Kepala Sekolah asli (non-demo) yang sudah diisi di Nota Dinas, Pengaturan, atau Profil Guru lain
+    const allPeriods = getStorage<EKinerjaPeriod[]>(STORAGE_KEYS.E_KINERJA_PERIODS, INITIAL_E_KINERJA_PERIODS);
+    const teacherPeriods = allPeriods.filter(
+      p => p.teacherId === found.id || (!p.teacherId && found.id === 'guru-1')
+    );
+    const periodNotaWithCustomKepsek =
+      teacherPeriods.find(p => p.notaDinas?.principalName && !isDemoPrincipalName(p.notaDinas.principalName))
+        ?.notaDinas ||
+      allPeriods.find(p => p.notaDinas?.principalName && !isDemoPrincipalName(p.notaDinas.principalName))
+        ?.notaDinas;
+
+    const settings = getStorage<AppSettings>(STORAGE_KEYS.SETTINGS, INITIAL_APP_SETTINGS);
+    const legacyProfile = getStorage<TeacherProfile>(STORAGE_KEYS.PROFILE, INITIAL_TEACHER_PROFILE);
+    const otherTeacherWithCustomKepsek = teachers.find(
+      t =>
+        !isDemoPrincipalName(t.principalName) &&
+        (!found.schoolName ||
+          !t.schoolName ||
+          t.schoolName.trim().toLowerCase() === found.schoolName.trim().toLowerCase())
+    ) || teachers.find(t => !isDemoPrincipalName(t.principalName));
+
+    const resolvedPrincipalName = (
+      !isDemoPrincipalName(found.principalName)
+        ? found.principalName!
+        : periodNotaWithCustomKepsek?.principalName && !isDemoPrincipalName(periodNotaWithCustomKepsek.principalName)
+        ? periodNotaWithCustomKepsek.principalName
+        : !isDemoPrincipalName(settings.principalName)
+        ? settings.principalName
+        : legacyProfile && !isDemoPrincipalName(legacyProfile.principalName)
+        ? legacyProfile.principalName!
+        : otherTeacherWithCustomKepsek?.principalName
+        ? otherTeacherWithCustomKepsek.principalName
+        : found.principalName?.trim() ||
+          periodNotaWithCustomKepsek?.principalName ||
+          settings.principalName?.trim() ||
+          INITIAL_TEACHER_PROFILE.principalName ||
+          'Hj. Siti Rohmah, M.Pd.'
+    ).trim();
+
+    const resolvedPrincipalNip = (
+      !isDemoPrincipalNip(found.principalNip)
+        ? found.principalNip!
+        : periodNotaWithCustomKepsek?.principalNip && !isDemoPrincipalNip(periodNotaWithCustomKepsek.principalNip)
+        ? periodNotaWithCustomKepsek.principalNip
+        : !isDemoPrincipalNip(settings.principalNip)
+        ? settings.principalNip
+        : legacyProfile && !isDemoPrincipalNip(legacyProfile.principalNip)
+        ? legacyProfile.principalNip!
+        : otherTeacherWithCustomKepsek?.principalNip && !isDemoPrincipalNip(otherTeacherWithCustomKepsek.principalNip)
+        ? otherTeacherWithCustomKepsek.principalNip
+        : found.principalNip?.trim() ||
+          periodNotaWithCustomKepsek?.principalNip ||
+          settings.principalNip?.trim() ||
+          INITIAL_TEACHER_PROFILE.principalNip ||
+          '197405101998022001'
+    ).trim();
+
+    const resolvedTeacherSig =
+      (found.signatureDataUrl && found.signatureDataUrl !== DEFAULT_TEACHER_SIGNATURE
+        ? found.signatureDataUrl
+        : periodNotaWithCustomKepsek?.signatureDataUrl || found.signatureDataUrl) ||
+      DEFAULT_TEACHER_SIGNATURE;
+
+    const resolvedPrincipalSig =
+      (found.principalSignatureDataUrl && found.principalSignatureDataUrl !== DEFAULT_PRINCIPAL_SIGNATURE
+        ? found.principalSignatureDataUrl
+        : periodNotaWithCustomKepsek?.principalSignatureDataUrl ||
+          otherTeacherWithCustomKepsek?.principalSignatureDataUrl ||
+          found.principalSignatureDataUrl) ||
+      DEFAULT_PRINCIPAL_SIGNATURE;
+
+    return {
+      ...found,
+      principalName: resolvedPrincipalName,
+      principalNip: resolvedPrincipalNip,
+      signatureDataUrl: resolvedTeacherSig,
+      principalSignatureDataUrl: resolvedPrincipalSig
+    };
   },
 
   saveTeacherProfile: (profile: TeacherProfile): TeacherProfile => {
@@ -795,6 +881,21 @@ export const StorageService = {
       updatedAt: new Date().toISOString()
     };
 
+    const isDemoPrincipalName = (val?: string) => {
+      if (!val || !val.trim()) return true;
+      const lower = val.trim().toLowerCase();
+      return (
+        lower === 'hj. siti rohmah, m.pd.' ||
+        lower === 'hj. siti rohmah, m.pd' ||
+        lower === 'drs. h. subur, m.pd.' ||
+        lower === 'drs. h. subur, m.pd' ||
+        lower === 'drs. h. bambang sudibyo, m.pd.' ||
+        lower === 'drs. h. bambang sudibyo, m.pd' ||
+        lower === 'kepala sekolah' ||
+        lower === '-'
+      );
+    };
+
     const idx = teachers.findIndex(t => t.id === id);
     let updatedList: TeacherProfile[];
     if (idx !== -1) {
@@ -803,12 +904,125 @@ export const StorageService = {
     } else {
       updatedList = [...teachers, updatedProfile];
     }
+
+    // Jika profil guru yang disimpan memiliki nama Kepala Sekolah asli (non-demo),
+    // perbarui juga guru lain yang masih memakai nama Kepala Sekolah demo bawaan
+    if (updatedProfile.principalName && !isDemoPrincipalName(updatedProfile.principalName)) {
+      updatedList = updatedList.map(t => {
+        if (t.id === id) return t;
+        if (isDemoPrincipalName(t.principalName)) {
+          return {
+            ...t,
+            principalName: updatedProfile.principalName,
+            principalNip: updatedProfile.principalNip || t.principalNip,
+            principalSignatureDataUrl:
+              updatedProfile.principalSignatureDataUrl || t.principalSignatureDataUrl
+          };
+        }
+        return t;
+      });
+    }
+
     setStorage(STORAGE_KEYS.TEACHERS, updatedList);
 
-    // If active teacher was updated or only 1 teacher, sync to PROFILE key & session
+    // Sinkronkan juga ke seluruh periode E-Kinerja (Nota Dinas) milik guru ini agar Nama Kepala Sekolah & TTD selalu sama
+    try {
+      const allPeriods = getStorage<EKinerjaPeriod[]>(STORAGE_KEYS.E_KINERJA_PERIODS, INITIAL_E_KINERJA_PERIODS);
+      let periodsChanged = false;
+      const syncedPeriods = allPeriods.map(p => {
+        const belongsToTeacher = p.teacherId === id || (!p.teacherId && id === 'guru-1');
+        if (!belongsToTeacher) {
+          if (
+            p.notaDinas &&
+            updatedProfile.principalName &&
+            !isDemoPrincipalName(updatedProfile.principalName) &&
+            isDemoPrincipalName(p.notaDinas.principalName)
+          ) {
+            periodsChanged = true;
+            return {
+              ...p,
+              notaDinas: {
+                ...p.notaDinas,
+                principalName: updatedProfile.principalName,
+                principalNip: updatedProfile.principalNip || p.notaDinas.principalNip
+              }
+            };
+          }
+          return p;
+        }
+        periodsChanged = true;
+        return {
+          ...p,
+          notaDinas: p.notaDinas
+            ? {
+                ...p.notaDinas,
+                dari: updatedProfile.fullName || p.notaDinas.dari,
+                nip: updatedProfile.nip || p.notaDinas.nip,
+                principalName: updatedProfile.principalName || p.notaDinas.principalName,
+                principalNip: updatedProfile.principalNip || p.notaDinas.principalNip,
+                signatureDataUrl: updatedProfile.signatureDataUrl || p.notaDinas.signatureDataUrl,
+                principalSignatureDataUrl:
+                  updatedProfile.principalSignatureDataUrl || p.notaDinas.principalSignatureDataUrl
+              }
+            : p.notaDinas
+        };
+      });
+      if (periodsChanged) {
+        setStorage(STORAGE_KEYS.E_KINERJA_PERIODS, syncedPeriods);
+      }
+    } catch {
+      // ignore
+    }
+
+    // Sinkronkan juga ke seluruh Jurnal Mengajar milik guru ini agar Nama Kepala Sekolah di Jurnal selalu sama dengan Laporan Kinerja
+    try {
+      const allJournals = getStorage<TeachingJournal[]>(STORAGE_KEYS.JOURNALS, INITIAL_TEACHING_JOURNALS);
+      let journalsChanged = false;
+      const syncedJournals = allJournals.map(j => {
+        const belongsToTeacher = j.teacherId === id || (!j.teacherId && id === 'guru-1');
+        if (!belongsToTeacher) {
+          if (
+            updatedProfile.principalName &&
+            !isDemoPrincipalName(updatedProfile.principalName) &&
+            isDemoPrincipalName(j.principalName)
+          ) {
+            journalsChanged = true;
+            return {
+              ...j,
+              principalName: updatedProfile.principalName,
+              principalNip: updatedProfile.principalNip || j.principalNip
+            };
+          }
+          return j;
+        }
+        journalsChanged = true;
+        return {
+          ...j,
+          teacherName: updatedProfile.fullName || j.teacherName,
+          teacherNip: updatedProfile.nip || j.teacherNip,
+          schoolName: updatedProfile.schoolName || j.schoolName,
+          principalName: updatedProfile.principalName || j.principalName,
+          principalNip: updatedProfile.principalNip || j.principalNip
+        };
+      });
+      if (journalsChanged) {
+        setStorage(STORAGE_KEYS.JOURNALS, syncedJournals);
+      }
+    } catch {
+      // ignore
+    }
+
+    // If active teacher was updated or only 1 teacher, sync to PROFILE key, SETTINGS & session
     const activeId = StorageService.getActiveTeacherId();
     if (activeId === id || teachers.length === 0) {
       setStorage(STORAGE_KEYS.PROFILE, updatedProfile);
+      const currentSettings = getStorage<AppSettings>(STORAGE_KEYS.SETTINGS, INITIAL_APP_SETTINGS);
+      setStorage(STORAGE_KEYS.SETTINGS, {
+        ...currentSettings,
+        schoolName: updatedProfile.schoolName || currentSettings.schoolName,
+        principalName: updatedProfile.principalName || currentSettings.principalName,
+        principalNip: updatedProfile.principalNip || currentSettings.principalNip
+      });
       const currentSession = StorageService.getSession();
       if (currentSession && currentSession.role === 'admin') {
         StorageService.setSession({
@@ -876,10 +1090,37 @@ export const StorageService = {
 
   getAppSettings: (): AppSettings => {
     const s = getStorage<AppSettings>(STORAGE_KEYS.SETTINGS, INITIAL_APP_SETTINGS);
+    const activeProf = StorageService.getTeacherProfile();
+    const isDemoName = (val?: string) => {
+      if (!val || !val.trim()) return true;
+      const l = val.trim().toLowerCase();
+      return (
+        l === 'hj. siti rohmah, m.pd.' ||
+        l === 'hj. siti rohmah, m.pd' ||
+        l === 'drs. h. subur, m.pd.' ||
+        l === 'drs. h. subur, m.pd' ||
+        l === 'drs. h. bambang sudibyo, m.pd.' ||
+        l === 'kepala sekolah' ||
+        l === '-'
+      );
+    };
+    const isDemoNip = (val?: string) => {
+      if (!val || !val.trim()) return true;
+      const c = val.trim();
+      return c === '197405101998022001' || c === '196903141994031005' || c === '196904121994121003' || c === '-';
+    };
     return {
       ...s,
-      principalName: s.principalName?.trim() || INITIAL_APP_SETTINGS.principalName || 'Hj. Siti Rohmah, M.Pd.',
-      principalNip: s.principalNip?.trim() || INITIAL_APP_SETTINGS.principalNip || '197405101998022001'
+      principalName: !isDemoName(activeProf.principalName)
+        ? activeProf.principalName!
+        : !isDemoName(s.principalName)
+        ? s.principalName.trim()
+        : activeProf.principalName || s.principalName?.trim() || INITIAL_APP_SETTINGS.principalName || 'Hj. Siti Rohmah, M.Pd.',
+      principalNip: !isDemoNip(activeProf.principalNip)
+        ? activeProf.principalNip!
+        : !isDemoNip(s.principalNip)
+        ? s.principalNip.trim()
+        : activeProf.principalNip || s.principalNip?.trim() || INITIAL_APP_SETTINGS.principalNip || '197405101998022001'
     };
   },
 
@@ -1104,10 +1345,23 @@ export const StorageService = {
 
   getJournals: (teacherId?: string): TeachingJournal[] => {
     const all = getStorage<TeachingJournal[]>(STORAGE_KEYS.JOURNALS, INITIAL_TEACHING_JOURNALS);
-    if (!teacherId) return all;
-    return all.filter(
-      j => j.teacherId === teacherId || (!j.teacherId && teacherId === 'guru-1')
-    );
+    const filtered = teacherId
+      ? all.filter(j => j.teacherId === teacherId || (!j.teacherId && teacherId === 'guru-1'))
+      : all;
+    const activeProf = StorageService.getTeacherProfile(teacherId);
+    return filtered.map(j => {
+      const prof = j.teacherId && j.teacherId !== activeProf.id
+        ? StorageService.getTeacherProfile(j.teacherId)
+        : activeProf;
+      return {
+        ...j,
+        teacherName: prof.fullName || j.teacherName,
+        teacherNip: prof.nip || j.teacherNip,
+        schoolName: prof.schoolName || j.schoolName,
+        principalName: prof.principalName || j.principalName,
+        principalNip: prof.principalNip || j.principalNip
+      };
+    });
   },
 
   saveJournal: (entry: Omit<TeachingJournal, 'id'> & { id?: string }, teacherId?: string): TeachingJournal => {

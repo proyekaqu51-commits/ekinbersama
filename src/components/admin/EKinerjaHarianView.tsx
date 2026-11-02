@@ -778,18 +778,42 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       : `Kepala ${unitKerjaName}`;
     const defaultDari = profile.fullName || 'Suhendri';
     const defaultNip = profile.nip || '198001122024211002';
-    const defaultKepsek =
-      (profile.principalName && profile.principalName.trim() !== '' && profile.principalName !== 'Kepala Sekolah'
-        ? profile.principalName
-        : settings.principalName && settings.principalName.trim() !== ''
-        ? settings.principalName
-        : 'Hj. Siti Rohmah, M.Pd.').trim();
-    const defaultKepsekNip =
-      (profile.principalNip && profile.principalNip.trim() !== '' && profile.principalNip !== '-'
-        ? profile.principalNip
-        : settings.principalNip && settings.principalNip.trim() !== ''
-        ? settings.principalNip
-        : '197405101998022001').trim();
+    const isDemoPrincipalName = (name?: string) =>
+      !name ||
+      !name.trim() ||
+      name.trim() === 'Kepala Sekolah' ||
+      name.trim() === 'Hj. Siti Rohmah, M.Pd.' ||
+      name.trim() === 'Drs. H. Subur, M.Pd.' ||
+      name.trim() === 'Drs. H. Bambang Sudibyo, M.Pd.';
+
+    const isDemoPrincipalNip = (nipVal?: string) =>
+      !nipVal ||
+      !nipVal.trim() ||
+      nipVal.trim() === '-' ||
+      nipVal.trim() === '197405101998022001' ||
+      nipVal.trim() === '196903141994031005' ||
+      nipVal.trim() === '196904121994121003';
+
+    const resolvedPrincipalName = (
+      !isDemoPrincipalName(profile.principalName)
+        ? profile.principalName!
+        : !isDemoPrincipalName(saved?.principalName)
+        ? saved!.principalName!
+        : !isDemoPrincipalName(settings.principalName)
+        ? settings.principalName!
+        : profile.principalName || saved?.principalName || settings.principalName || 'Hj. Siti Rohmah, M.Pd.'
+    ).trim();
+
+    const resolvedPrincipalNip = (
+      !isDemoPrincipalNip(profile.principalNip)
+        ? profile.principalNip!
+        : !isDemoPrincipalNip(saved?.principalNip)
+        ? saved!.principalNip!
+        : !isDemoPrincipalNip(settings.principalNip)
+        ? settings.principalNip!
+        : profile.principalNip || saved?.principalNip || settings.principalNip || '197405101998022001'
+    ).trim();
+
     const yearStr = period?.year || String(new Date().getFullYear());
     const defaultNomor = `421.2/     -SD/${yearStr}`;
     const defaultTanggal = new Date().toISOString().split('T')[0];
@@ -816,14 +840,8 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       kepadaYth: saved?.kepadaYth || defaultKepada,
       dari: saved?.dari || defaultDari,
       nip: saved?.nip || defaultNip,
-      principalName:
-        (saved?.principalName && saved.principalName.trim() !== '' && saved.principalName !== 'Kepala Sekolah'
-          ? saved.principalName
-          : defaultKepsek).trim(),
-      principalNip:
-        (saved?.principalNip && saved.principalNip.trim() !== '' && saved.principalNip !== '-'
-          ? saved.principalNip
-          : defaultKepsekNip).trim(),
+      principalName: resolvedPrincipalName,
+      principalNip: resolvedPrincipalNip,
       nomorSurat: saved?.nomorSurat || defaultNomor,
       tanggalSurat: saved?.tanggalSurat || defaultTanggal,
       lampiran: saved?.lampiran || '1 (Satu) Berkas',
@@ -1082,6 +1100,15 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
     }
     const updated = StorageService.saveTeacherProfile(editProfileForm);
     setTeacherProfile(updated);
+    setNotaDinasForm(prev => ({
+      ...prev,
+      dari: updated.fullName || prev.dari,
+      nip: updated.nip || prev.nip,
+      principalName: updated.principalName || prev.principalName,
+      principalNip: updated.principalNip || prev.principalNip,
+      signatureDataUrl: updated.signatureDataUrl || prev.signatureDataUrl,
+      principalSignatureDataUrl: updated.principalSignatureDataUrl || prev.principalSignatureDataUrl
+    }));
     if (onProfileUpdated) onProfileUpdated(editProfileForm.fullName);
     setIdentityModalOpen(false);
     showToast('Identitas Pegawai berhasil diperbarui!', 'success');
@@ -2220,24 +2247,44 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
 
     const schoolNameUpper = (autoUnitKerja || '-').toUpperCase();
 
+    persistNotaDinasConfig(notaDinasForm, false);
+    const latestProfile = StorageService.getTeacherProfile(currentTeacherId);
+    const latestSettings = StorageService.getAppSettings();
+
+    const isDemoPrincipalName = (name?: string) =>
+      !name ||
+      !name.trim() ||
+      name.trim() === 'Kepala Sekolah' ||
+      name.trim() === 'Hj. Siti Rohmah, M.Pd.' ||
+      name.trim() === 'Drs. H. Subur, M.Pd.' ||
+      name.trim() === 'Drs. H. Bambang Sudibyo, M.Pd.';
+
+    const isDemoPrincipalNip = (nipVal?: string) =>
+      !nipVal ||
+      !nipVal.trim() ||
+      nipVal.trim() === '-' ||
+      nipVal.trim() === '197405101998022001' ||
+      nipVal.trim() === '196903141994031005' ||
+      nipVal.trim() === '196904121994121003';
+
     const resolvedPrincipalName = (
-      (notaDinasForm.principalName && notaDinasForm.principalName.trim() !== '' && notaDinasForm.principalName !== 'Kepala Sekolah'
-        ? notaDinasForm.principalName
-        : teacherProfile.principalName && teacherProfile.principalName.trim() !== ''
-        ? teacherProfile.principalName
-        : appSettings.principalName && appSettings.principalName.trim() !== ''
-        ? appSettings.principalName
-        : 'Hj. Siti Rohmah, M.Pd.')
+      !isDemoPrincipalName(latestProfile.principalName)
+        ? latestProfile.principalName!
+        : !isDemoPrincipalName(notaDinasForm.principalName)
+        ? notaDinasForm.principalName!
+        : !isDemoPrincipalName(latestSettings.principalName)
+        ? latestSettings.principalName!
+        : latestProfile.principalName || notaDinasForm.principalName || latestSettings.principalName || 'Hj. Siti Rohmah, M.Pd.'
     ).trim();
 
     const resolvedPrincipalNip = (
-      (notaDinasForm.principalNip && notaDinasForm.principalNip.trim() !== '' && notaDinasForm.principalNip !== '-'
-        ? notaDinasForm.principalNip
-        : teacherProfile.principalNip && teacherProfile.principalNip.trim() !== ''
-        ? teacherProfile.principalNip
-        : appSettings.principalNip && appSettings.principalNip.trim() !== ''
-        ? appSettings.principalNip
-        : '197405101998022001')
+      !isDemoPrincipalNip(latestProfile.principalNip)
+        ? latestProfile.principalNip!
+        : !isDemoPrincipalNip(notaDinasForm.principalNip)
+        ? notaDinasForm.principalNip!
+        : !isDemoPrincipalNip(latestSettings.principalNip)
+        ? latestSettings.principalNip!
+        : latestProfile.principalNip || notaDinasForm.principalNip || latestSettings.principalNip || '197405101998022001'
     ).trim();
 
     const resolvedPrincipalSigUrl =
@@ -2359,13 +2406,6 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                   <td style="text-align:center; font-weight:bold;">${idx + 1}</td>
                   <td>
                     <div style="font-weight:600; color:#0f172a;">${formatHariTanggalIndo(act.date)}</div>
-                    ${
-                      act.workMode
-                        ? `<div style="margin-top:4px; font-size:10px; font-weight:700; color:${act.workMode === 'WFA' ? '#0d9488' : act.workMode === 'WFO' ? '#2563eb' : '#7c3aed'};">
-                            <span>[${act.workMode}]</span> ${act.locationName ? `<span style="font-weight:normal; color:#475569;">${act.locationName}</span>` : ''}
-                          </div>`
-                        : ''
-                    }
                   </td>
                   <td>
                     <div style="font-weight:600; color:#0f172a;">${act.rencanaAksiText}</div>
@@ -2474,6 +2514,26 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                 item.doc.mimeType === 'text/html' ||
                 item.doc.fileName.toLowerCase().endsWith('.html') ||
                 item.doc.dataUrl.startsWith('data:text/html');
+
+              let resolvedDocDataUrl = item.doc.dataUrl;
+              if (isHtmlDoc && item.doc.dataUrl.startsWith('data:text/html;base64,')) {
+                try {
+                  const base64Part = item.doc.dataUrl.slice('data:text/html;base64,'.length);
+                  const decodedHtml = decodeURIComponent(escape(window.atob(base64Part)));
+                  const updatedHtml = decodedHtml
+                    .replace(/Hj\.\s*Siti\s*Rohmah,\s*M\.Pd\./g, resolvedPrincipalName)
+                    .replace(/Drs\.\s*H\.\s*Subur,\s*M\.Pd\./g, resolvedPrincipalName)
+                    .replace(/Drs\.\s*H\.\s*Bambang\s*Sudibyo,\s*M\.Pd\./g, resolvedPrincipalName)
+                    .replace(/197405101998022001/g, resolvedPrincipalNip)
+                    .replace(/196903141994031005/g, resolvedPrincipalNip)
+                    .replace(/196904121994121003/g, resolvedPrincipalNip);
+                  resolvedDocDataUrl =
+                    'data:text/html;base64,' + window.btoa(unescape(encodeURIComponent(updatedHtml)));
+                } catch {
+                  resolvedDocDataUrl = item.doc.dataUrl;
+                }
+              }
+
               return `
                 <div class="page attachment-page lampiran2-page">
                   <div class="lampiran-banner">
@@ -2484,7 +2544,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                       </div>
                     </div>
                     <div class="no-print" style="display:flex; align-items:center; gap:8px;">
-                      <a href="${item.doc.dataUrl}" download="${item.doc.fileName}" class="download-doc-btn">
+                      <a href="${resolvedDocDataUrl}" download="${item.doc.fileName}" class="download-doc-btn">
                         📥 Unduh Dokumen Asli
                       </a>
                     </div>
@@ -2494,7 +2554,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                     isPdf || isHtmlDoc
                       ? `
                         <div class="lampiran2-full-doc-frame">
-                          <iframe src="${item.doc.dataUrl}${isPdf ? '#toolbar=0&navpanes=0&scrollbar=0&view=FitH' : ''}" title="${item.doc.fileName}" class="lampiran2-full-iframe"></iframe>
+                          <iframe src="${resolvedDocDataUrl}${isPdf ? '#toolbar=0&navpanes=0&scrollbar=0&view=FitH' : ''}" title="${item.doc.fileName}" class="lampiran2-full-iframe"></iframe>
                         </div>
                       `
                       : `
@@ -3036,6 +3096,15 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       const next = { ...prev, [key]: value };
       return next;
     });
+    if (key === 'principalName' && typeof value === 'string') {
+      const updatedProfile = { ...teacherProfile, principalName: value };
+      setTeacherProfile(updatedProfile);
+      StorageService.saveTeacherProfile(updatedProfile);
+    } else if (key === 'principalNip' && typeof value === 'string') {
+      const updatedProfile = { ...teacherProfile, principalNip: value };
+      setTeacherProfile(updatedProfile);
+      StorageService.saveTeacherProfile(updatedProfile);
+    }
   };
 
   const handleAddNotaDinasAspect = () => {
