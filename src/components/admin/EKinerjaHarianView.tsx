@@ -2933,13 +2933,25 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
             </tbody>
           </table>
 
-          <div class="signature-grid" style="justify-content:flex-end;">
+          <div class="signature-grid" style="justify-content:space-between;">
             <div class="sig-box">
-              <div>Bekasi, ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}<br/>Pegawai / Guru PAI</div>
+              <div>Mengetahui,<br/>Kepala Sekolah</div>
+              <div class="sig-space" style="display:flex; align-items:center; justify-content:center;">
+                ${
+                  resolvedPrincipalSigUrl
+                    ? `<img src="${resolvedPrincipalSigUrl}" alt="TTD Kepala Sekolah" style="max-height:64px; max-width:170px; object-fit:contain;" />`
+                    : ''
+                }
+              </div>
+              <div style="font-weight:bold; text-decoration:underline;">${resolvedPrincipalName}</div>
+              <div>NIP. ${resolvedPrincipalNip}</div>
+            </div>
+            <div class="sig-box">
+              <div>Bekasi, ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}<br/>Pegawai / Guru</div>
               <div class="sig-space" style="display:flex; align-items:center; justify-content:center;">
                 ${
                   resolvedTeacherSigUrl
-                    ? `<img src="${resolvedTeacherSigUrl}" alt="TTD" style="max-height:64px; max-width:170px; object-fit:contain;" />`
+                    ? `<img src="${resolvedTeacherSigUrl}" alt="TTD Guru" style="max-height:64px; max-width:170px; object-fit:contain;" />`
                     : ''
                 }
               </div>
@@ -4460,7 +4472,7 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-12 gap-1 sm:gap-3 py-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-1 sm:gap-3 py-1.5 border-b border-white/5">
               <div className="sm:col-span-3 font-bold text-slate-300 flex items-center justify-between">
                 <span>6. Periode Bulan &amp; Tahun</span>
                 <span className="hidden sm:inline">:</span>
@@ -4476,6 +4488,39 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                     Laporan Tersimpan
                   </span>
                 )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-1 sm:gap-3 py-1.5 items-center">
+              <div className="sm:col-span-3 font-bold text-slate-300 flex items-center justify-between">
+                <span>7. Kepala Sekolah &amp; TTD</span>
+                <span className="hidden sm:inline">:</span>
+              </div>
+              <div className="sm:col-span-9 flex flex-wrap items-center gap-2">
+                <span className="font-bold text-amber-300">
+                  {teacherProfile.principalName || appSettings.principalName || 'Hj. Siti Rohmah, M.Pd.'}
+                </span>
+                <span className="text-xs text-slate-400 font-mono">
+                  (NIP. {teacherProfile.principalNip || appSettings.principalNip || '197405101998022001'})
+                </span>
+                <span
+                  className={`text-[10px] px-2 py-0.5 rounded font-semibold ${
+                    teacherProfile.signatureDataUrl
+                      ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                      : 'bg-white/5 text-slate-400 border border-white/10'
+                  }`}
+                >
+                  {teacherProfile.signatureDataUrl ? '✓ TTD Guru' : 'TTD Guru Standar'}
+                </span>
+                <span
+                  className={`text-[10px] px-2 py-0.5 rounded font-semibold ${
+                    teacherProfile.principalSignatureDataUrl
+                      ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                      : 'bg-white/5 text-slate-400 border border-white/10'
+                  }`}
+                >
+                  {teacherProfile.principalSignatureDataUrl ? '✓ TTD Kepsek' : 'TTD Kepsek Standar'}
+                </span>
               </div>
             </div>
           </div>
@@ -6598,11 +6643,16 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
          ======================================================================== */}
       {identityModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-strong rounded-3xl max-w-lg w-full p-6 border border-white/15 space-y-5">
+          <div className="glass-strong rounded-3xl max-w-2xl w-full p-6 border border-white/15 space-y-4 max-h-[90vh] overflow-y-auto scrollbar-thin">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <h3 className="font-display font-bold text-base text-white">
-                Identitas Pegawai (Otomatis Terhubung ke Profil Guru)
-              </h3>
+              <div>
+                <h3 className="font-display font-bold text-base text-white">
+                  Identitas Pegawai, Kepala Sekolah &amp; Tanda Tangan
+                </h3>
+                <p className="text-[11px] text-slate-400">
+                  Tersimpan langsung pada profil guru aktif ({editProfileForm.fullName || 'Guru'})
+                </p>
+              </div>
               <button
                 onClick={() => setIdentityModalOpen(false)}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-white cursor-pointer"
@@ -6612,59 +6662,65 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
             </div>
 
             <form onSubmit={handleSaveIdentity} className="space-y-3.5">
-              <div>
-                <label className="text-xs font-bold text-slate-300 uppercase block mb-1">
-                  1. Nama Pegawai
-                </label>
-                <input
-                  type="text"
-                  value={editProfileForm.fullName}
-                  onChange={e =>
-                    setEditProfileForm({ ...editProfileForm, fullName: e.target.value })
-                  }
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-sm"
-                  required
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-300 uppercase block mb-1">
+                    1. Nama Pegawai / Guru
+                  </label>
+                  <input
+                    type="text"
+                    value={editProfileForm.fullName}
+                    onChange={e =>
+                      setEditProfileForm({ ...editProfileForm, fullName: e.target.value })
+                    }
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-300 uppercase block mb-1">
+                    2. NIP Guru
+                  </label>
+                  <input
+                    type="text"
+                    value={editProfileForm.nip}
+                    onChange={e => setEditProfileForm({ ...editProfileForm, nip: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-sm font-mono"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="text-xs font-bold text-slate-300 uppercase block mb-1">
-                  2. NIP
-                </label>
-                <input
-                  type="text"
-                  value={editProfileForm.nip}
-                  onChange={e => setEditProfileForm({ ...editProfileForm, nip: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-sm font-mono"
-                />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-300 uppercase block mb-1">
+                    3. Jabatan
+                  </label>
+                  <input
+                    type="text"
+                    value={editProfileForm.jabatan || ''}
+                    onChange={e =>
+                      setEditProfileForm({ ...editProfileForm, jabatan: e.target.value })
+                    }
+                    placeholder="Guru Ahli Pertama / Guru PAI & Budi Pekerti"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-300 uppercase block mb-1">
+                    4. Unit Kerja (Satuan Pendidikan)
+                  </label>
+                  <input
+                    type="text"
+                    value={editProfileForm.schoolName}
+                    onChange={e =>
+                      setEditProfileForm({ ...editProfileForm, schoolName: e.target.value })
+                    }
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-sm"
+                    required
+                  />
+                </div>
               </div>
-              <div>
-                <label className="text-xs font-bold text-slate-300 uppercase block mb-1">
-                  3. Jabatan
-                </label>
-                <input
-                  type="text"
-                  value={editProfileForm.jabatan || ''}
-                  onChange={e =>
-                    setEditProfileForm({ ...editProfileForm, jabatan: e.target.value })
-                  }
-                  placeholder="Guru Ahli Pertama / Guru PAI & Budi Pekerti"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-sm"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-slate-300 uppercase block mb-1">
-                  4. Unit Kerja
-                </label>
-                <input
-                  type="text"
-                  value={editProfileForm.schoolName}
-                  onChange={e =>
-                    setEditProfileForm({ ...editProfileForm, schoolName: e.target.value })
-                  }
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-sm"
-                  required
-                />
-              </div>
+
               <div>
                 <label className="text-xs font-bold text-slate-300 uppercase block mb-1">
                   5. Jam Kerja (Diisi Manual)
@@ -6680,7 +6736,145 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/10">
+                <div>
+                  <label className="text-xs font-bold text-amber-300 uppercase block mb-1">
+                    6. Nama Kepala Sekolah
+                  </label>
+                  <input
+                    type="text"
+                    value={editProfileForm.principalName || ''}
+                    onChange={e =>
+                      setEditProfileForm({ ...editProfileForm, principalName: e.target.value })
+                    }
+                    placeholder="Contoh: Hj. Siti Rohmah, M.Pd."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-amber-500/30 text-white text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-amber-300 uppercase block mb-1">
+                    7. NIP Kepala Sekolah
+                  </label>
+                  <input
+                    type="text"
+                    value={editProfileForm.principalNip || ''}
+                    onChange={e =>
+                      setEditProfileForm({ ...editProfileForm, principalNip: e.target.value })
+                    }
+                    placeholder="Contoh: 197405101998022001"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-amber-500/30 text-white text-sm font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* Upload TTD Guru & TTD Kepala Sekolah */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/10">
+                {/* Upload TTD Guru */}
+                <div className="p-3 rounded-2xl bg-slate-900/90 border border-white/15 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-bold text-emerald-300">TTD Guru</span>
+                    <label className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold flex items-center gap-1 cursor-pointer">
+                      <Upload className="w-3 h-3" />
+                      <span>{editProfileForm.signatureDataUrl ? 'Ganti' : 'Upload'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={e => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const reader = new FileReader();
+                          reader.onload = evt => {
+                            const dataUrl = String(evt.target?.result || '');
+                            setEditProfileForm(prev => ({ ...prev, signatureDataUrl: dataUrl }));
+                          };
+                          reader.readAsDataURL(file);
+                          e.target.value = '';
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                  {editProfileForm.signatureDataUrl ? (
+                    <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white/10">
+                      <div className="h-12 px-2 py-1 rounded bg-white/95 flex items-center justify-center">
+                        <img
+                          src={editProfileForm.signatureDataUrl}
+                          alt="TTD Guru"
+                          className="max-h-10 max-w-[110px] object-contain"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setEditProfileForm(prev => ({ ...prev, signatureDataUrl: '' }))
+                        }
+                        className="p-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-[10px] font-bold cursor-pointer"
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-slate-400 italic">Belum ada TTD Guru</p>
+                  )}
+                </div>
+
+                {/* Upload TTD Kepala Sekolah */}
+                <div className="p-3 rounded-2xl bg-slate-900/90 border border-amber-500/25 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-bold text-amber-300">TTD Kepala Sekolah</span>
+                    <label className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-300 text-[11px] font-bold flex items-center gap-1 cursor-pointer">
+                      <Upload className="w-3 h-3" />
+                      <span>{editProfileForm.principalSignatureDataUrl ? 'Ganti' : 'Upload'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={e => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const reader = new FileReader();
+                          reader.onload = evt => {
+                            const dataUrl = String(evt.target?.result || '');
+                            setEditProfileForm(prev => ({
+                              ...prev,
+                              principalSignatureDataUrl: dataUrl
+                            }));
+                          };
+                          reader.readAsDataURL(file);
+                          e.target.value = '';
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                  {editProfileForm.principalSignatureDataUrl ? (
+                    <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white/10">
+                      <div className="h-12 px-2 py-1 rounded bg-white/95 flex items-center justify-center">
+                        <img
+                          src={editProfileForm.principalSignatureDataUrl}
+                          alt="TTD Kepala Sekolah"
+                          className="max-h-10 max-w-[110px] object-contain"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setEditProfileForm(prev => ({
+                            ...prev,
+                            principalSignatureDataUrl: ''
+                          }))
+                        }
+                        className="p-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-[10px] font-bold cursor-pointer"
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-slate-400 italic">Belum ada TTD Kepala Sekolah</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-white/10">
                 <button
                   type="button"
                   onClick={() => setIdentityModalOpen(false)}

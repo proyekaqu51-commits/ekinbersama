@@ -621,14 +621,28 @@ export const ProfileAndSettingsView: React.FC<ProfileAndSettingsViewProps> = ({
     const reader = new FileReader();
     reader.onload = evt => {
       const dataUrl = evt.target?.result as string;
-      setProfile(prev => ({ ...prev, signatureDataUrl: dataUrl }));
-      showToast('Gambar TTD Guru berhasil diunggah. Klik Simpan Data Guru.', 'info');
+      setProfile(prev => {
+        const next = { ...prev, signatureDataUrl: dataUrl };
+        if (!isAddingNewTeacher && next.id && next.fullName.trim()) {
+          StorageService.saveTeacherProfile(next);
+          setTeachers(StorageService.getTeachers());
+        }
+        return next;
+      });
+      showToast('Gambar TTD Guru berhasil diunggah dan disimpan ke profil guru ini.', 'success');
     };
     reader.readAsDataURL(file);
   };
 
   const handleRemoveTeacherTtd = () => {
-    setProfile(prev => ({ ...prev, signatureDataUrl: '' }));
+    setProfile(prev => {
+      const next = { ...prev, signatureDataUrl: '' };
+      if (!isAddingNewTeacher && next.id && next.fullName.trim()) {
+        StorageService.saveTeacherProfile(next);
+        setTeachers(StorageService.getTeachers());
+      }
+      return next;
+    });
     showToast('Tanda tangan Guru dihapus.', 'info');
   };
 
@@ -638,14 +652,28 @@ export const ProfileAndSettingsView: React.FC<ProfileAndSettingsViewProps> = ({
     const reader = new FileReader();
     reader.onload = evt => {
       const dataUrl = evt.target?.result as string;
-      setProfile(prev => ({ ...prev, principalSignatureDataUrl: dataUrl }));
-      showToast('Gambar TTD Kepala Sekolah berhasil diunggah. Klik Simpan Data Guru.', 'info');
+      setProfile(prev => {
+        const next = { ...prev, principalSignatureDataUrl: dataUrl };
+        if (!isAddingNewTeacher && next.id && next.fullName.trim()) {
+          StorageService.saveTeacherProfile(next);
+          setTeachers(StorageService.getTeachers());
+        }
+        return next;
+      });
+      showToast('Gambar TTD Kepala Sekolah berhasil diunggah dan disimpan ke profil guru ini.', 'success');
     };
     reader.readAsDataURL(file);
   };
 
   const handleRemovePrincipalTtd = () => {
-    setProfile(prev => ({ ...prev, principalSignatureDataUrl: '' }));
+    setProfile(prev => {
+      const next = { ...prev, principalSignatureDataUrl: '' };
+      if (!isAddingNewTeacher && next.id && next.fullName.trim()) {
+        StorageService.saveTeacherProfile(next);
+        setTeachers(StorageService.getTeachers());
+      }
+      return next;
+    });
     showToast('Tanda tangan Kepala Sekolah dihapus.', 'info');
   };
 
@@ -669,7 +697,7 @@ export const ProfileAndSettingsView: React.FC<ProfileAndSettingsViewProps> = ({
 
     if (onProfileUpdated) onProfileUpdated(saved.fullName);
     showToast(
-      `Data Guru "${saved.fullName}" & TTD berhasil disimpan dan terhubung ke E-Kinerja & Nota Dinas!`,
+      `Data Guru "${saved.fullName}", Kepala Sekolah & TTD berhasil disimpan!`,
       'success'
     );
   };
@@ -713,7 +741,7 @@ export const ProfileAndSettingsView: React.FC<ProfileAndSettingsViewProps> = ({
                   </span>
                 </h3>
                 <p className="text-xs text-slate-400">
-                  Pilih guru untuk melihat/mengubah profil, atau klik tombol untuk menambah guru baru
+                  Pilih guru untuk melihat/mengubah profil, nama kepala sekolah, dan tanda tangan masing-masing guru
                 </p>
               </div>
             </div>
@@ -772,6 +800,29 @@ export const ProfileAndSettingsView: React.FC<ProfileAndSettingsViewProps> = ({
                     <School className="w-3 h-3 shrink-0" />
                     {t.schoolName || 'Satuan Pendidikan belum diisi'}
                   </p>
+                  <p className="text-[10px] text-amber-300/90 font-medium mt-0.5 truncate">
+                    Kepsek: {t.principalName || 'Belum diisi'}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-1.5 mt-2 pt-1.5 border-t border-white/10">
+                    <span
+                      className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                        t.signatureDataUrl
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                          : 'bg-white/5 text-slate-400 border border-white/10'
+                      }`}
+                    >
+                      {t.signatureDataUrl ? '✓ TTD Guru' : 'Belum TTD Guru'}
+                    </span>
+                    <span
+                      className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                        t.principalSignatureDataUrl
+                          ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                          : 'bg-white/5 text-slate-400 border border-white/10'
+                      }`}
+                    >
+                      {t.principalSignatureDataUrl ? '✓ TTD Kepsek' : 'Belum TTD Kepsek'}
+                    </span>
+                  </div>
                 </div>
               );
             })}
@@ -804,7 +855,7 @@ export const ProfileAndSettingsView: React.FC<ProfileAndSettingsViewProps> = ({
         </div>
 
         {/* ====================================================================
-            FORM ISIAN PROFIL GURU TERPILIH (LENGKAP DENGAN 4 DATA UTAMA)
+            FORM ISIAN PROFIL GURU TERPILIH (LENGKAP DENGAN IDENTITAS KEPALA SEKOLAH & UPLOAD TTD)
            ==================================================================== */}
         <div className="glass rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
@@ -813,7 +864,7 @@ export const ProfileAndSettingsView: React.FC<ProfileAndSettingsViewProps> = ({
                 {isAddingNewTeacher ? 'Formulir Profil Guru Baru' : `Pengaturan Profil: ${profile.fullName || 'Guru'}`}
               </h3>
               <p className="text-xs text-slate-400">
-                Data ini terhubung langsung ke E-Kinerja, RHK, Rencana Aksi, Nota Dinas, dan Lembar Cetak
+                Data guru, nama kepala sekolah, dan tanda tangan terhubung langsung ke E-Kinerja, Jurnal Mengajar, Nota Dinas, dan Lembar Cetak
               </p>
             </div>
             {teachers.length > 1 && !isAddingNewTeacher && profile.id && (
@@ -967,28 +1018,66 @@ export const ProfileAndSettingsView: React.FC<ProfileAndSettingsViewProps> = ({
               </div>
             </div>
 
-            {/* 3. UNGGAH TANDA TANGAN GURU */}
+            {/* 3. IDENTITAS KEPALA SEKOLAH PADA PROFIL MASING-MASING GURU */}
             <div className="space-y-4 pt-2">
-              <div className="flex items-center gap-2 text-purple-400 font-bold text-xs uppercase tracking-wider pb-1 border-b border-white/10">
-                <PenTool className="w-4 h-4" /> 3. Unggah Tanda Tangan Guru (Pegawai yang Dinilai)
+              <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-wider pb-1 border-b border-white/10">
+                <UserCheck className="w-4 h-4" /> 3. Identitas Kepala Sekolah (Masing-Masing Guru)
               </div>
               <p className="text-xs text-slate-400">
-                Tanda tangan akan otomatis terintegrasi ke Nota Dinas, Laporan Kinerja, dan dokumen cetak resmi
+                Isi nama lengkap beserta gelar dan NIP Kepala Sekolah untuk profil guru ini. Data ini otomatis tampil pada pengesahan Laporan Harian Kinerja Pegawai, Nota Dinas, dan Jurnal Mengajar.
               </p>
 
-              <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-300 uppercase block mb-1.5">
+                    Nama Lengkap &amp; Gelar Kepala Sekolah <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={profile.principalName || ''}
+                    onChange={e => setProfile({ ...profile, principalName: e.target.value })}
+                    placeholder="Contoh: Hj. Siti Rohmah, M.Pd."
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white text-sm focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-300 uppercase block mb-1.5">
+                    Nomor Induk Pegawai (NIP) Kepala Sekolah
+                  </label>
+                  <input
+                    type="text"
+                    value={profile.principalNip || ''}
+                    onChange={e => setProfile({ ...profile, principalNip: e.target.value })}
+                    placeholder="Contoh: 197405101998022001"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white text-sm focus:outline-none focus:border-amber-500 font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 4. UNGGAH TANDA TANGAN GURU & KEPALA SEKOLAH */}
+            <div className="space-y-4 pt-2">
+              <div className="flex items-center gap-2 text-purple-400 font-bold text-xs uppercase tracking-wider pb-1 border-b border-white/10">
+                <PenTool className="w-4 h-4" /> 4. Unggah Tanda Tangan Guru &amp; Kepala Sekolah
+              </div>
+              <p className="text-xs text-slate-400">
+                Unggah gambar tanda tangan (PNG transparan / JPG) untuk Guru dan Kepala Sekolah pada profil ini. Otomatis terintegrasi ke Laporan Harian Kinerja Pegawai, Nota Dinas, dan Jurnal Mengajar.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* TTD GURU */}
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3 max-w-lg">
-                  <div className="flex items-center justify-between">
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
                     <div>
                       <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
                         <PenTool className="w-3.5 h-3.5 text-emerald-400" /> TTD Guru (Pegawai yang Dinilai)
                       </h4>
                       <p className="text-[11px] text-slate-400">Format PNG transparan / JPG</p>
                     </div>
-                    <label className="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center gap-1 cursor-pointer transition-all">
+                    <label className="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center gap-1 cursor-pointer transition-all shrink-0">
                       <Upload className="w-3.5 h-3.5" />
-                      <span>{profile.signatureDataUrl ? 'Ganti TTD' : 'Upload TTD'}</span>
+                      <span>{profile.signatureDataUrl ? 'Ganti TTD Guru' : 'Upload TTD Guru'}</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -1003,16 +1092,16 @@ export const ProfileAndSettingsView: React.FC<ProfileAndSettingsViewProps> = ({
 
                   {profile.signatureDataUrl ? (
                     <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/10 border border-emerald-500/30">
-                      <div className="h-16 px-3 py-1 rounded-lg bg-white/90 flex items-center justify-center">
+                      <div className="h-16 px-3 py-1 rounded-lg bg-white/90 flex items-center justify-center shrink-0">
                         <img
                           src={profile.signatureDataUrl}
                           alt="TTD Guru"
                           className="max-h-14 max-w-[140px] object-contain"
                         />
                       </div>
-                      <div className="flex-1 text-left">
+                      <div className="flex-1 text-left min-w-0">
                         <span className="text-xs font-bold text-emerald-300 flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> TTD Terpasang
+                          <CheckCircle2 className="w-3.5 h-3.5 shrink-0" /> TTD Guru Terpasang
                         </span>
                         <span className="text-[10px] text-slate-300 block truncate">
                           {profile.fullName || 'Guru'}
@@ -1021,7 +1110,7 @@ export const ProfileAndSettingsView: React.FC<ProfileAndSettingsViewProps> = ({
                       <button
                         type="button"
                         onClick={handleRemoveTeacherTtd}
-                        className="p-2 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 cursor-pointer"
+                        className="p-2 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 cursor-pointer shrink-0"
                         title="Hapus TTD Guru"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -1029,7 +1118,64 @@ export const ProfileAndSettingsView: React.FC<ProfileAndSettingsViewProps> = ({
                     </div>
                   ) : (
                     <div className="p-4 rounded-xl border border-dashed border-white/15 text-center text-[11px] text-slate-400">
-                      Belum ada gambar tanda tangan guru. Klik <b>Upload TTD</b> di atas.
+                      Belum ada gambar tanda tangan guru. Klik <b>Upload TTD Guru</b> di atas.
+                    </div>
+                  )}
+                </div>
+
+                {/* TTD KEPALA SEKOLAH */}
+                <div className="p-4 rounded-2xl bg-white/5 border border-amber-500/20 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <PenTool className="w-3.5 h-3.5 text-amber-400" /> TTD Kepala Sekolah
+                      </h4>
+                      <p className="text-[11px] text-slate-400">Format PNG transparan / JPG</p>
+                    </div>
+                    <label className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center gap-1 cursor-pointer transition-all shrink-0">
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>{profile.principalSignatureDataUrl ? 'Ganti TTD Kepsek' : 'Upload TTD Kepsek'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={e => {
+                          handleUploadPrincipalTtd(e.target.files);
+                          e.target.value = '';
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+
+                  {profile.principalSignatureDataUrl ? (
+                    <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/10 border border-amber-500/30">
+                      <div className="h-16 px-3 py-1 rounded-lg bg-white/90 flex items-center justify-center shrink-0">
+                        <img
+                          src={profile.principalSignatureDataUrl}
+                          alt="TTD Kepala Sekolah"
+                          className="max-h-14 max-w-[140px] object-contain"
+                        />
+                      </div>
+                      <div className="flex-1 text-left min-w-0">
+                        <span className="text-xs font-bold text-amber-300 flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 shrink-0" /> TTD Kepsek Terpasang
+                        </span>
+                        <span className="text-[10px] text-slate-300 block truncate">
+                          {profile.principalName || 'Kepala Sekolah'}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemovePrincipalTtd}
+                        className="p-2 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 cursor-pointer shrink-0"
+                        title="Hapus TTD Kepala Sekolah"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-xl border border-dashed border-white/15 text-center text-[11px] text-slate-400">
+                      Belum ada gambar tanda tangan Kepala Sekolah. Klik <b>Upload TTD Kepsek</b> di atas.
                     </div>
                   )}
                 </div>
