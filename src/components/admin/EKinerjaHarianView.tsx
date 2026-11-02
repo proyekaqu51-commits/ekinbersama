@@ -3561,9 +3561,6 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
       [
         'No',
         'Hari / Tanggal',
-        'Mode Kerja',
-        'Lokasi / Geotag GPS',
-        'RKH Terkait',
         'Jenis Kegiatan (Rencana Aksi)',
         'Tindak Lanjut',
         'Output',
@@ -3578,19 +3575,9 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
         act.documents && act.documents.length > 0
           ? act.documents.map(d => `${d.fileName} (${d.fileType.toUpperCase()})`).join(' | ')
           : '-';
-      const locText =
-        act.locationName ||
-        (act.workMode === 'WFO'
-          ? 'SDN Ciketing Udik 2'
-          : act.locationCoords
-          ? `GPS: ${act.locationCoords.latitude.toFixed(5)}, ${act.locationCoords.longitude.toFixed(5)}`
-          : 'WFA Fleksibel');
       rows.push([
         idx + 1,
         formatHariTanggalIndo(act.date),
-        act.workMode || 'WFA',
-        locText,
-        act.rkhText || '-',
         act.rencanaAksiText,
         act.tindakLanjutList && act.tindakLanjutList.length > 0
           ? act.tindakLanjutList.join(' • ')
@@ -4555,62 +4542,6 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
             </div>
           </div>
 
-          {/* Filter Mode Kerja (WFA / WFO / WFH) */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-slate-900/80 border border-white/10">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 mr-1">
-                <Globe className="w-4 h-4 text-teal-400" /> Mode Kerja:
-              </span>
-              <button
-                type="button"
-                onClick={() => setWorkModeFilter('all')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  workModeFilter === 'all'
-                    ? 'bg-emerald-500 text-white shadow-md'
-                    : 'bg-white/5 text-slate-300 hover:bg-white/10'
-                }`}
-              >
-                Semua ({periodActivities.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setWorkModeFilter('WFA')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  workModeFilter === 'WFA'
-                    ? 'bg-teal-500 text-slate-950 shadow-md font-extrabold'
-                    : 'bg-teal-500/10 text-teal-300 hover:bg-teal-500/20 border border-teal-500/30'
-                }`}
-              >
-                <Globe className="w-3.5 h-3.5" /> WFA ({wfaCount})
-              </button>
-              <button
-                type="button"
-                onClick={() => setWorkModeFilter('WFO')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  workModeFilter === 'WFO'
-                    ? 'bg-blue-600 text-white shadow-md font-extrabold'
-                    : 'bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 border border-blue-500/30'
-                }`}
-              >
-                <Building className="w-3.5 h-3.5" /> WFO ({wfoCount})
-              </button>
-              <button
-                type="button"
-                onClick={() => setWorkModeFilter('WFH')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  workModeFilter === 'WFH'
-                    ? 'bg-purple-600 text-white shadow-md font-extrabold'
-                    : 'bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 border border-purple-500/30'
-                }`}
-              >
-                <Home className="w-3.5 h-3.5" /> WFH ({wfhCount})
-              </button>
-            </div>
-            <div className="text-[11px] text-slate-400">
-              Menampilkan <span className="font-bold text-white">{displayedActivities.length}</span> kegiatan
-            </div>
-          </div>
-
           <div className="overflow-x-auto rounded-2xl border border-white/15 bg-slate-950/60">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -4633,13 +4564,13 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10 text-xs sm:text-sm">
-                {displayedActivities.length > 0 ? (
-                  displayedActivities.map((act, index) => {
-                    const sameDateCount = displayedActivities.filter(
+                {periodActivities.length > 0 ? (
+                  periodActivities.map((act, index) => {
+                    const sameDateCount = periodActivities.filter(
                       a => a.date === act.date
                     ).length;
                     const sameDateIndex =
-                      displayedActivities
+                      periodActivities
                         .filter(a => a.date === act.date)
                         .findIndex(a => a.id === act.id) + 1;
 
@@ -4663,40 +4594,11 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                           {index + 1}
                         </td>
 
-                        {/* Kolom 2: Hari / Tanggal + Mode WFA / WFO / WFH */}
+                        {/* Kolom 2: Hari / Tanggal */}
                         <td className="py-4 px-4 border-r border-white/10">
                           <div className="font-bold text-white">
                             {formatHariTanggalIndo(act.date)}
                           </div>
-                          {/* Badge Mode Kerja (WFA / WFO / WFH) */}
-                          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                            {(act.workMode || 'WFA') === 'WFA' ? (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-500/20 border border-teal-500/40 text-teal-300 text-[10px] font-bold">
-                                <Globe className="w-3 h-3 text-teal-400" /> WFA
-                              </span>
-                            ) : act.workMode === 'WFO' ? (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/20 border border-blue-500/40 text-blue-300 text-[10px] font-bold">
-                                <Building className="w-3 h-3 text-blue-400" /> WFO
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-500/20 border border-purple-500/40 text-purple-300 text-[10px] font-bold">
-                                <Home className="w-3 h-3 text-purple-400" /> WFH
-                              </span>
-                            )}
-
-                            {act.locationName && (
-                              <span className="text-[10px] text-slate-300 truncate max-w-[140px]" title={act.locationName}>
-                                {act.locationName}
-                              </span>
-                            )}
-                          </div>
-
-                          {act.locationCoords && (
-                            <div className="mt-1 flex items-center gap-1 text-[10px] text-teal-400/90 font-mono">
-                              <MapPin className="w-3 h-3 text-teal-400 shrink-0" />
-                              <span>{act.locationCoords.latitude.toFixed(4)}, {act.locationCoords.longitude.toFixed(4)}</span>
-                            </div>
-                          )}
 
                           {sameDateCount > 1 && (
                             <span className="inline-block mt-1 px-2 py-0.5 rounded bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-[10px] font-bold">
@@ -6031,101 +5933,6 @@ export const EKinerjaHarianView: React.FC<EKinerjaHarianViewProps> = ({
                         >
                           <Trash2 className="w-3.5 h-3.5" /> Hapus Baris Ini
                         </button>
-                      )}
-                    </div>
-
-                    {/* Mode Kerja & Lokasi (WFA / WFO / WFH) */}
-                    <div className="p-3.5 rounded-xl bg-slate-950/80 border border-teal-500/30 space-y-3">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                        <div className="flex items-center gap-2">
-                          <label className="text-xs font-extrabold text-teal-300 uppercase tracking-wide flex items-center gap-1.5">
-                            <Globe className="w-4 h-4 text-teal-400" /> Mode Pelaksanaan Kerja:
-                          </label>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-200 border border-teal-500/30 font-bold">
-                            Bisa WFA
-                          </span>
-                        </div>
-                        <div className="inline-flex rounded-xl p-1 bg-slate-900 border border-white/10 gap-1">
-                          <button
-                            type="button"
-                            onClick={() => updateDraftEntry(entry.tempId, { workMode: 'WFA' })}
-                            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                              (entry.workMode || 'WFA') === 'WFA'
-                                ? 'bg-teal-500 text-slate-950 shadow-md font-extrabold'
-                                : 'text-slate-400 hover:text-white'
-                            }`}
-                          >
-                            <Globe className="w-3.5 h-3.5" /> WFA (Fleksibel / Luar)
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => updateDraftEntry(entry.tempId, { workMode: 'WFO', locationName: 'SDN Ciketing Udik 2' })}
-                            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                              entry.workMode === 'WFO'
-                                ? 'bg-blue-600 text-white shadow-md font-extrabold'
-                                : 'text-slate-400 hover:text-white'
-                            }`}
-                          >
-                            <Building className="w-3.5 h-3.5" /> WFO (Sekolah)
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => updateDraftEntry(entry.tempId, { workMode: 'WFH', locationName: 'Rumah' })}
-                            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                              entry.workMode === 'WFH'
-                                ? 'bg-purple-600 text-white shadow-md font-extrabold'
-                                : 'text-slate-400 hover:text-white'
-                            }`}
-                          >
-                            <Home className="w-3.5 h-3.5" /> WFH (Rumah)
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
-                        <div className="sm:col-span-8">
-                          <input
-                            type="text"
-                            value={entry.locationName || ''}
-                            onChange={e => updateDraftEntry(entry.tempId, { locationName: e.target.value })}
-                            placeholder={
-                              (entry.workMode || 'WFA') === 'WFA'
-                                ? 'Keterangan Lokasi WFA (misal: Ruang Rapat Dinas Pendidikan / KKG / Tempat Diklat)'
-                                : entry.workMode === 'WFH'
-                                ? 'Rumah Kediaman'
-                                : 'SDN Ciketing Udik 2'
-                            }
-                            className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/15 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-teal-400"
-                          />
-                        </div>
-                        <div className="sm:col-span-4">
-                          <button
-                            type="button"
-                            onClick={() => handleGetGpsLocation(entry.tempId)}
-                            disabled={isLocatingId === entry.tempId}
-                            className="w-full px-3 py-2 rounded-xl bg-gradient-to-r from-teal-500/25 to-emerald-500/25 hover:from-teal-500/35 hover:to-emerald-500/35 border border-teal-500/40 text-teal-300 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition shadow-sm"
-                          >
-                            <MapPin className="w-3.5 h-3.5 text-teal-400" />
-                            {isLocatingId === entry.tempId ? 'Mendeteksi GPS...' : '📍 Deteksi GPS WFA'}
-                          </button>
-                        </div>
-                      </div>
-
-                      {entry.locationCoords && (
-                        <div className="flex items-center justify-between text-[11px] text-teal-300 font-mono bg-teal-950/60 px-3 py-1.5 rounded-lg border border-teal-500/30">
-                          <span className="flex items-center gap-1.5">
-                            <MapPin className="w-3.5 h-3.5 text-teal-400" />
-                            Koordinat GPS: {entry.locationCoords.latitude.toFixed(6)}, {entry.locationCoords.longitude.toFixed(6)} {entry.locationCoords.accuracy ? `(±${Math.round(entry.locationCoords.accuracy)}m)` : ''}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => updateDraftEntry(entry.tempId, { locationCoords: undefined })}
-                            className="text-slate-400 hover:text-rose-400 text-xs font-bold"
-                            title="Hapus titik GPS"
-                          >
-                            ✕
-                          </button>
-                        </div>
                       )}
                     </div>
 

@@ -30,7 +30,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
             </div>
           </div>
           <span className="text-xs px-2.5 py-1 bg-emerald-500/20 text-emerald-300 rounded-full font-medium">
-            WFA Standalone Mode
+            Standalone Mode
           </span>
         </div>
       );
@@ -57,10 +57,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h4 className="text-base font-bold text-slate-100">Pasang Aplikasi ke Layar Utama (PWA / WFA)</h4>
-                <span className="px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider bg-teal-500/20 text-teal-300 border border-teal-500/30 rounded-full">
-                  Bisa WFA
-                </span>
+                <h4 className="text-base font-bold text-slate-100">Pasang Aplikasi ke Layar Utama (PWA)</h4>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
                 Install aplikasi ke HP, Tablet, atau Laptop untuk kemudahan isi E-Kinerja dari mana saja, bahkan saat sinyal lemah.
