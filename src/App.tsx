@@ -119,7 +119,7 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-[100dvh] overflow-hidden w-full relative bg-slate-950 text-slate-100">
+    <div className="theme-mint flex h-[100dvh] overflow-hidden w-full relative bg-[#a7f3d0] text-slate-900">
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
       <OfflineIndicator />
 

@@ -25,7 +25,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, showToast 
     setLoading(true);
 
     setTimeout(() => {
-      // Check Admin / Guru PAI credentials
       if (cleanUser === 'ADMIN' && cleanPass === 'admin123') {
         const session: UserSession = {
           userId: 'admin-guru',
@@ -66,15 +65,11 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, showToast 
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950/40">
-      {/* Background Islamic Geometric Aesthetic Ambient */}
-      <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px]"></div>
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
+    <div className="theme-mint min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[#a7f3d0]">
       <div className="w-full max-w-md relative z-10">
         {/* School & Brand Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-slate-900/80 border border-emerald-500/30 shadow-2xl mb-4 backdrop-blur-md">
+          <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-white border-2 border-emerald-500 shadow-md mb-4">
             <img
               src={appSettings.appLogoUrl || 'https://jhlryjdhotxtndavacpd.supabase.co/storage/v1/object/public/logo/logo.png'}
               alt="Logo Sekolah"
@@ -83,48 +78,48 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, showToast 
                 (e.target as HTMLElement).style.display = 'none';
               }}
             />
-            <School className="w-10 h-10 text-emerald-400 hidden only:block" />
+            <School className="w-10 h-10 text-[#065f46] hidden only:block" />
           </div>
-          <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             E-KINERJA GURU PAI
           </h1>
-          <p className="text-emerald-400 font-semibold text-xs sm:text-sm mt-1">
+          <p className="text-[#065f46] font-extrabold text-xs sm:text-sm mt-1">
             SDN Ciketing Udik 2 Bantargebang
           </p>
-          <p className="text-slate-400 text-xs mt-0.5">
+          <p className="text-slate-700 font-medium text-xs mt-0.5">
             Kota Bekasi &bull; Tahun Ajaran {appSettings.academicYear || '2026/2027'}
           </p>
         </div>
 
         {/* Login Box */}
-        <div className="glass-strong rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/10">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-lg border-2 border-emerald-500">
           <div className="mb-5">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-emerald-400" /> Masuk Akun Guru / Admin
+            <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-[#065f46]" /> Masuk Akun Guru / Admin
             </h2>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-slate-600 mt-1">
               Silakan masukkan Username dan Password Guru PAI untuk mengakses dashboard.
             </p>
           </div>
 
           {/* Quick Access Bar */}
-          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-3 mb-5">
-            <div className="flex items-center justify-between text-xs font-semibold text-emerald-300 mb-2">
+          <div className="bg-[#ecfdf5] border border-emerald-500 rounded-2xl p-3 mb-5">
+            <div className="flex items-center justify-between text-xs font-bold text-[#064e3b] mb-2">
               <span>Akses Cepat Guru PAI:</span>
             </div>
             <button
               type="button"
               onClick={loginAsDemoTeacher}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-xs font-bold transition-all cursor-pointer shadow-sm"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-[#a7f3d0] hover:bg-emerald-300 border border-emerald-600 text-[#064e3b] text-xs font-extrabold transition-all cursor-pointer shadow-xs"
             >
-              <UserCheck className="w-4 h-4 text-emerald-400" />
+              <UserCheck className="w-4 h-4 text-[#064e3b]" />
               <span>Masuk Langsung sebagai Guru PAI (admin)</span>
             </button>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">
+              <label className="text-xs font-extrabold text-slate-800 uppercase tracking-wider block mb-1.5">
                 Username
               </label>
               <input
@@ -132,13 +127,13 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, showToast 
                 value={username}
                 onChange={e => setUsername(e.target.value)}
                 placeholder="admin"
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 font-mono focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all uppercase text-sm"
+                className="w-full px-4 py-3 rounded-xl bg-white border-2 border-emerald-500 text-slate-900 placeholder-slate-400 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all uppercase text-sm font-bold"
                 autoComplete="off"
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">
+              <label className="text-xs font-extrabold text-slate-800 uppercase tracking-wider block mb-1.5">
                 Password
               </label>
               <div className="relative">
@@ -147,12 +142,12 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, showToast 
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="admin123"
-                  className="w-full px-4 py-3 pr-11 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all text-sm"
+                  className="w-full px-4 py-3 pr-11 rounded-xl bg-white border-2 border-emerald-500 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all text-sm font-bold"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPwd(!showPwd)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-400 transition-colors"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-[#065f46] transition-colors"
                 >
                   {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -162,7 +157,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, showToast 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 font-bold text-white shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+              className="w-full py-3.5 rounded-xl bg-[#065f46] hover:bg-[#064e3b] font-bold text-white shadow-md flex items-center justify-center gap-2 text-sm transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -171,7 +166,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, showToast 
                 </>
               ) : (
                 <>
-                  <LogIn className="w-4 h-4" />
+                  <LogIn className="w-4 h-4 text-white" />
                   <span>Masuk Portal Guru PAI</span>
                 </>
               )}
@@ -180,7 +175,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, showToast 
         </div>
 
         {/* Footer Credit */}
-        <div className="mt-6 text-center text-xs text-slate-500">
+        <div className="mt-6 text-center text-xs font-semibold text-slate-700">
           &copy; {new Date().getFullYear()} E-KINERJA &bull; SDN Ciketing Udik 2 Bantargebang
         </div>
       </div>

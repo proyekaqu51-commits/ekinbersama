@@ -4,24 +4,18 @@ import {
   Calendar,
   Camera,
   CheckCircle2,
-  Clock,
   ArrowRight,
   Plus,
   Printer,
   User,
   UserCheck,
   Settings,
-  Sparkles,
   Cloud,
   RefreshCw,
   FileText,
   Building2,
-  Layers,
-  Award,
   ChevronRight,
-  ExternalLink,
-  ShieldCheck,
-  Globe
+  ShieldCheck
 } from 'lucide-react';
 import { StorageService } from '../../services/storageService';
 import { SupabaseService } from '../../services/supabaseService';
@@ -142,125 +136,111 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, show
   }, [periods, activities]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* ============================================================================
-          HERO BANNER: DASHBOARD E-KINERJA HARIAN
+          HERO BANNER: DASHBOARD E-KINERJA HARIAN (Matching reference image card style)
          ============================================================================ */}
-      <div className="relative overflow-hidden rounded-3xl glass-strong border border-emerald-500/25 p-5 sm:p-7 shadow-xl space-y-4">
-        {/* Glow ambient decoration */}
-        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-72 h-72 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 -mb-16 w-56 h-56 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div className="space-y-2">
+      <div className="bg-white rounded-2xl border-2 border-emerald-500 p-5 sm:p-7 shadow-xs space-y-4">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-5">
+          <div className="space-y-2.5 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold">
-                <ClipboardCheck className="w-3.5 h-3.5" /> Dashboard E-Kinerja Harian Pegawai
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-[11px] font-semibold">
-                <Building2 className="w-3 h-3" /> {teacherProfile.schoolName || 'Satuan Pendidikan'}
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-semibold">
-                ⚖️ PermenPAN-RB No. 6 Th 2022
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/20 border border-teal-500/40 text-teal-300 text-[11px] font-bold">
-                <Globe className="w-3 h-3 text-teal-400" /> Support WFA &amp; PWA
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#a7f3d0] border border-emerald-600 text-[#064e3b] text-xs font-extrabold uppercase tracking-wide">
+                SIM E-KINERJA HARIAN PEGAWAI &bull; {teacherProfile.schoolName || 'SDN CIKETING UDIK 2'}
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-              <div>
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold font-display text-white tracking-tight">
-                  Assalamu'alaikum, {teacherProfile.fullName || 'Bapak/Ibu Guru'}
-                </h1>
-                <p className="text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed mt-1">
-                  Sistem manajemen <b>E-Kinerja Multi-Guru</b>. Pilih guru aktif untuk melihat dan mengisi RKH, rencana aksi, bukti fisik, serta Nota Dinas masing-masing.
-                </p>
-              </div>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold font-display text-slate-900 tracking-tight">
+              Selamat Datang, {teacherProfile.fullName || 'Bapak/Ibu Guru'}
+            </h1>
 
-              {/* Multi-Teacher Quick Picker in Dashboard */}
-              <div className="bg-slate-900/80 p-2.5 rounded-2xl border border-emerald-500/30 shrink-0">
-                <label htmlFor="dashboard-guru-select" className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block mb-1 flex items-center gap-1">
-                  <UserCheck className="w-3.5 h-3.5" /> Guru Aktif Saat Ini:
-                </label>
-                <select
-                  id="dashboard-guru-select"
-                  value={activeTeacherId}
-                  onChange={e => handleSwitchTeacher(e.target.value)}
-                  className="px-3 py-1.5 rounded-xl bg-slate-800 border border-emerald-500/40 text-white text-xs font-bold focus:ring-2 focus:ring-emerald-400 focus:outline-none cursor-pointer"
-                >
-                  {teachers.map(t => (
-                    <option key={t.id || t.fullName} value={t.id}>
-                      {t.fullName} ({t.schoolName})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+            <p className="text-slate-700 text-xs sm:text-sm leading-relaxed">
+              Sistem manajemen <b>E-Kinerja Harian Guru PAI</b> yang akurat, terukur, dan bermakna. Kelola Rencana Hasil Kerja (RHK), rencana aksi harian, tindak lanjut, jurnal mengajar, hingga penerbitan laporan resmi.
+            </p>
 
-            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-slate-400">
+            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-slate-600 font-medium">
               <span className="flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-slate-200 font-semibold">{teacherProfile.fullName || 'Guru PAI'}</span>
+                <User className="w-3.5 h-3.5 text-[#065f46]" />
+                <span className="text-slate-900 font-bold">{teacherProfile.fullName || 'Guru PAI'}</span>
               </span>
               <span>&bull;</span>
-              <span>NIP: <span className="font-mono text-cyan-300">{teacherProfile.nip || '-'}</span></span>
+              <span>NIP: <span className="font-mono font-bold text-[#065f46]">{teacherProfile.nip || '-'}</span></span>
               <span>&bull;</span>
-              <span>Pangkat/Gol: <span className="text-slate-200">{teacherProfile.pangkatGolongan || 'PNS / PPPK'}</span></span>
+              <span>Pangkat/Gol: <span className="text-slate-900 font-semibold">{teacherProfile.pangkatGolongan || 'PNS / PPPK'}</span></span>
             </div>
           </div>
 
-          {/* Quick Actions in Banner */}
-          <div className="flex flex-wrap lg:flex-col gap-2.5 shrink-0 relative z-10">
-            <button
-              onClick={() => onNavigate('e-kinerja')}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all transform hover:-translate-y-0.5"
-            >
-              <Plus className="w-4 h-4 text-emerald-100" />
-              <span>Input Kegiatan Baru</span>
-            </button>
-            <div className="flex items-center gap-2">
+          {/* Right Action Buttons matching the reference image (Dark Green, Golden Amber, Outlined Mint) */}
+          <div className="flex flex-col sm:flex-row xl:flex-col items-stretch sm:items-center xl:items-end gap-3 shrink-0">
+            <div className="flex flex-wrap items-center gap-2.5">
               <button
-                onClick={() => onNavigate('profile')}
-                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs border border-white/10 flex items-center gap-1.5 cursor-pointer transition-all"
+                onClick={() => onNavigate('e-kinerja')}
+                className="px-4 py-2.5 rounded-xl bg-[#065f46] hover:bg-[#064e3b] text-white font-bold text-xs sm:text-sm shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
-                <User className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Profil Guru</span>
+                <Plus className="w-4 h-4 text-white" />
+                <span>Input Kinerja Baru</span>
               </button>
+
               <button
-                onClick={() => onNavigate('settings')}
-                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs border border-white/10 flex items-center gap-1.5 cursor-pointer transition-all"
+                onClick={() => onNavigate('jurnal-mengajar')}
+                className="px-4 py-2.5 rounded-xl bg-[#fbbf24] hover:bg-[#f59e0b] border border-amber-500 text-slate-900 font-extrabold text-xs sm:text-sm shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
-                <Settings className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Pengaturan</span>
+                <FileText className="w-4 h-4 text-slate-900" />
+                <span>Buka Jurnal Guru</span>
               </button>
+
+              <button
+                onClick={() => onNavigate('e-kinerja')}
+                className="px-4 py-2.5 rounded-xl bg-[#a7f3d0] hover:bg-emerald-300 border-2 border-[#065f46] text-[#064e3b] font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer transition-all"
+              >
+                <Printer className="w-4 h-4 text-[#064e3b]" />
+                <span>Cetak Laporan</span>
+              </button>
+            </div>
+
+            {/* Multi-Teacher Quick Picker */}
+            <div className="flex items-center gap-2 bg-[#ecfdf5] px-3 py-1.5 rounded-xl border border-emerald-500 text-xs">
+              <label htmlFor="dashboard-guru-select" className="font-bold text-[#064e3b] flex items-center gap-1 shrink-0">
+                <UserCheck className="w-3.5 h-3.5" /> Pilih Guru:
+              </label>
+              <select
+                id="dashboard-guru-select"
+                value={activeTeacherId}
+                onChange={e => handleSwitchTeacher(e.target.value)}
+                className="px-2.5 py-1 rounded-lg bg-white border border-emerald-500 text-slate-900 text-xs font-bold focus:outline-none cursor-pointer"
+              >
+                {teachers.map(t => (
+                  <option key={t.id || t.fullName} value={t.id}>
+                    {t.fullName} ({t.schoolName})
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
 
         {/* Database & Cloud Synchronization Ribbon */}
-        <div className="pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-slate-300 flex-wrap">
+        <div className="pt-3 border-t border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 text-slate-700 flex-wrap font-medium">
             <span
               className={`w-2.5 h-2.5 rounded-full ${
-                supaConfig.url ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+                supaConfig.url ? 'bg-emerald-600' : 'bg-amber-500'
               } shrink-0`}
             />
-            <Cloud className={`w-4 h-4 ${supaConfig.url ? 'text-cyan-400' : 'text-amber-400'} shrink-0`} />
+            <Cloud className="w-4 h-4 text-[#065f46] shrink-0" />
             <span>
               {supaConfig.url ? (
                 <>
                   Penyimpanan Cloud Supabase Terhubung:{' '}
-                  <code className="text-cyan-300 font-mono text-[11px]">{supaConfig.url}</code>
+                  <code className="text-[#065f46] font-mono text-[11px] font-bold">{supaConfig.url}</code>
                 </>
               ) : (
-                <span className="text-slate-300">
+                <span>
                   Mode Penyimpanan Lokal Offline-First (IndexedDB Aman &amp; Aktif)
                 </span>
               )}
             </span>
             {lastSyncTime && supaConfig.url && (
-              <span className="text-[11px] text-slate-400">
+              <span className="text-[11px] text-slate-500">
                 &bull; Sinkron: {new Date(lastSyncTime).toLocaleTimeString('id-ID')}
               </span>
             )}
@@ -270,7 +250,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, show
             type="button"
             disabled={isSyncing}
             onClick={handleSyncNow}
-            className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-300 hover:text-cyan-200 font-semibold text-xs flex items-center gap-1.5 cursor-pointer transition-colors w-fit"
+            className="px-3 py-1.5 rounded-xl bg-[#ecfdf5] hover:bg-[#d1fae5] border border-emerald-500 text-[#064e3b] font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors w-fit"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
             <span>{isSyncing ? 'Menyinkronkan...' : 'Sinkronkan Data'}</span>
@@ -279,86 +259,102 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, show
       </div>
 
       {/* ============================================================================
-          KPI METRIC CARDS: INDIKATOR UTAMA E-KINERJA
+          KPI METRIC CARDS: INDIKATOR UTAMA E-KINERJA (Matching reference 4-card grid)
          ============================================================================ */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {/* Total Aktivitas E-Kinerja */}
-        <div className="glass rounded-2xl p-4 sm:p-5 flex flex-col justify-between border border-emerald-500/20 hover:border-emerald-500/40 transition-all shadow-md">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Total Kegiatan */}
+        <div className="bg-white rounded-2xl p-5 flex flex-col justify-between border-2 border-emerald-500 shadow-xs">
           <div className="flex items-center justify-between gap-2 mb-3">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <span className="text-xs sm:text-sm font-extrabold text-slate-900">
               Total Kegiatan
             </span>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow">
+            <div className="w-9 h-9 rounded-lg bg-[#d1fae5] border border-emerald-500 flex items-center justify-center text-[#065f46]">
               <ClipboardCheck className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <p className="text-2xl sm:text-3xl font-extrabold font-display text-white tabular-nums">
-              {totalActivities}
-            </p>
-            <p className="text-[11px] text-emerald-400 mt-0.5 font-medium flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3" />
-              <span>Aktivitas Harian Terinput</span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl font-extrabold font-display text-slate-900 tabular-nums">
+                {totalActivities}
+              </span>
+              <span className="text-xs font-semibold text-slate-700">
+                kegiatan tercatat
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 mt-1">
+              Total aktivitas harian terinput
             </p>
           </div>
         </div>
 
-        {/* Periode Aktif */}
-        <div className="glass rounded-2xl p-4 sm:p-5 flex flex-col justify-between border border-cyan-500/20 hover:border-cyan-500/40 transition-all shadow-md">
+        {/* Card 2: Periode Bulan */}
+        <div className="bg-white rounded-2xl p-5 flex flex-col justify-between border-2 border-emerald-500 shadow-xs">
           <div className="flex items-center justify-between gap-2 mb-3">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              Periode Bulan
+            <span className="text-xs sm:text-sm font-extrabold text-slate-900">
+              Periode Aktif
             </span>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow">
+            <div className="w-9 h-9 rounded-lg bg-[#d1fae5] border border-emerald-500 flex items-center justify-center text-[#065f46]">
               <Calendar className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <p className="text-xl sm:text-2xl font-extrabold font-display text-white truncate">
-              {activePeriod ? `${activePeriod.month} ${activePeriod.year}` : 'Belum Ada'}
-            </p>
-            <p className="text-[11px] text-cyan-300 mt-0.5">
-              {periods.length} Periode Bulan Terdaftar
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-xl sm:text-2xl font-extrabold font-display text-slate-900 truncate">
+                {activePeriod ? `${activePeriod.month} ${activePeriod.year}` : 'Belum Ada'}
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 mt-1">
+              {periods.length} periode bulan terdaftar
             </p>
           </div>
         </div>
 
-        {/* Kelengkapan Bukti Foto */}
-        <div className="glass rounded-2xl p-4 sm:p-5 flex flex-col justify-between border border-amber-500/20 hover:border-amber-500/40 transition-all shadow-md">
+        {/* Card 3: Dokumentasi Foto (Amber accent like "Butuh Remedial" in reference image) */}
+        <div className="bg-white rounded-2xl p-5 flex flex-col justify-between border-2 border-emerald-500 shadow-xs">
           <div className="flex items-center justify-between gap-2 mb-3">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <span className="text-xs sm:text-sm font-extrabold text-slate-900">
               Dokumentasi Foto
             </span>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white shadow">
+            <div className="w-9 h-9 rounded-lg bg-amber-50 border border-amber-400 flex items-center justify-center text-amber-700">
               <Camera className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <p className="text-2xl sm:text-3xl font-extrabold font-display text-white tabular-nums">
-              {withPhotosCount}
-            </p>
-            <p className="text-[11px] text-amber-300 mt-0.5">
-              Kegiatan Dilengkapi Bukti Fisik
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl font-extrabold font-display text-amber-700 tabular-nums">
+                {withPhotosCount}
+              </span>
+              <span className="text-xs font-semibold text-slate-700">
+                kegiatan berfoto
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 mt-1">
+              Dilengkapi bukti fisik foto kegiatan
             </p>
           </div>
         </div>
 
-        {/* Status Tindak Lanjut */}
-        <div className="glass rounded-2xl p-4 sm:p-5 flex flex-col justify-between border border-indigo-500/20 hover:border-indigo-500/40 transition-all shadow-md">
+        {/* Card 4: Kelengkapan Tindak Lanjut */}
+        <div className="bg-white rounded-2xl p-5 flex flex-col justify-between border-2 border-emerald-500 shadow-xs">
           <div className="flex items-center justify-between gap-2 mb-3">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              Tindak Lanjut
+            <span className="text-xs sm:text-sm font-extrabold text-slate-900">
+              Kelengkapan Evaluasi
             </span>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow">
+            <div className="w-9 h-9 rounded-lg bg-[#d1fae5] border border-emerald-500 flex items-center justify-center text-[#065f46]">
               <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <p className="text-2xl sm:text-3xl font-extrabold font-display text-white tabular-nums">
-              {withTindakLanjutCount}
-            </p>
-            <p className="text-[11px] text-indigo-300 mt-0.5">
-              Aktivitas Ber-Evaluasi Lengkap
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl font-extrabold font-display text-slate-900 tabular-nums">
+                {totalActivities > 0 ? Math.round((withTindakLanjutCount / totalActivities) * 100) : 0}%
+              </span>
+              <span className="text-xs font-semibold text-slate-700">
+                terinput
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 mt-1">
+              {withTindakLanjutCount} dari {totalActivities} entri tindak lanjut
             </p>
           </div>
         </div>
@@ -370,80 +366,80 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, show
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <button
           onClick={() => onNavigate('e-kinerja')}
-          className="glass rounded-2xl p-5 border border-emerald-500/30 hover:border-emerald-400/60 transition-all text-left group flex items-start gap-4 shadow-lg hover:bg-emerald-500/5 cursor-pointer"
+          className="bg-white rounded-2xl p-5 border-2 border-emerald-500 hover:bg-[#ecfdf5] transition-all text-left group flex items-start gap-3.5 shadow-xs cursor-pointer"
         >
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-            <ClipboardCheck className="w-6 h-6" />
+          <div className="w-11 h-11 rounded-xl bg-[#d1fae5] border border-emerald-500 text-[#065f46] flex items-center justify-center shrink-0">
+            <ClipboardCheck className="w-5 h-5" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-sm text-white group-hover:text-emerald-300 transition-colors">
+              <h3 className="font-extrabold text-sm text-slate-900 group-hover:text-[#065f46] transition-colors">
                 Kelola E-Kinerja Harian
               </h3>
-              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-[#065f46] group-hover:translate-x-0.5 transition-all" />
             </div>
-            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-              Input RKH harian, uraian kegiatan, rencana aksi, tindak lanjut, dan unggah foto dokumentasi kegiatan.
+            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+              Input RHK harian, rencana aksi, tindak lanjut, dan unggah foto dokumentasi.
             </p>
           </div>
         </button>
 
         <button
           onClick={() => onNavigate('jurnal-mengajar')}
-          className="glass rounded-2xl p-5 border border-teal-500/30 hover:border-teal-400/60 transition-all text-left group flex items-start gap-4 shadow-lg hover:bg-teal-500/5 cursor-pointer"
+          className="bg-white rounded-2xl p-5 border-2 border-emerald-500 hover:bg-[#ecfdf5] transition-all text-left group flex items-start gap-3.5 shadow-xs cursor-pointer"
         >
-          <div className="w-12 h-12 rounded-2xl bg-teal-500/20 border border-teal-500/40 text-teal-300 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-            <FileText className="w-6 h-6" />
+          <div className="w-11 h-11 rounded-xl bg-[#d1fae5] border border-emerald-500 text-[#065f46] flex items-center justify-center shrink-0">
+            <FileText className="w-5 h-5" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-sm text-white group-hover:text-teal-300 transition-colors">
+              <h3 className="font-extrabold text-sm text-slate-900 group-hover:text-[#065f46] transition-colors">
                 Jurnal Mengajar Guru
               </h3>
-              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-teal-400 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-[#065f46] group-hover:translate-x-0.5 transition-all" />
             </div>
-            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-              Buat jurnal pelaksanaan KBM profesional, presensi siswa, refleksi &amp; cetak sebagai bukti fisik E-Kinerja.
+            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+              Buat jurnal pelaksanaan KBM profesional, presensi siswa, refleksi &amp; cetak bukti fisik.
             </p>
           </div>
         </button>
 
         <button
           onClick={() => onNavigate('profile')}
-          className="glass rounded-2xl p-5 border border-cyan-500/30 hover:border-cyan-400/60 transition-all text-left group flex items-start gap-4 shadow-lg hover:bg-cyan-500/5 cursor-pointer"
+          className="bg-white rounded-2xl p-5 border-2 border-emerald-500 hover:bg-[#ecfdf5] transition-all text-left group flex items-start gap-3.5 shadow-xs cursor-pointer"
         >
-          <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-            <User className="w-6 h-6" />
+          <div className="w-11 h-11 rounded-xl bg-[#d1fae5] border border-emerald-500 text-[#065f46] flex items-center justify-center shrink-0">
+            <User className="w-5 h-5" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-sm text-white group-hover:text-cyan-300 transition-colors">
+              <h3 className="font-extrabold text-sm text-slate-900 group-hover:text-[#065f46] transition-colors">
                 Profil &amp; Identitas Pegawai
               </h3>
-              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-[#065f46] group-hover:translate-x-0.5 transition-all" />
             </div>
-            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-              Atur Nama Lengkap, NIP, Golongan/Pangkat, Tanda Tangan Digital, dan data satuan pendidikan.
+            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+              Atur Nama Lengkap, NIP, Pangkat/Golongan, Kepala Sekolah, dan Tanda Tangan.
             </p>
           </div>
         </button>
 
         <button
           onClick={() => onNavigate('settings')}
-          className="glass rounded-2xl p-5 border border-amber-500/30 hover:border-amber-400/60 transition-all text-left group flex items-start gap-4 shadow-lg hover:bg-amber-500/5 cursor-pointer"
+          className="bg-white rounded-2xl p-5 border-2 border-emerald-500 hover:bg-[#ecfdf5] transition-all text-left group flex items-start gap-3.5 shadow-xs cursor-pointer"
         >
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-            <Settings className="w-6 h-6" />
+          <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-400 text-amber-700 flex items-center justify-center shrink-0">
+            <Settings className="w-5 h-5" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-sm text-white group-hover:text-amber-300 transition-colors">
-                Pengaturan Sistem &amp; Profil
+              <h3 className="font-extrabold text-sm text-slate-900 group-hover:text-amber-700 transition-colors">
+                Pengaturan Sistem
               </h3>
-              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-amber-700 group-hover:translate-x-0.5 transition-all" />
             </div>
-            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-              Konfigurasi data satuan pendidikan, logo aplikasi, dan pengaturan sistem.
+            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+              Konfigurasi data satuan pendidikan, logo aplikasi, cadangan &amp; sinkronisasi.
             </p>
           </div>
         </button>
@@ -452,33 +448,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, show
       {/* ============================================================================
           MAIN SECTION: AKTIVITAS E-KINERJA TERBARU & REKAP BULANAN
          ============================================================================ */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Kolom 1 & 2: Daftar Aktivitas Terbaru */}
-        <div className="lg:col-span-2 glass rounded-3xl p-5 sm:p-6 border border-emerald-500/20 shadow-xl space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+        <div className="lg:col-span-2 bg-white rounded-2xl p-5 sm:p-6 border-2 border-emerald-500 shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-200 pb-4">
             <div>
               <div className="flex items-center gap-2">
-                <ClipboardCheck className="w-5 h-5 text-emerald-400" />
-                <h3 className="font-bold text-base sm:text-lg text-white font-display">
+                <ClipboardCheck className="w-5 h-5 text-[#065f46]" />
+                <h3 className="font-extrabold text-base sm:text-lg text-slate-900 font-display">
                   Aktivitas E-Kinerja Harian Terbaru
                 </h3>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-600 mt-0.5">
                 Riwayat catatan kegiatan, rencana aksi, dan tindak lanjut pelaksanaan tugas
               </p>
             </div>
 
             {/* Filter Periode */}
             <div className="flex items-center gap-2 self-start sm:self-auto">
-              <label className="text-xs text-slate-400 font-medium">Periode:</label>
+              <label className="text-xs text-slate-700 font-bold">Periode:</label>
               <select
                 value={selectedPeriodId}
                 onChange={e => setSelectedPeriodId(e.target.value)}
-                className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-emerald-300 text-xs font-semibold focus:outline-none focus:border-emerald-500"
+                className="px-3 py-1.5 rounded-xl bg-[#ecfdf5] border border-emerald-500 text-slate-900 text-xs font-bold focus:outline-none"
               >
-                <option value="all" className="bg-slate-900 text-white">Semua Periode ({activities.length})</option>
+                <option value="all">Semua Periode ({activities.length})</option>
                 {periods.map(p => (
-                  <option key={p.id} value={p.id} className="bg-slate-900 text-white">
+                  <option key={p.id} value={p.id}>
                     {p.month} {p.year}
                   </option>
                 ))}
@@ -488,21 +484,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, show
 
           {/* List Kegiatan */}
           {recentActivities.length === 0 ? (
-            <div className="text-center py-12 px-4 rounded-2xl bg-white/5 border border-dashed border-white/10 space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto">
+            <div className="text-center py-12 px-4 rounded-2xl bg-[#ecfdf5] border border-dashed border-emerald-500 space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-[#d1fae5] border border-emerald-500 text-[#065f46] flex items-center justify-center mx-auto">
                 <ClipboardCheck className="w-6 h-6" />
               </div>
-              <p className="text-sm font-bold text-slate-300">
+              <p className="text-sm font-extrabold text-slate-900">
                 Belum ada aktivitas E-Kinerja pada periode ini
               </p>
-              <p className="text-xs text-slate-400 max-w-md mx-auto">
+              <p className="text-xs text-slate-600 max-w-md mx-auto">
                 Mulai catat pelaksanaan kinerja harian Anda melalui formulir E-Kinerja yang telah disediakan.
               </p>
               <button
                 onClick={() => onNavigate('e-kinerja')}
-                className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-md transition-all"
+                className="px-4 py-2 rounded-xl bg-[#065f46] hover:bg-[#064e3b] text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4 text-white" />
                 <span>Tambah Kegiatan Hari Ini</span>
               </button>
             </div>
@@ -512,38 +508,38 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, show
                 <div
                   key={act.id}
                   onClick={() => onNavigate('e-kinerja')}
-                  className="p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-500/40 transition-all cursor-pointer group space-y-2"
+                  className="p-4 rounded-xl bg-[#f0fdf4] hover:bg-[#d1fae5]/70 border border-emerald-400 transition-all cursor-pointer group space-y-1.5"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold font-mono">
+                      <span className="px-2.5 py-0.5 rounded-lg bg-[#a7f3d0] border border-emerald-600 text-[#064e3b] text-xs font-extrabold font-mono">
                         {act.date}
                       </span>
                       {act.photos && act.photos.length > 0 && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-semibold">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-100 border border-amber-400 text-amber-900 text-[10px] font-bold">
                           <Camera className="w-3 h-3" /> {act.photos.length} Foto
                         </span>
                       )}
                     </div>
-                    <span className="text-[11px] text-slate-400 flex items-center gap-1 group-hover:text-emerald-400 transition-colors">
+                    <span className="text-[11px] text-[#065f46] font-bold flex items-center gap-1">
                       <span>Buka di E-Kinerja</span>
                       <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                     </span>
                   </div>
 
                   {act.rkhText && (
-                    <div className="text-xs font-semibold text-cyan-300 line-clamp-1">
-                      RKH: {act.rkhText}
+                    <div className="text-xs font-bold text-[#065f46] line-clamp-1">
+                      RHK: {act.rkhText}
                     </div>
                   )}
 
-                  <p className="text-xs sm:text-sm font-bold text-white group-hover:text-emerald-200 transition-colors line-clamp-2">
+                  <p className="text-xs sm:text-sm font-extrabold text-slate-900 line-clamp-2">
                     {act.rencanaAksiText || 'Tidak ada rincian aksi'}
                   </p>
 
                   {act.tindakLanjutText && (
-                    <p className="text-xs text-slate-300 line-clamp-1">
-                      <span className="text-slate-400 font-medium">Tindak Lanjut: </span>
+                    <p className="text-xs text-slate-700 line-clamp-1">
+                      <span className="text-slate-600 font-semibold">Tindak Lanjut: </span>
                       {act.tindakLanjutText}
                     </p>
                   )}
@@ -551,12 +547,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, show
               ))}
 
               <div className="pt-2 flex items-center justify-between">
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-slate-600 font-medium">
                   Menampilkan {recentActivities.length} dari {filteredCount} kegiatan
                 </span>
                 <button
                   onClick={() => onNavigate('e-kinerja')}
-                  className="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1 cursor-pointer transition-colors"
+                  className="text-xs font-extrabold text-[#065f46] hover:text-[#064e3b] flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <span>Lihat Seluruh Aktivitas &amp; Cetak Laporan</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -567,19 +563,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, show
         </div>
 
         {/* Kolom 3: Rekap Periode & Informasi Pegawai */}
-        <div className="space-y-6">
+        <div className="space-y-5">
           {/* Rekap Kegiatan Per Periode Bulan */}
-          <div className="glass rounded-3xl p-5 sm:p-6 border border-white/10 shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <h3 className="font-bold text-sm sm:text-base text-white font-display flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-cyan-400" /> Rekapitulasi per Periode
+          <div className="bg-white rounded-2xl p-5 sm:p-6 border-2 border-emerald-500 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-emerald-200 pb-3">
+              <h3 className="font-extrabold text-sm sm:text-base text-slate-900 font-display flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-[#065f46]" /> Rekapitulasi per Periode
               </h3>
-              <span className="text-xs text-slate-400">{periods.length} Bulan</span>
+              <span className="text-xs font-bold text-slate-600">{periods.length} Bulan</span>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {periodDistribution.length === 0 ? (
-                <p className="text-xs text-slate-400 text-center py-4">
+                <p className="text-xs text-slate-600 text-center py-4">
                   Belum ada periode yang dibuat
                 </p>
               ) : (
@@ -590,16 +586,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, show
                       setSelectedPeriodId(item.id);
                       onNavigate('e-kinerja');
                     }}
-                    className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-500/40 transition-all cursor-pointer flex items-center justify-between gap-3"
+                    className="p-3 rounded-xl bg-[#f0fdf4] hover:bg-[#d1fae5] border border-emerald-400 transition-all cursor-pointer flex items-center justify-between gap-3"
                   >
                     <div>
-                      <p className="text-xs font-bold text-white">{item.label}</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
+                      <p className="text-xs font-extrabold text-slate-900">{item.label}</p>
+                      <p className="text-[11px] text-slate-600 mt-0.5">
                         {item.count > 0 ? `${item.count} hari kegiatan tercatat` : 'Belum ada kegiatan'}
                       </p>
                     </div>
-                    <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold font-mono">
-                      {item.count} RKH
+                    <span className="px-2.5 py-1 rounded-lg bg-[#a7f3d0] border border-emerald-600 text-[#064e3b] text-xs font-extrabold font-mono">
+                      {item.count} Keg
                     </span>
                   </div>
                 ))
@@ -608,32 +604,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate, show
 
             <button
               onClick={() => onNavigate('e-kinerja')}
-              className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-slate-200 hover:text-white text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors"
+              className="w-full py-2.5 rounded-xl bg-[#065f46] hover:bg-[#064e3b] text-white text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors"
             >
-              <Printer className="w-4 h-4 text-emerald-400" />
+              <Printer className="w-4 h-4 text-white" />
               <span>Cetak Laporan E-Kinerja Bulan Ini</span>
             </button>
           </div>
 
           {/* Informasi Satuan Pendidikan */}
-          <div className="glass rounded-3xl p-5 sm:p-6 border border-white/10 shadow-xl space-y-3 text-xs">
-            <h3 className="font-bold text-sm text-white font-display flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-emerald-400" /> Informasi Satuan Pendidikan
+          <div className="bg-white rounded-2xl p-5 sm:p-6 border-2 border-emerald-500 shadow-xs space-y-3 text-xs">
+            <h3 className="font-extrabold text-sm text-slate-900 font-display flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-[#065f46]" /> Informasi Satuan Pendidikan
             </h3>
-            <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+            <div className="p-3.5 rounded-xl bg-[#f0fdf4] border border-emerald-400 space-y-2">
               <div>
-                <p className="text-[10px] text-slate-400 uppercase font-semibold">Satuan Pendidikan</p>
-                <p className="font-bold text-emerald-300 text-xs">{appSettings.schoolName || 'SDN Ciketing Udik 2 Bantargebang'}</p>
-                <p className="text-slate-400 text-[11px] mt-0.5">{appSettings.schoolAddress || 'Jl. Raya Ciketing Udik No. 2, Bantargebang, Kota Bekasi'}</p>
+                <p className="text-[10px] text-slate-600 uppercase font-bold">Satuan Pendidikan</p>
+                <p className="font-extrabold text-[#065f46] text-xs">{teacherProfile.schoolName || appSettings.schoolName || 'SDN Ciketing Udik 2'}</p>
+                <p className="text-slate-600 text-[11px] mt-0.5">{teacherProfile.schoolAddress || appSettings.schoolAddress || 'Jl. Raya Ciketing Udik No. 2, Bantargebang, Kota Bekasi'}</p>
               </div>
-              <div className="pt-2 border-t border-white/10">
-                <p className="text-[10px] text-slate-400 uppercase font-semibold">Tahun Ajaran Aktif</p>
-                <p className="font-bold text-white text-xs">{appSettings.academicYear || '2026/2027'}</p>
+              <div className="pt-2 border-t border-emerald-200">
+                <p className="text-[10px] text-slate-600 uppercase font-bold">Tahun Ajaran Aktif</p>
+                <p className="font-extrabold text-slate-900 text-xs">{appSettings.academicYear || '2026/2027'}</p>
               </div>
             </div>
             <button
               onClick={() => onNavigate('settings')}
-              className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+              className="text-xs text-[#065f46] hover:text-[#064e3b] font-extrabold flex items-center gap-1 cursor-pointer transition-colors"
             >
               <span>Ubah data di Pengaturan</span>
               <ChevronRight className="w-3.5 h-3.5" />

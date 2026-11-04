@@ -3,6 +3,8 @@
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #a7f3d0;
+    color: #0f172a;
   }
 }
 
@@ -15,31 +17,164 @@
 }
 
 .glass {
-  background: rgba(15, 23, 42, 0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: #ffffff;
+  border: 1.5px solid #10b981;
+  box-shadow: 0 4px 12px rgba(6, 95, 70, 0.06);
 }
 
 .glass-strong {
-  background: rgba(15, 23, 42, 0.88);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: #ffffff;
+  border: 2px solid #10b981;
+  box-shadow: 0 6px 18px rgba(6, 95, 70, 0.08);
 }
 
 .scrollbar-thin::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.4);
+  background: #d1fae5;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: #059669;
   border-radius: 9999px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.4);
+  background: #065f46;
+}
+
+/* Light Mint & White Card Theme Adaptation for Inner Views */
+.theme-mint .bg-slate-950,
+.theme-mint .bg-slate-950\/90,
+.theme-mint .bg-slate-950\/80,
+.theme-mint .bg-slate-950\/70,
+.theme-mint .bg-slate-950\/60,
+.theme-mint .bg-slate-950\/50,
+.theme-mint .bg-slate-950\/40 {
+  background-color: #f0fdf4 !important;
+}
+
+.theme-mint .bg-slate-900,
+.theme-mint .bg-slate-900\/95,
+.theme-mint .bg-slate-900\/90,
+.theme-mint .bg-slate-900\/80,
+.theme-mint .bg-slate-900\/70,
+.theme-mint .bg-slate-900\/60,
+.theme-mint .bg-slate-900\/50,
+.theme-mint .bg-slate-900\/40,
+.theme-mint .bg-slate-800,
+.theme-mint .bg-slate-800\/90,
+.theme-mint .bg-slate-800\/80,
+.theme-mint .bg-slate-800\/60 {
+  background-color: #ffffff !important;
+}
+
+.theme-mint .bg-white\/5,
+.theme-mint .bg-white\/10,
+.theme-mint .bg-white\/15,
+.theme-mint .bg-white\/\[0\.02\],
+.theme-mint .bg-white\/\[0\.03\],
+.theme-mint .bg-white\/\[0\.04\] {
+  background-color: #ecfdf5 !important;
+}
+
+.theme-mint .border-white\/5,
+.theme-mint .border-white\/10,
+.theme-mint .border-white\/15,
+.theme-mint .border-white\/20,
+.theme-mint .border-slate-700,
+.theme-mint .border-slate-700\/50,
+.theme-mint .border-slate-800 {
+  border-color: #10b981 !important;
+}
+
+.theme-mint .divide-white\/5 > :not([hidden]) ~ :not([hidden]),
+.theme-mint .divide-white\/10 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #a7f3d0 !important;
+}
+
+/* Text readability on white & light mint cards */
+.theme-mint .text-white:not(button):not(button *):not(a):not(.badge-solid) {
+  color: #0f172a !important;
+}
+
+.theme-mint button.bg-white\/5,
+.theme-mint button.bg-white\/10,
+.theme-mint button.bg-white\/15,
+.theme-mint button.bg-slate-800,
+.theme-mint button.bg-slate-900 {
+  color: #064e3b !important;
+  border-color: #10b981 !important;
+}
+
+.theme-mint button.bg-white\/5 *,
+.theme-mint button.bg-white\/10 *,
+.theme-mint button.bg-white\/15 *,
+.theme-mint button.bg-slate-800 *,
+.theme-mint button.bg-slate-900 * {
+  color: #064e3b !important;
+}
+
+.theme-mint .text-slate-100,
+.theme-mint .text-slate-200 {
+  color: #1e293b !important;
+}
+
+.theme-mint .text-slate-300 {
+  color: #334155 !important;
+}
+
+.theme-mint .text-slate-400,
+.theme-mint .text-slate-500 {
+  color: #475569 !important;
+}
+
+.theme-mint .text-emerald-200,
+.theme-mint .text-emerald-300,
+.theme-mint .text-emerald-400 {
+  color: #065f46 !important;
+}
+
+.theme-mint .text-teal-200,
+.theme-mint .text-teal-300,
+.theme-mint .text-teal-400,
+.theme-mint .text-cyan-200,
+.theme-mint .text-cyan-300,
+.theme-mint .text-cyan-400 {
+  color: #0f766e !important;
+}
+
+.theme-mint .text-amber-200,
+.theme-mint .text-amber-300,
+.theme-mint .text-amber-400 {
+  color: #b45309 !important;
+}
+
+.theme-mint .text-indigo-200,
+.theme-mint .text-indigo-300,
+.theme-mint .text-indigo-400,
+.theme-mint .text-purple-300 {
+  color: #3730a3 !important;
+}
+
+.theme-mint .text-rose-200,
+.theme-mint .text-rose-300,
+.theme-mint .text-rose-400 {
+  color: #be123c !important;
+}
+
+.theme-mint input,
+.theme-mint select,
+.theme-mint textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #10b981 !important;
+}
+
+.theme-mint input::placeholder,
+.theme-mint textarea::placeholder {
+  color: #64748b !important;
 }
