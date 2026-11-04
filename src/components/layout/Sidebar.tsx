@@ -69,7 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }`}
       >
         {/* Brand Header (Mint Green Box matching reference image) */}
-        <div className="p-4 sm:p-5 bg-[#a7f3d0] border-b-2 border-emerald-500 flex items-center justify-between">
+        <div className="p-4 sm:p-5 bg-[#a7f3d0] border-b-2 border-emerald-600 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
               src={appSettings.appLogoUrl || 'https://jhlryjdhotxtndavacpd.supabase.co/storage/v1/object/public/logo/logo.png'}
@@ -80,40 +80,40 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
             />
             <div>
-              <h2 className="font-display font-extrabold text-sm sm:text-base text-slate-900 tracking-wide uppercase">
+              <h2 className="font-display font-black text-sm sm:text-base text-slate-950 tracking-wide uppercase">
                 E-KINERJA GURU PAI
               </h2>
-              <p className="text-[11px] text-slate-800 font-semibold truncate max-w-[160px]" title={activeTeacher.schoolName}>
+              <p className="text-xs text-slate-900 font-bold truncate max-w-[160px]" title={activeTeacher.schoolName}>
                 {activeTeacher.schoolName || 'SDN Ciketing Udik 2'}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="lg:hidden p-1.5 text-slate-700 hover:text-slate-900 rounded-lg hover:bg-emerald-300/50 transition-colors"
+            className="lg:hidden p-1.5 text-slate-900 hover:text-slate-950 rounded-lg hover:bg-emerald-300/50 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* User Card */}
-        <div className="p-3.5 border-b border-emerald-200">
+        <div className="p-3.5 border-b border-emerald-300">
           <div
             onClick={() => {
               onNavigate('profile');
               onClose();
             }}
-            className="bg-white rounded-xl p-3 flex items-center justify-between gap-2.5 border-2 border-emerald-500 hover:bg-emerald-50/60 transition-colors cursor-pointer"
+            className="bg-white rounded-xl p-3 flex items-center justify-between gap-2.5 border-2 border-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer"
           >
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-extrabold text-slate-900 truncate" title={activeTeacher.fullName}>
+              <p className="text-xs sm:text-sm font-black text-slate-950 truncate" title={activeTeacher.fullName}>
                 {activeTeacher.fullName || session.fullName}
               </p>
-              <p className="text-[11px] text-slate-700 font-medium truncate mt-0.5">
-                {activeTeacher.jabatan || 'Guru PAI'} &bull; <span className="underline font-semibold text-[#065f46]">Ganti</span>
+              <p className="text-xs text-slate-900 font-bold truncate mt-0.5">
+                {activeTeacher.jabatan || 'Guru PAI'} &bull; <span className="underline font-extrabold text-[#064e3b]">Ganti</span>
               </p>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-700 shrink-0" />
+            <ChevronRight className="w-4 h-4 text-slate-900 shrink-0" />
           </div>
         </div>
 
@@ -129,15 +129,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onNavigate(item.id);
                   onClose();
                 }}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
                   isActive
                     ? 'bg-[#065f46] text-white shadow-sm'
-                    : 'text-slate-800 hover:bg-[#d1fae5] hover:text-[#064e3b]'
+                    : 'text-slate-950 hover:bg-[#d1fae5] hover:text-[#064e3b]'
                 }`}
               >
                 <Icon
                   className={`w-4 h-4 shrink-0 transition-colors ${
-                    isActive ? 'text-white' : 'text-[#065f46]'
+                    isActive ? 'text-white' : 'text-[#064e3b]'
                   }`}
                 />
                 <span className="truncate">{item.label}</span>
@@ -147,12 +147,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
 
         {/* Logout Button */}
-        <div className="p-3 border-t border-emerald-200">
+        <div className="p-3 border-t border-emerald-300">
           <button
             onClick={onLogout}
-            className="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-400 text-rose-700 text-xs font-bold transition-all cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-rose-100 hover:bg-rose-200 border-2 border-rose-600 text-rose-950 text-xs font-extrabold transition-all cursor-pointer"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4 text-rose-900" />
             <span>Keluar Aplikasi</span>
           </button>
         </div>

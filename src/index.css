@@ -4,7 +4,10 @@
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     background-color: #a7f3d0;
-    color: #0f172a;
+    color: #020617;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 }
 
@@ -18,14 +21,14 @@
 
 .glass {
   background: #ffffff;
-  border: 1.5px solid #10b981;
-  box-shadow: 0 4px 12px rgba(6, 95, 70, 0.06);
+  border: 2px solid #059669;
+  box-shadow: 0 4px 12px rgba(6, 78, 59, 0.08);
 }
 
 .glass-strong {
   background: #ffffff;
-  border: 2px solid #10b981;
-  box-shadow: 0 6px 18px rgba(6, 95, 70, 0.08);
+  border: 2px solid #047857;
+  box-shadow: 0 6px 18px rgba(6, 78, 59, 0.12);
 }
 
 .scrollbar-thin::-webkit-scrollbar {
@@ -38,15 +41,20 @@
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #059669;
+  background: #047857;
   border-radius: 9999px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: #065f46;
+  background: #064e3b;
 }
 
-/* Light Mint & White Card Theme Adaptation for Inner Views */
+/* ============================================================================
+   HIGH-CONTRAST MINT & WHITE CARD THEME FOR ALL VIEWS
+   Ensures all lettering/typography is ultra-clear, dark, and high contrast
+   ============================================================================ */
+
+/* Surface & Card Backgrounds */
 .theme-mint .bg-slate-950,
 .theme-mint .bg-slate-950\/90,
 .theme-mint .bg-slate-950\/80,
@@ -54,7 +62,7 @@
 .theme-mint .bg-slate-950\/60,
 .theme-mint .bg-slate-950\/50,
 .theme-mint .bg-slate-950\/40 {
-  background-color: #f0fdf4 !important;
+  background-color: #ecfdf5 !important;
 }
 
 .theme-mint .bg-slate-900,
@@ -68,113 +76,249 @@
 .theme-mint .bg-slate-800,
 .theme-mint .bg-slate-800\/90,
 .theme-mint .bg-slate-800\/80,
-.theme-mint .bg-slate-800\/60 {
+.theme-mint .bg-slate-800\/60,
+.theme-mint .bg-slate-800\/50,
+.theme-mint .bg-slate-800\/40 {
   background-color: #ffffff !important;
 }
 
 .theme-mint .bg-white\/5,
 .theme-mint .bg-white\/10,
 .theme-mint .bg-white\/15,
+.theme-mint .bg-white\/20,
 .theme-mint .bg-white\/\[0\.02\],
 .theme-mint .bg-white\/\[0\.03\],
 .theme-mint .bg-white\/\[0\.04\] {
   background-color: #ecfdf5 !important;
 }
 
+/* Translucent Colored Panels & Badges -> Solid High-Contrast Light Tints */
+.theme-mint .bg-emerald-500\/5,
+.theme-mint .bg-emerald-500\/10,
+.theme-mint .bg-emerald-500\/15,
+.theme-mint .bg-emerald-500\/20,
+.theme-mint .bg-emerald-500\/30,
+.theme-mint .bg-teal-500\/10,
+.theme-mint .bg-teal-500\/20 {
+  background-color: #d1fae5 !important;
+}
+
+.theme-mint .bg-amber-500\/5,
+.theme-mint .bg-amber-500\/10,
+.theme-mint .bg-amber-500\/15,
+.theme-mint .bg-amber-500\/20,
+.theme-mint .bg-amber-500\/30 {
+  background-color: #fef3c7 !important;
+}
+
+.theme-mint .bg-indigo-500\/5,
+.theme-mint .bg-indigo-500\/10,
+.theme-mint .bg-indigo-500\/15,
+.theme-mint .bg-indigo-500\/20,
+.theme-mint .bg-indigo-500\/30,
+.theme-mint .bg-purple-500\/10,
+.theme-mint .bg-purple-500\/20 {
+  background-color: #e0e7ff !important;
+}
+
+.theme-mint .bg-cyan-500\/10,
+.theme-mint .bg-cyan-500\/15,
+.theme-mint .bg-cyan-500\/20 {
+  background-color: #cffafe !important;
+}
+
+.theme-mint .bg-rose-500\/5,
+.theme-mint .bg-rose-500\/10,
+.theme-mint .bg-rose-500\/15,
+.theme-mint .bg-rose-500\/20,
+.theme-mint .bg-rose-500\/30 {
+  background-color: #ffe4e6 !important;
+}
+
+/* Crisp Borders */
 .theme-mint .border-white\/5,
 .theme-mint .border-white\/10,
 .theme-mint .border-white\/15,
 .theme-mint .border-white\/20,
 .theme-mint .border-slate-700,
 .theme-mint .border-slate-700\/50,
-.theme-mint .border-slate-800 {
-  border-color: #10b981 !important;
+.theme-mint .border-slate-800,
+.theme-mint .border-emerald-500\/20,
+.theme-mint .border-emerald-500\/30,
+.theme-mint .border-emerald-500\/40 {
+  border-color: #059669 !important;
+}
+
+.theme-mint .border-amber-500\/20,
+.theme-mint .border-amber-500\/30,
+.theme-mint .border-amber-500\/40 {
+  border-color: #d97706 !important;
+}
+
+.theme-mint .border-indigo-500\/20,
+.theme-mint .border-indigo-500\/30,
+.theme-mint .border-indigo-500\/40,
+.theme-mint .border-purple-500\/30 {
+  border-color: #4f46e5 !important;
+}
+
+.theme-mint .border-rose-500\/20,
+.theme-mint .border-rose-500\/30,
+.theme-mint .border-rose-500\/40 {
+  border-color: #e11d48 !important;
 }
 
 .theme-mint .divide-white\/5 > :not([hidden]) ~ :not([hidden]),
 .theme-mint .divide-white\/10 > :not([hidden]) ~ :not([hidden]) {
-  border-color: #a7f3d0 !important;
+  border-color: #6ee7b7 !important;
 }
 
-/* Text readability on white & light mint cards */
-.theme-mint .text-white:not(button):not(button *):not(a):not(.badge-solid) {
-  color: #0f172a !important;
-}
-
-.theme-mint button.bg-white\/5,
-.theme-mint button.bg-white\/10,
-.theme-mint button.bg-white\/15,
-.theme-mint button.bg-slate-800,
-.theme-mint button.bg-slate-900 {
-  color: #064e3b !important;
-  border-color: #10b981 !important;
-}
-
-.theme-mint button.bg-white\/5 *,
-.theme-mint button.bg-white\/10 *,
-.theme-mint button.bg-white\/15 *,
-.theme-mint button.bg-slate-800 *,
-.theme-mint button.bg-slate-900 * {
-  color: #064e3b !important;
-}
-
+/* ============================================================================
+   ULTRA-HIGH CONTRAST TYPOGRAPHY RULES
+   All text defaults to deep black/slate (#020617 / #0f172a) on light surfaces
+   ============================================================================ */
+.theme-mint .text-white,
+.theme-mint .text-slate-50,
 .theme-mint .text-slate-100,
-.theme-mint .text-slate-200 {
-  color: #1e293b !important;
+.theme-mint .text-slate-200,
+.theme-mint .text-slate-300,
+.theme-mint .text-slate-800,
+.theme-mint .text-slate-900,
+.theme-mint .text-slate-950 {
+  color: #020617 !important;
 }
 
-.theme-mint .text-slate-300 {
-  color: #334155 !important;
-}
-
+/* Eliminate washed-out gray text: make all secondary text dark & clear */
 .theme-mint .text-slate-400,
-.theme-mint .text-slate-500 {
-  color: #475569 !important;
+.theme-mint .text-slate-500,
+.theme-mint .text-slate-600,
+.theme-mint .text-slate-700 {
+  color: #0f172a !important;
+  font-weight: 600;
 }
 
+/* Deep Forest Green for Emerald/Teal/Cyan Accent Text */
+.theme-mint .text-emerald-100,
 .theme-mint .text-emerald-200,
 .theme-mint .text-emerald-300,
-.theme-mint .text-emerald-400 {
-  color: #065f46 !important;
-}
-
+.theme-mint .text-emerald-400,
+.theme-mint .text-emerald-500,
+.theme-mint .text-emerald-600,
+.theme-mint .text-emerald-700,
+.theme-mint .text-emerald-800,
+.theme-mint .text-emerald-900,
 .theme-mint .text-teal-200,
 .theme-mint .text-teal-300,
 .theme-mint .text-teal-400,
 .theme-mint .text-cyan-200,
 .theme-mint .text-cyan-300,
 .theme-mint .text-cyan-400 {
-  color: #0f766e !important;
+  color: #064e3b !important;
 }
 
+/* Deep Brown-Amber for Amber/Yellow Accent Text */
+.theme-mint .text-amber-100,
 .theme-mint .text-amber-200,
 .theme-mint .text-amber-300,
-.theme-mint .text-amber-400 {
-  color: #b45309 !important;
+.theme-mint .text-amber-400,
+.theme-mint .text-amber-500,
+.theme-mint .text-amber-600,
+.theme-mint .text-amber-700,
+.theme-mint .text-amber-800,
+.theme-mint .text-amber-900 {
+  color: #78350f !important;
 }
 
+/* Deep Navy/Indigo for Indigo/Purple/Blue Accent Text */
+.theme-mint .text-indigo-100,
 .theme-mint .text-indigo-200,
 .theme-mint .text-indigo-300,
 .theme-mint .text-indigo-400,
-.theme-mint .text-purple-300 {
-  color: #3730a3 !important;
+.theme-mint .text-indigo-500,
+.theme-mint .text-purple-200,
+.theme-mint .text-purple-300,
+.theme-mint .text-purple-400 {
+  color: #1e1b4b !important;
 }
 
+/* Deep Crimson for Rose/Red Accent Text */
+.theme-mint .text-rose-100,
 .theme-mint .text-rose-200,
 .theme-mint .text-rose-300,
-.theme-mint .text-rose-400 {
-  color: #be123c !important;
+.theme-mint .text-rose-400,
+.theme-mint .text-rose-500,
+.theme-mint .text-rose-600,
+.theme-mint .text-rose-700 {
+  color: #881337 !important;
 }
 
+/* ============================================================================
+   SOLID DARK BUTTONS & GRADIENT CTA BUTTONS -> CRISP PURE WHITE TEXT
+   ============================================================================ */
+.theme-mint .bg-\[\#065f46\],
+.theme-mint .bg-\[\#065f46\] *,
+.theme-mint .bg-\[\#064e3b\],
+.theme-mint .bg-\[\#064e3b\] *,
+.theme-mint .bg-emerald-600,
+.theme-mint .bg-emerald-600 *,
+.theme-mint .bg-emerald-700,
+.theme-mint .bg-emerald-700 *,
+.theme-mint .bg-teal-600,
+.theme-mint .bg-teal-600 *,
+.theme-mint .bg-indigo-600,
+.theme-mint .bg-indigo-600 *,
+.theme-mint .bg-rose-600,
+.theme-mint .bg-rose-600 *,
+.theme-mint .bg-blue-600,
+.theme-mint .bg-blue-600 *,
+.theme-mint .bg-purple-600,
+.theme-mint .bg-purple-600 *,
+.theme-mint [class*="from-emerald-500"],
+.theme-mint [class*="from-emerald-500"] *,
+.theme-mint [class*="from-emerald-600"],
+.theme-mint [class*="from-emerald-600"] *,
+.theme-mint [class*="from-indigo-500"],
+.theme-mint [class*="from-indigo-500"] *,
+.theme-mint [class*="from-indigo-600"],
+.theme-mint [class*="from-indigo-600"] *,
+.theme-mint [class*="from-rose-500"],
+.theme-mint [class*="from-rose-500"] *,
+.theme-mint [class*="from-cyan-500"],
+.theme-mint [class*="from-cyan-500"] *,
+.theme-mint [class*="from-amber-500"],
+.theme-mint [class*="from-amber-500"] * {
+  color: #ffffff !important;
+}
+
+/* Keep amber badge inside dark button dark-text for contrast */
+.theme-mint .bg-\[\#065f46\] .bg-amber-400 {
+  color: #020617 !important;
+}
+
+/* Form Controls: Inputs, Selects, Textareas */
 .theme-mint input,
 .theme-mint select,
 .theme-mint textarea {
   background-color: #ffffff !important;
-  color: #0f172a !important;
-  border-color: #10b981 !important;
+  color: #020617 !important;
+  font-weight: 600 !important;
+  border-color: #059669 !important;
 }
 
 .theme-mint input::placeholder,
 .theme-mint textarea::placeholder {
-  color: #64748b !important;
+  color: #475569 !important;
+  font-weight: 500 !important;
+}
+
+/* Tables inside views */
+.theme-mint table th {
+  color: #020617 !important;
+  font-weight: 800 !important;
+  background-color: #d1fae5 !important;
+}
+
+.theme-mint table td {
+  color: #020617 !important;
+  font-weight: 500;
 }

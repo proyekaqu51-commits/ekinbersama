@@ -129,20 +129,20 @@ export const Header: React.FC<HeaderProps> = ({
   });
 
   return (
-    <header className="bg-white sticky top-0 z-30 px-4 sm:px-6 py-3.5 flex items-center justify-between border-b-2 border-emerald-500 shrink-0 shadow-xs">
+    <header className="bg-white sticky top-0 z-30 px-4 sm:px-6 py-3.5 flex items-center justify-between border-b-2 border-emerald-600 shrink-0 shadow-xs">
       <div className="flex items-center gap-3 min-w-0">
         <button
           onClick={onToggleSidebar}
-          className="lg:hidden p-2 rounded-xl bg-[#d1fae5] border border-emerald-500 text-slate-900 hover:bg-emerald-200 transition-colors shrink-0"
+          className="lg:hidden p-2 rounded-xl bg-[#d1fae5] border-2 border-emerald-600 text-slate-950 hover:bg-emerald-200 transition-colors shrink-0"
           aria-label="Buka Menu"
         >
           <Menu className="w-5 h-5" />
         </button>
         <div className="min-w-0">
-          <h1 className="text-base sm:text-lg font-extrabold font-display text-slate-900 tracking-tight flex items-center gap-2 truncate">
+          <h1 className="text-base sm:text-lg font-black font-display text-slate-950 tracking-tight flex items-center gap-2 truncate">
             {title}
           </h1>
-          <p className="text-[11px] text-slate-600 hidden sm:block truncate max-w-md font-medium">
+          <p className="text-xs text-slate-800 hidden sm:block truncate max-w-md font-bold">
             {subtitle}
           </p>
         </div>
@@ -150,19 +150,19 @@ export const Header: React.FC<HeaderProps> = ({
 
       <div className="flex items-center gap-2 sm:gap-2.5 text-right shrink-0 relative">
         {/* Multi-Guru Quick Switcher styled like reference top-bar selector */}
-        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#d1fae5] border-2 border-emerald-500 text-xs">
-          <span className="font-extrabold text-slate-900 flex items-center gap-1">
-            <UserCheck className="w-3.5 h-3.5 text-[#065f46] shrink-0" />
+        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#d1fae5] border-2 border-emerald-600 text-xs">
+          <span className="font-black text-slate-950 flex items-center gap-1">
+            <UserCheck className="w-3.5 h-3.5 text-[#064e3b] shrink-0" />
             Guru:
           </span>
           <select
             value={activeTeacherId}
             onChange={e => handleHeaderTeacherSwitch(e.target.value)}
-            className="bg-white border border-emerald-600 rounded-lg px-2.5 py-1 text-slate-900 font-bold text-xs focus:outline-none cursor-pointer"
+            className="bg-white border border-emerald-700 rounded-lg px-2.5 py-1 text-slate-950 font-extrabold text-xs focus:outline-none cursor-pointer"
             title="Ganti Guru Aktif"
           >
             {teachers.map(t => (
-              <option key={t.id || t.fullName} value={t.id} className="bg-white text-slate-900">
+              <option key={t.id || t.fullName} value={t.id} className="bg-white text-slate-950 font-bold">
                 {t.fullName}
               </option>
             ))}
